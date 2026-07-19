@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from config import Config
 from extensions import db, bcrypt, jwt
+from utils.exceptions import AppError
 
 from routes.auth_routes import auth_bp
 from routes.restaurant_routes import restaurant_bp
@@ -25,6 +26,25 @@ def create_app():
     @app.route("/api/health", methods=["GET"])
     def health_check():
         return jsonify({"status": "ok", "service": "BookABite API"}), 200
+
+    # Global error handlers — ensures every error returns clean, consistent JSON
+    # instead of an HTML error page or a leaked stack trace.
+    @app.errorhandler(AppError)
+    def handle_app_error(e):
+        return jsonify(e.to_dict()), e.status_code
+
+    @app.errorhandler(404)
+    def handle_not_found(e):
+        return jsonify({"error": "The requested resource was not found."}), 404
+
+    @app.errorhandler(405)
+    def handle_method_not_allowed(e):
+        return jsonify({"error": "This HTTP method is not allowed for this endpoint."}), 405
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(e):
+        app.logger.exception("Unhandled exception")
+        return jsonify({"error": "Something went wrong. Please try again later."}), 500
 
     return app
 
