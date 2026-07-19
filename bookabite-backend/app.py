@@ -23,6 +23,8 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(restaurant_bp)
 
+    app.json.sort_keys = False
+
     @app.route("/api/health", methods=["GET"])
     def health_check():
         return jsonify({"status": "ok", "service": "BookABite API"}), 200

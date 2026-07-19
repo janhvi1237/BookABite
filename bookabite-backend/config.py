@@ -43,5 +43,3 @@ class Config:
     RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
 
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-
-    JSON_SORT_KEYS = False
