@@ -1,0 +1,158 @@
+/* ==========================================================================
+   BookABite - Help & FAQ Page Styles
+   ========================================================================== */
+
+.bab-faq-page {
+  min-height: calc(100vh - 80px);
+  background-color: var(--color-bg-cream);
+  padding: 60px 0 80px;
+}
+
+.bab-faq-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.bab-faq-header {
+  text-align: center;
+  margin-bottom: var(--space-10);
+}
+
+.bab-faq-header h1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-4xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+}
+
+.bab-faq-header p {
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.bab-faq-search-wrap {
+  position: relative;
+  max-width: 580px;
+  margin: var(--space-8) auto 0;
+}
+
+.bab-faq-search-input {
+  width: 100%;
+  padding: 14px 20px 14px 48px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: white;
+  font-size: var(--text-base);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.bab-faq-search-input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(214, 90, 58, 0.15);
+}
+
+.bab-faq-category-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.bab-faq-category-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: white;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bab-faq-category-btn:hover {
+  border-color: var(--color-secondary);
+  color: var(--color-text-dark);
+}
+
+.bab-faq-category-btn--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+/* Accordion */
+.bab-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-12);
+}
+
+.bab-faq-item {
+  background: white;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.bab-faq-item--open {
+  border-color: var(--color-secondary);
+}
+
+.bab-faq-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-5) var(--space-6);
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.bab-faq-answer {
+  padding: 0 var(--space-6) var(--space-6);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+/* Still have questions card */
+.bab-faq-support-card {
+  background: white;
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  border: 1px solid var(--color-border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.bab-faq-support-card h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.bab-faq-support-card p {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  max-width: 480px;
+  margin: 0;
+}

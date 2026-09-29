@@ -1,0 +1,115 @@
+/* ==========================================================================
+   BookABite - Search Results Page Styles
+   ========================================================================== */
+
+.bab-search-page {
+  min-height: calc(100vh - 80px);
+  background-color: var(--color-bg-cream);
+  padding: 40px 0 80px;
+}
+
+.bab-search-container {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.bab-search-hero {
+  background: white;
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-8);
+}
+
+.bab-search-hero__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-4);
+}
+
+.bab-search-bar-inline {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.bab-search-bar-inline__input-wrap {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+}
+
+.bab-search-bar-inline__select-wrap {
+  width: 180px;
+}
+
+.bab-search-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 2px;
+}
+
+.bab-search-tab-btn {
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bab-search-tab-btn:hover {
+  color: var(--color-secondary);
+}
+
+.bab-search-tab-btn--active {
+  color: var(--color-secondary);
+  border-bottom-color: var(--color-secondary);
+}
+
+.bab-search-results-section {
+  margin-bottom: var(--space-10);
+}
+
+.bab-search-results-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-5);
+}
+
+.bab-search-results-section__header h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.bab-search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-6);
+}
+
+.bab-dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-5);
+}
+
+@media (max-width: 640px) {
+  .bab-search-bar-inline {
+    flex-direction: column;
+  }
+  .bab-search-bar-inline__select-wrap {
+    width: 100%;
+  }
+}

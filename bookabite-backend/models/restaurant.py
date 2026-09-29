@@ -28,6 +28,7 @@ class Restaurant(db.Model):
     opening_time = db.Column(db.Time, nullable=True)
     closing_time = db.Column(db.Time, nullable=True)
     cover_image = db.Column(db.String(255), nullable=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"), nullable=True)
     is_instant_booking = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -38,10 +39,12 @@ class Restaurant(db.Model):
     tables = db.relationship("RestaurantTable", backref="restaurant", lazy=True)
     bookings = db.relationship("Booking", backref="restaurant", lazy=True)
     reviews = db.relationship("Review", backref="restaurant", lazy=True)
+    menu_items = db.relationship("MenuItem", backref="restaurant", cascade="all, delete-orphan", lazy=True)
 
     def to_dict(self, include_amenities=True):
         data = {
             "restaurant_id": self.restaurant_id,
+            "owner_id": self.owner_id,
             "name": self.name,
             "description": self.description,
             "address": self.address,

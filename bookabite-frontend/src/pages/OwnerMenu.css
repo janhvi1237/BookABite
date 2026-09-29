@@ -1,0 +1,788 @@
+/* ============================================================
+   BOOKABITE — OWNER MENU MANAGEMENT
+   ============================================================ */
+
+.owner-menu-page {
+  min-height: 100vh;
+  padding: 40px 20px 80px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 237, 213, 0.7), transparent 35%),
+    #faf9f7;
+}
+
+.owner-menu-container {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.owner-menu-header {
+  margin-bottom: 28px;
+}
+
+.owner-menu-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: #6b6259;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+
+.owner-menu-back-btn:hover {
+  color: #1f1b17;
+}
+
+.owner-menu-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.owner-menu-eyebrow {
+  color: #a05a28;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin-bottom: 8px;
+}
+
+.owner-menu-title-row h1 {
+  margin: 0;
+  color: #211c18;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.owner-menu-title-row p {
+  margin: 10px 0 0;
+  color: #756c64;
+  font-size: 15px;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.owner-menu-add-btn,
+.owner-menu-save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: #24201c;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 17px;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.owner-menu-add-btn:hover,
+.owner-menu-save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(36, 32, 28, 0.16);
+}
+
+.owner-menu-add-btn:disabled,
+.owner-menu-save-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+.owner-menu-success,
+.owner-menu-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.owner-menu-success {
+  background: #edf8ef;
+  color: #246b35;
+  border: 1px solid #ccebd2;
+}
+
+.owner-menu-error {
+  background: #fff0ee;
+  color: #a33b2e;
+  border: 1px solid #f3cec8;
+}
+
+.owner-menu-success span,
+.owner-menu-error span {
+  flex: 1;
+}
+
+.owner-menu-success button,
+.owner-menu-error button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+}
+
+
+/* ============================================================
+   FORM SECTION
+   ============================================================ */
+
+.owner-menu-form-section {
+  background: white;
+  border: 1px solid #e8e2dc;
+  border-radius: 20px;
+  margin-bottom: 42px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(38, 30, 22, 0.06);
+}
+
+.owner-menu-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #eee9e4;
+  background: #fcfbfa;
+}
+
+.owner-menu-form-header > div > span {
+  color: #a05a28;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.owner-menu-form-header h2 {
+  margin: 5px 0 0;
+  color: #211c18;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.owner-menu-form-close {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ded8d1;
+  border-radius: 10px;
+  background: white;
+  color: #655d56;
+  cursor: pointer;
+}
+
+.owner-menu-form-close:hover {
+  background: #f5f2ef;
+}
+
+.owner-menu-form {
+  padding: 24px;
+}
+
+.owner-menu-form-block {
+  padding: 0 0 25px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #eee9e4;
+}
+
+.owner-menu-form-block:last-of-type {
+  margin-bottom: 0;
+}
+
+.owner-menu-form-block-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  color: #332d27;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.owner-menu-form-block-title svg {
+  color: #a05a28;
+}
+
+.owner-menu-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.owner-menu-field {
+  min-width: 0;
+}
+
+.owner-menu-field-full {
+  grid-column: 1 / -1;
+}
+
+.owner-menu-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #403933;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.owner-menu-field input,
+.owner-menu-field textarea,
+.owner-menu-field select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ddd6cf;
+  border-radius: 10px;
+  background: white;
+  color: #27221e;
+  font: inherit;
+  font-size: 14px;
+  padding: 11px 12px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.owner-menu-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.owner-menu-field input:focus,
+.owner-menu-field textarea:focus,
+.owner-menu-field select:focus {
+  border-color: #b76b34;
+  box-shadow: 0 0 0 3px rgba(183, 107, 52, 0.1);
+}
+
+.owner-menu-field small {
+  display: block;
+  margin-top: 6px;
+  color: #8a8179;
+  font-size: 11px;
+}
+
+.owner-menu-input-prefix {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #ddd6cf;
+  border-radius: 10px;
+  background: white;
+}
+
+.owner-menu-input-prefix span {
+  padding-left: 12px;
+  color: #6d645c;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.owner-menu-input-prefix input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+
+/* ============================================================
+   CHECKBOX
+   ============================================================ */
+
+.owner-menu-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.owner-menu-checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.owner-menu-checkbox-box {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  border: 1px solid #cfc7bf;
+  border-radius: 6px;
+  background: white;
+  position: relative;
+}
+
+.owner-menu-checkbox input:checked + .owner-menu-checkbox-box {
+  background: #24201c;
+  border-color: #24201c;
+}
+
+.owner-menu-checkbox input:checked + .owner-menu-checkbox-box::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.owner-menu-checkbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.owner-menu-checkbox-text strong {
+  color: #302a25;
+  font-size: 14px;
+}
+
+.owner-menu-checkbox-text small {
+  color: #827970;
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
+.owner-menu-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.owner-menu-cancel-btn {
+  border: 1px solid #ddd6cf;
+  border-radius: 11px;
+  background: white;
+  color: #514a44;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 17px;
+  cursor: pointer;
+}
+
+.owner-menu-cancel-btn:hover {
+  background: #f7f4f1;
+}
+
+
+/* ============================================================
+   MANAGED SECTION
+   ============================================================ */
+
+.owner-menu-managed-section {
+  margin-top: 20px;
+}
+
+.owner-menu-managed-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 18px;
+}
+
+.owner-menu-managed-heading > div > span {
+  color: #a05a28;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.owner-menu-managed-heading h2 {
+  margin: 5px 0 0;
+  color: #211c18;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.owner-menu-loading {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #756c64;
+}
+
+.owner-menu-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #e4ded8;
+  border-top-color: #24201c;
+  border-radius: 50%;
+  animation: owner-menu-spin 0.8s linear infinite;
+}
+
+.owner-menu-loading p {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+@keyframes owner-menu-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.owner-menu-empty {
+  text-align: center;
+  padding: 70px 20px;
+  border: 1px dashed #d8d0c8;
+  border-radius: 18px;
+  background: white;
+}
+
+.owner-menu-empty-icon {
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: #f4ebe3;
+  color: #a05a28;
+}
+
+.owner-menu-empty h3 {
+  margin: 16px 0 7px;
+  color: #2c2722;
+  font-size: 19px;
+}
+
+.owner-menu-empty p {
+  margin: 0 0 20px;
+  color: #7c736b;
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   MENU GRID
+   ============================================================ */
+
+.owner-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.owner-menu-card {
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e8e2dc;
+  border-radius: 17px;
+  box-shadow: 0 7px 25px rgba(38, 30, 22, 0.055);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.owner-menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(38, 30, 22, 0.09);
+}
+
+.owner-menu-card-unavailable {
+  opacity: 0.72;
+}
+
+
+/* ============================================================
+   MENU IMAGE
+   ============================================================ */
+
+.owner-menu-image {
+  height: 190px;
+  position: relative;
+  overflow: hidden;
+  background: #eee9e4;
+}
+
+.owner-menu-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.owner-menu-image > span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: rgba(30, 26, 22, 0.84);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+
+/* ============================================================
+   MENU CONTENT
+   ============================================================ */
+
+.owner-menu-content {
+  padding: 17px;
+}
+
+.owner-menu-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.owner-menu-item-top h3 {
+  margin: 0 0 7px;
+  color: #28231f;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.owner-menu-item-top > strong {
+  flex: 0 0 auto;
+  color: #a05a28;
+  font-size: 17px;
+}
+
+.owner-menu-veg,
+.owner-menu-nonveg {
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.owner-menu-veg {
+  color: #28703a;
+  background: #eaf6ec;
+}
+
+.owner-menu-nonveg {
+  color: #9a3d31;
+  background: #fae9e6;
+}
+
+.owner-menu-description {
+  min-height: 42px;
+  margin: 13px 0;
+  color: #766d65;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.owner-menu-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.owner-menu-meta span {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #f5f2ef;
+  color: #6d645c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   AVAILABILITY
+   ============================================================ */
+
+.owner-menu-availability {
+  margin-bottom: 13px;
+}
+
+.owner-menu-available-btn,
+.owner-menu-soldout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.owner-menu-available-btn {
+  background: #eaf6ec;
+  color: #28703a;
+}
+
+.owner-menu-soldout-btn {
+  background: #f6e9e7;
+  color: #9a3d31;
+}
+
+.owner-menu-available-btn:disabled,
+.owner-menu-soldout-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.owner-menu-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.owner-menu-edit-btn,
+.owner-menu-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 9px;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.owner-menu-edit-btn {
+  border: 1px solid #ddd6cf;
+  background: white;
+  color: #49423c;
+}
+
+.owner-menu-edit-btn:hover {
+  background: #f7f4f1;
+}
+
+.owner-menu-delete-btn {
+  border: 1px solid #efd0cb;
+  background: #fff8f7;
+  color: #a33b2e;
+}
+
+.owner-menu-delete-btn:hover {
+  background: #fcecea;
+}
+
+.owner-menu-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 950px) {
+  .owner-menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .owner-menu-page {
+    padding: 28px 14px 60px;
+  }
+
+  .owner-menu-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .owner-menu-add-btn {
+    width: 100%;
+  }
+
+  .owner-menu-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-menu-field-full {
+    grid-column: auto;
+  }
+
+  .owner-menu-form {
+    padding: 18px;
+  }
+
+  .owner-menu-form-header {
+    padding: 18px;
+  }
+
+  .owner-menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 450px) {
+  .owner-menu-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .owner-menu-cancel-btn,
+  .owner-menu-save-btn {
+    width: 100%;
+  }
+}

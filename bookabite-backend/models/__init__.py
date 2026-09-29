@@ -1,5 +1,6 @@
 from .user import User
 from .restaurant import Restaurant, RestaurantImage, Amenity, RestaurantTable
+from .menu import MenuItem
 from .booking import Booking
 from .payment import Payment
 from .review import Review
@@ -13,6 +14,7 @@ __all__ = [
     "RestaurantImage",
     "Amenity",
     "RestaurantTable",
+    "MenuItem",
     "Booking",
     "Payment",
     "Review",

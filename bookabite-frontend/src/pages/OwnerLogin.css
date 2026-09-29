@@ -1,0 +1,189 @@
+.owner-login-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(190, 92, 51, 0.12),
+      transparent 32%
+    ),
+    #f8f1e9;
+}
+
+.owner-login-card {
+  width: 100%;
+  max-width: 480px;
+  background: #fffdf9;
+  border: 1px solid #eadfd5;
+  border-radius: 24px;
+  padding: 42px;
+  box-shadow: 0 24px 70px rgba(54, 35, 24, 0.1);
+}
+
+.owner-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 42px;
+}
+
+.owner-login-logo {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #bd5c32;
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.owner-login-brand-name {
+  color: #2a1c17;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.owner-login-brand-name span {
+  color: #bd5c32;
+}
+
+.owner-login-brand-subtitle {
+  margin-top: 3px;
+  color: #927e72;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.owner-login-heading {
+  margin-bottom: 28px;
+}
+
+.owner-login-heading > span {
+  color: #bd5c32;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+.owner-login-heading h1 {
+  margin: 10px 0 8px;
+  color: #241914;
+  font-family: Georgia, serif;
+  font-size: 42px;
+  line-height: 1.05;
+}
+
+.owner-login-heading p {
+  margin: 0;
+  color: #796b63;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.owner-login-error {
+  margin-bottom: 20px;
+  padding: 13px 15px;
+  border: 1px solid #efcaca;
+  border-radius: 12px;
+  background: #fff0f0;
+  color: #a53c32;
+  font-size: 14px;
+}
+
+.owner-login-field {
+  margin-bottom: 20px;
+}
+
+.owner-login-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #3c2d26;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.owner-login-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 15px;
+  border: 1px solid #dfd1c7;
+  border-radius: 12px;
+  outline: none;
+  background: white;
+  color: #2a1c17;
+  font-size: 15px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.owner-login-field input:focus {
+  border-color: #bd5c32;
+  box-shadow: 0 0 0 3px rgba(189, 92, 50, 0.1);
+}
+
+.owner-login-field input::placeholder {
+  color: #b0a199;
+}
+
+.owner-login-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #bd5c32;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.owner-login-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.owner-login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.owner-login-back {
+  width: 100%;
+  margin-top: 22px;
+  border: 0;
+  background: transparent;
+  color: #806f64;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.owner-login-back:hover {
+  color: #bd5c32;
+}
+
+@media (max-width: 600px) {
+  .owner-login-page {
+    padding: 30px 15px;
+  }
+
+  .owner-login-card {
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+
+  .owner-login-heading h1 {
+    font-size: 35px;
+  }
+}

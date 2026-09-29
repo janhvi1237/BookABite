@@ -20,12 +20,13 @@ class UserRepository:
         return User.query.filter_by(phone=phone).first()
 
     @staticmethod
-    def create(full_name, email, phone, password_hash):
+    def create(full_name, email, phone, password_hash, role="customer"):
         user = User(
             full_name=full_name,
             email=email,
             phone=phone,
             password_hash=password_hash,
+            role=role,
         )
         db.session.add(user)
         db.session.commit()

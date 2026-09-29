@@ -1,0 +1,74 @@
+.bab-section {
+  max-width: var(--bab-container-max);
+  margin: 0 auto;
+  padding: var(--bab-space-8) var(--bab-space-5);
+}
+
+.bab-section__header {
+  margin-bottom: var(--bab-space-6);
+}
+
+.bab-section__header h2 {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 600;
+  margin-bottom: var(--bab-space-2);
+  line-height: 1.2;
+  padding-bottom: 14px;
+}
+
+/* Signature accent stroke — a small poured line under every section title,
+   the same warm accent that runs through the whole page */
+.bab-section__header h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 44px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--bab-accent), color-mix(in srgb, var(--bab-accent) 25%, transparent));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 700ms var(--bab-ease);
+}
+
+.bab-reveal--visible .bab-section__header h2::after {
+  transform: scaleX(1);
+}
+
+.bab-section__header p {
+  color: var(--bab-text-muted);
+  font-size: 0.98rem;
+  margin: 0;
+}
+
+.bab-section__header--row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--bab-space-4);
+  flex-wrap: wrap;
+}
+
+.bab-section__link {
+  position: relative;
+  font-family: var(--bab-font-utility);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--bab-accent);
+  white-space: nowrap;
+  transition: gap 250ms var(--bab-ease);
+}
+
+.bab-section__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bab-section__status {
+  color: var(--bab-text-muted);
+  font-size: 0.92rem;
+  padding: var(--bab-space-6) 0;
+}

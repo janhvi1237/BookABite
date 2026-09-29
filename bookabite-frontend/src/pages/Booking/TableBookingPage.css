@@ -1,0 +1,328 @@
+.bab-booking-page {
+  padding: 30px 0 80px;
+}
+
+.bab-booking-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.bab-booking-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--bab-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bab-booking-title {
+  font-family: var(--bab-font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  color: var(--bab-primary);
+  margin-bottom: 6px;
+}
+
+.bab-booking-subtitle {
+  font-size: 0.95rem;
+  color: var(--bab-text-muted);
+}
+
+/* PROGRESS BAR */
+.bab-progress-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+  position: relative;
+}
+
+.bab-progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.bab-progress-step span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--bab-text-muted);
+}
+
+.bab-progress-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bab-bg-card);
+  border: 2px solid var(--bab-border);
+  color: var(--bab-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all var(--bab-transition-fast);
+}
+
+.bab-progress-circle--active {
+  background: var(--bab-secondary);
+  border-color: var(--bab-secondary);
+  color: #FFFFFF;
+}
+
+.bab-progress-line {
+  flex: 1;
+  height: 3px;
+  background: var(--bab-border);
+  margin: 0 8px 20px;
+  transition: background var(--bab-transition-med);
+}
+
+.bab-progress-line--active {
+  background: var(--bab-secondary);
+}
+
+/* FORM CARD */
+.bab-booking-card {
+  background: var(--bab-bg-card);
+  border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-lg);
+  padding: 32px;
+  box-shadow: var(--bab-shadow-md);
+}
+
+@media (min-width: 768px) {
+  .bab-booking-card {
+    padding: 44px;
+  }
+}
+
+.bab-step-heading {
+  font-family: var(--bab-font-display);
+  font-size: 1.45rem;
+  color: var(--bab-primary);
+  margin-bottom: 24px;
+}
+
+.bab-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bab-form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bab-primary);
+}
+
+.bab-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.bab-field-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--bab-secondary);
+}
+
+.bab-form-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: var(--bab-radius-sm);
+  border: 1px solid var(--bab-border);
+  background: var(--bab-bg-soft);
+  font-family: var(--bab-font-body);
+  font-size: 0.95rem;
+  color: var(--bab-text);
+  outline: none;
+  transition: border-color var(--bab-transition-fast);
+}
+
+.bab-form-input:focus {
+  border-color: var(--bab-secondary);
+}
+
+.bab-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .bab-form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* TIME SLOTS PICKER */
+.bab-slots-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .bab-slots-picker-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.bab-slot-pill {
+  background: var(--bab-bg-soft);
+  border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-xs);
+  padding: 10px 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--bab-text);
+  cursor: pointer;
+  transition: all var(--bab-transition-fast);
+}
+
+.bab-slot-pill:hover {
+  border-color: var(--bab-secondary);
+  color: var(--bab-secondary);
+}
+
+.bab-slot-pill--selected {
+  background: var(--bab-secondary);
+  color: #FFFFFF;
+  border-color: var(--bab-secondary);
+}
+
+/* PARTY SIZE BUTTONS */
+.bab-party-size-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bab-party-btn {
+  background: var(--bab-bg-soft);
+  border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-sm);
+  padding: 10px 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--bab-text);
+  cursor: pointer;
+  transition: all var(--bab-transition-fast);
+}
+
+.bab-party-btn:hover {
+  border-color: var(--bab-secondary);
+  color: var(--bab-secondary);
+}
+
+.bab-party-btn--selected {
+  background: var(--bab-secondary);
+  color: #FFFFFF;
+  border-color: var(--bab-secondary);
+}
+
+/* SEATING PREFERENCE CARDS */
+.bab-seating-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .bab-seating-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.bab-seating-card {
+  border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-md);
+  padding: 16px;
+  background: var(--bab-bg-soft);
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: all var(--bab-transition-fast);
+}
+
+.bab-seating-card--selected {
+  border-color: var(--bab-secondary);
+  background: var(--bab-secondary-light);
+}
+
+.bab-seating-card strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--bab-primary);
+  margin-bottom: 4px;
+}
+
+.bab-seating-card p {
+  font-size: 0.78rem;
+  color: var(--bab-text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* SUMMARY BOX */
+.bab-booking-summary-box {
+  background: var(--bab-bg-soft);
+  border-radius: var(--bab-radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bab-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.bab-summary-row span {
+  color: var(--bab-text-muted);
+}
+
+.bab-summary-row strong {
+  color: var(--bab-primary);
+}
+
+.bab-summary-divider {
+  height: 1px;
+  background: var(--bab-border);
+  margin: 6px 0;
+}
+
+.bab-booking-mascot-cheer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bab-secondary-light);
+  border-radius: var(--bab-radius-md);
+  padding: 16px 20px;
+  margin-top: 20px;
+}
+
+.bab-booking-mascot-cheer p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--bab-secondary);
+  font-weight: 600;
+}
+
+/* STEP NAVIGATION */
+.bab-step-nav-buttons {
+  display: flex;
+  align-items: center;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--bab-border);
+}

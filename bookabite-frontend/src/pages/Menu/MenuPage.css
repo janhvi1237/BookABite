@@ -1,0 +1,152 @@
+.bab-menu-page {
+  padding-bottom: 80px;
+}
+
+.bab-menu-hero {
+  background: var(--bab-bg-soft);
+  padding: 40px 0 28px;
+  border-bottom: 1px solid var(--bab-border);
+}
+
+.bab-menu-title {
+  font-family: var(--bab-font-display);
+  font-size: clamp(2rem, 3.8vw, 2.8rem);
+  color: var(--bab-primary);
+  margin-bottom: 8px;
+}
+
+.bab-menu-subtitle {
+  font-size: 1.05rem;
+  color: var(--bab-text-muted);
+  max-width: 620px;
+  margin: 0 0 24px 0;
+}
+
+.bab-menu-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .bab-menu-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.bab-menu-search {
+  position: relative;
+  flex: 1;
+  max-width: 500px;
+}
+
+.bab-menu-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bab-text-muted);
+}
+
+.bab-menu-search input {
+  width: 100%;
+  padding: 12px 18px 12px 44px;
+  border-radius: 9999px;
+  border: 1px solid var(--bab-border);
+  background: #FFFFFF;
+  font-family: var(--bab-font-body);
+  font-size: 0.95rem;
+  color: var(--bab-text);
+  outline: none;
+  box-shadow: var(--bab-shadow-sm);
+}
+
+.bab-dietary-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.bab-dietary-pill {
+  background: var(--bab-bg-card);
+  border: 1px solid var(--bab-border);
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--bab-text-muted);
+  cursor: pointer;
+  transition: all var(--bab-transition-fast);
+}
+
+.bab-dietary-pill:hover {
+  border-color: var(--bab-secondary);
+  color: var(--bab-secondary);
+}
+
+.bab-dietary-pill--active {
+  background: var(--bab-secondary);
+  border-color: var(--bab-secondary);
+  color: #FFFFFF;
+}
+
+.bab-dietary-pill--active:hover {
+  background: var(--bab-secondary-hover);
+  color: #FFFFFF;
+}
+
+.bab-menu-categories {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.bab-menu-cat-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--bab-font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--bab-text-muted);
+  padding: 8px 18px;
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--bab-transition-fast);
+}
+
+.bab-menu-cat-btn:hover {
+  color: var(--bab-primary);
+  background: rgba(43, 23, 18, 0.05);
+}
+
+.bab-menu-cat-btn--active {
+  background: var(--bab-primary);
+  color: #FFF8F0;
+}
+
+.bab-menu-cat-btn--active:hover {
+  background: var(--bab-primary-hover);
+  color: #FFF8F0;
+}
+
+.bab-global-menu-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .bab-global-menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .bab-global-menu-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

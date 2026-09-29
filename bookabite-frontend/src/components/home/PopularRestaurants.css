@@ -1,0 +1,291 @@
+.popular-restaurants {
+  background: #170d09;
+  color: #f8eee3;
+  padding: 80px 5vw;
+}
+
+.popular-restaurants__header {
+  max-width: 1400px;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.popular-restaurants__eyebrow {
+  margin: 0 0 8px;
+  color: #d96b42;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.popular-restaurants h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(32px, 4vw, 54px);
+  line-height: 1;
+  font-weight: 500;
+}
+
+.popular-restaurants__subtitle {
+  margin: 14px 0 0;
+  color: rgba(248, 238, 227, 0.68);
+  font-size: 15px;
+}
+
+.popular-restaurants__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #f8eee3;
+  text-decoration: none;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.popular-restaurants__view-all:hover {
+  color: #e8754c;
+}
+
+.popular-restaurants__grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.restaurant-card {
+  overflow: hidden;
+  border: 1px solid rgba(248, 238, 227, 0.12);
+  border-radius: 18px;
+  background: #21130e;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(232, 117, 76, 0.55);
+}
+
+.restaurant-card__image-wrap {
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+}
+
+.restaurant-card__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.restaurant-card__image--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3a2119;
+  color: #e8754c;
+  font-family: Georgia, serif;
+  font-size: 64px;
+}
+
+.restaurant-card__favorite {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(23, 13, 9, 0.78);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.restaurant-card__favorite:hover {
+  color: #e8754c;
+}
+
+.restaurant-card__body {
+  padding: 22px;
+}
+
+.restaurant-card__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.restaurant-card h3 {
+  margin: 0;
+  color: #fff5ec;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.restaurant-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #f0b35b;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.restaurant-card__cuisine {
+  margin: 8px 0 14px;
+  color: rgba(248, 238, 227, 0.72);
+  font-size: 14px;
+}
+
+.restaurant-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(248, 238, 227, 0.58);
+  font-size: 13px;
+}
+
+.restaurant-card__meta span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.restaurant-card__price {
+  margin: 12px 0 0;
+  color: rgba(248, 238, 227, 0.78);
+  font-size: 13px;
+}
+
+.restaurant-card__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 18px;
+  border-radius: 999px;
+  background: #df6d43;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.restaurant-card__button:hover {
+  background: #c95b35;
+}
+
+.popular-restaurants__message {
+  max-width: 1400px;
+  min-height: 180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 15px;
+  color: rgba(248, 238, 227, 0.7);
+}
+
+.popular-restaurants__message button {
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: #df6d43;
+  color: white;
+  cursor: pointer;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #2d1b15;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.07),
+    transparent
+  );
+  animation: skeleton-loading 1.3s infinite;
+}
+
+.skeleton--title {
+  width: 65%;
+  height: 24px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.skeleton--text {
+  width: 90%;
+  height: 13px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.skeleton--text.small {
+  width: 55%;
+}
+
+@keyframes skeleton-loading {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 900px) {
+  .popular-restaurants {
+    padding: 60px 5vw;
+  }
+
+  .popular-restaurants__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .popular-restaurants__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .popular-restaurants {
+    padding: 48px 20px;
+  }
+
+  .popular-restaurants__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-card__image-wrap {
+    height: 230px;
+  }
+
+  .popular-restaurants__view-all {
+    margin-top: 4px;
+  }
+}

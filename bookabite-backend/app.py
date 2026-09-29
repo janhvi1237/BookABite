@@ -7,6 +7,10 @@ from utils.exceptions import AppError
 
 from routes.auth_routes import auth_bp
 from routes.restaurant_routes import restaurant_bp
+from routes.booking_routes import booking_bp
+from routes.menu_routes import menu_bp
+from routes.review_routes import review_bp
+from routes.favorite_routes import favorite_bp
 
 
 def create_app():
@@ -22,6 +26,10 @@ def create_app():
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(restaurant_bp)
+    app.register_blueprint(booking_bp)
+    app.register_blueprint(menu_bp)
+    app.register_blueprint(review_bp)
+    app.register_blueprint(favorite_bp)
 
     app.json.sort_keys = False
 
@@ -29,8 +37,6 @@ def create_app():
     def health_check():
         return jsonify({"status": "ok", "service": "BookABite API"}), 200
 
-    # Global error handlers — ensures every error returns clean, consistent JSON
-    # instead of an HTML error page or a leaked stack trace.
     @app.errorhandler(AppError)
     def handle_app_error(e):
         return jsonify(e.to_dict()), e.status_code

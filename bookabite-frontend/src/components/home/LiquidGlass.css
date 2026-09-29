@@ -1,0 +1,45 @@
+/* =========================================================
+   BOOKABITE — LIQUID GLASS UTILITIES
+========================================================= */
+
+.bab-liquid-card {
+  background-clip: padding-box;
+}
+
+.bab-liquid-card::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 27px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08),
+      transparent 35%,
+      transparent 65%,
+      rgba(255, 255, 255, 0.025)
+    );
+  opacity: 0.8;
+}
+
+.bab-liquid-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(255, 255, 255, 0.08),
+      transparent 25%
+    );
+  opacity: 0.55;
+}
+
+@supports not (backdrop-filter: blur(20px)) {
+  .bab-liquid-card {
+    background: rgba(38, 28, 25, 0.96);
+  }
+}

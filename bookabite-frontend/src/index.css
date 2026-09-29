@@ -1,21 +1,41 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
 @import './styles/tokens.css';
 
-html {
-  scroll-behavior: smooth;
-}
-
-#root {
+.bab-app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-main {
+.bab-app__main {
   flex: 1;
 }
 
-.container {
-  max-width: var(--container-max);
+/* Temporary placeholder styling for stub pages — removed as each page gets built */
+.bab-page-stub {
+  max-width: 640px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 120px 24px;
+  text-align: center;
+}
+
+.bab-page-stub__eyebrow {
+  display: inline-block;
+  font-family: var(--bab-font-utility);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bab-accent);
+  margin-bottom: 16px;
+}
+
+.bab-page-stub h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin-bottom: 16px;
+}
+
+.bab-page-stub p {
+  color: var(--bab-text-muted);
+  line-height: 1.6;
 }

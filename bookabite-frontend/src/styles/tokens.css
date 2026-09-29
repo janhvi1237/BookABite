@@ -1,75 +1,94 @@
 /* ============================================================
    BookABite Design Tokens
-   Aesthetic: cozy café meets modern startup.
-   Signature motion: a rising "steam wisp" — reused sparingly
-   (logo mark, loaders) rather than scattered everywhere.
+   Aesthetic: Premium boutique café & contemporary fine dining
    ============================================================ */
 
 :root {
-  /* ---- Light mode (default) ---- */
-  --color-bg: #FFF8F0;              /* cream */
-  --color-surface: #FFFDF9;         /* card surface, slightly whiter than bg */
-  --color-surface-raised: #FFFFFF;  /* modals, popovers */
-  --color-text: #2A2422;            /* charcoal */
-  --color-text-muted: #6B5E58;      /* softened charcoal for secondary copy */
-  --color-accent: #C4623D;          /* terracotta — CTAs, active states */
-  --color-accent-strong: #A94E2E;   /* pressed/hover state of accent */
-  --color-gold: #C9932E;            /* ratings, badges, scratch-card shimmer */
-  --color-sage: #7A8B6F;            /* secondary accent — open/available states */
-  --color-border: rgba(42, 36, 34, 0.10);
-  --color-shadow: rgba(90, 58, 40, 0.14);
+  /* Brand Core Palette */
+  --bab-primary: #2B1712;         /* Deep Espresso / Dark Brown */
+  --bab-primary-hover: #1A0E0B;
+  --bab-secondary: #D65A3A;       /* Warm Terracotta */
+  --bab-secondary-hover: #B84729;
+  --bab-secondary-light: #FDEEE9;
+  --bab-accent-gold: #E9B44C;     /* Golden Accent */
+  --bab-accent-gold-hover: #D49D34;
+  --bab-accent-gold-soft: #FFF7E8;
 
-  --glass-bg: rgba(255, 253, 249, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.4);
+  /* Surfaces & Backgrounds */
+  --bab-bg-cream: #FFF8F0;        /* Cream Background */
+  --bab-bg-soft: #F7EFE8;         /* Soft Background */
+  --bab-bg-card: #FFFFFF;
+  --bab-bg-raised: #FFFFFF;
 
-  /* ---- Type ---- */
-  --font-display: 'Cabinet Grotesk', 'Clash Display', 'Segoe UI', sans-serif;
-  --font-body: 'Inter', 'General Sans', -apple-system, sans-serif;
+  /* Text & Accents */
+  --bab-text: #1F1715;            /* Dark Text */
+  --bab-text-muted: #6E5A54;
+  --bab-text-light: #9B8882;
+  --bab-border: rgba(43, 23, 18, 0.12);
+  --bab-border-focus: #D65A3A;
 
-  --fs-h1: clamp(2.4rem, 5vw, 3.8rem);
-  --fs-h2: clamp(1.8rem, 3.2vw, 2.6rem);
-  --fs-h3: 1.4rem;
-  --fs-body: 1rem;
-  --fs-small: 0.85rem;
+  /* Feedback & Status */
+  --bab-success: #3FA66B;
+  --bab-success-light: #EBF8F0;
+  --bab-warning: #E9B44C;
+  --bab-danger: #D64545;
+  --bab-danger-light: #FDECEC;
 
-  /* ---- Layout ---- */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --nav-height: 72px;
-  --container-max: 1240px;
+  /* Glassmorphism */
+  --bab-glass-bg: rgba(255, 248, 240, 0.85);
+  --bab-glass-border: rgba(255, 255, 255, 0.7);
+  --bab-glass-shadow: 0 12px 36px rgba(43, 23, 18, 0.08);
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Shadows */
+  --bab-shadow-sm: 0 2px 8px rgba(43, 23, 18, 0.04);
+  --bab-shadow-md: 0 8px 24px rgba(43, 23, 18, 0.08);
+  --bab-shadow-lg: 0 16px 40px rgba(43, 23, 18, 0.12);
+  --bab-shadow-hover: 0 20px 48px rgba(43, 23, 18, 0.16);
+
+  /* Typography */
+  --bab-font-display: 'DM Serif Display', 'Playfair Display', serif;
+  --bab-font-subheading: 'Playfair Display', serif;
+  --bab-font-body: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+
+  /* Radii */
+  --bab-radius-xs: 6px;
+  --bab-radius-sm: 10px;
+  --bab-radius-md: 16px;
+  --bab-radius-lg: 24px;
+  --bab-radius-full: 9999px;
+
+  /* Layout */
+  --bab-nav-height: 76px;
+  --bab-bottom-nav-height: 64px;
+  --bab-container-max: 1240px;
+
+  /* Transitions */
+  --bab-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --bab-transition-fast: 160ms var(--bab-ease);
+  --bab-transition-med: 300ms var(--bab-ease);
+  --bab-transition-slow: 500ms var(--bab-ease);
+
+  /* Atmospheric Page Glow */
+  --bab-page-glow:
+    radial-gradient(ellipse 900px 500px at 85% -5%, rgba(214, 90, 58, 0.08), transparent 60%),
+    radial-gradient(ellipse 700px 500px at -5% 35%, rgba(233, 180, 76, 0.09), transparent 55%);
 }
 
 [data-theme='dark'] {
-  --color-bg: #1A1512;
-  --color-surface: #241D19;
-  --color-surface-raised: #2C2420;
-  --color-text: #F5EDE6;
-  --color-text-muted: #C4B6AD;
-  --color-accent: #E8935F;
-  --color-accent-strong: #F2A876;
-  --color-gold: #E0B354;
-  --color-sage: #93A886;
-  --color-border: rgba(245, 237, 230, 0.10);
-  --color-shadow: rgba(0, 0, 0, 0.45);
-
-  --glass-bg: rgba(36, 29, 25, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --bab-bg-cream: #1B100D;
+  --bab-bg-soft: #241511;
+  --bab-bg-card: #2B1712;
+  --bab-bg-raised: #341D17;
+  --bab-text: #FBF4EE;
+  --bab-text-muted: #C7B5AE;
+  --bab-text-light: #9B8882;
+  --bab-border: rgba(255, 248, 240, 0.12);
+  --bab-glass-bg: rgba(27, 16, 13, 0.88);
+  --bab-glass-border: rgba(255, 248, 240, 0.08);
+  --bab-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --bab-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
 }
 
-* { box-sizing: border-box; }
-
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  transition: background 0.3s var(--ease-out), color 0.3s var(--ease-out);
-  margin: 0;
-}
-
-/* Respect reduced motion system-wide */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -79,10 +98,150 @@ body {
   }
 }
 
-/* Visible keyboard focus everywhere */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--color-accent);
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bab-bg-cream);
+  background-image: var(--bab-page-glow);
+  background-attachment: fixed;
+  color: var(--bab-text);
+  font-family: var(--bab-font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--bab-font-display);
+  color: var(--bab-primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6 {
+  color: var(--bab-text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--bab-font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--bab-secondary);
   outline-offset: 2px;
+}
+
+/* Common container */
+.bab-container {
+  width: 100%;
+  max-width: var(--bab-container-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Button variants */
+.bab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--bab-radius-full);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--bab-transition-fast);
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.bab-btn--primary {
+  background: var(--bab-primary);
+  color: #FFF8F0;
+}
+.bab-btn--primary:hover {
+  background: var(--bab-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(43, 23, 18, 0.25);
+}
+
+.bab-btn--secondary {
+  background: var(--bab-secondary);
+  color: #FFFFFF;
+}
+.bab-btn--secondary:hover {
+  background: var(--bab-secondary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(214, 90, 58, 0.3);
+}
+
+.bab-btn--gold {
+  background: var(--bab-accent-gold);
+  color: var(--bab-primary);
+}
+.bab-btn--gold:hover {
+  background: var(--bab-accent-gold-hover);
+  transform: translateY(-2px);
+}
+
+.bab-btn--outline {
+  background: transparent;
+  border-color: var(--bab-border);
+  color: var(--bab-text);
+}
+.bab-btn--outline:hover {
+  border-color: var(--bab-secondary);
+  color: var(--bab-secondary);
+  background: var(--bab-secondary-light);
+}
+
+.bab-btn--glass {
+  background: var(--bab-glass-bg);
+  backdrop-filter: blur(12px);
+  border-color: var(--bab-glass-border);
+  color: var(--bab-text);
+}
+.bab-btn--glass:hover {
+  background: #FFFFFF;
+  box-shadow: var(--bab-shadow-md);
+}
+
+.bab-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--bab-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.bab-badge--terracotta {
+  background: var(--bab-secondary-light);
+  color: var(--bab-secondary);
+}
+
+.bab-badge--gold {
+  background: var(--bab-accent-gold-soft);
+  color: #996918;
+}
+
+.bab-badge--success {
+  background: var(--bab-success-light);
+  color: var(--bab-success);
 }

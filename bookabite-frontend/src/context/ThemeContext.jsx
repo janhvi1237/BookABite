@@ -3,8 +3,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext(null);
 
 function getInitialTheme() {
-  const saved = localStorage.getItem('bookabite-theme');
-  if (saved === 'light' || saved === 'dark') return saved;
+  const stored = window.localStorage.getItem('bab-theme');
+  if (stored === 'light' || stored === 'dark') return stored;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -13,7 +13,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('bookabite-theme', theme);
+    window.localStorage.setItem('bab-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));

@@ -1,0 +1,121 @@
+.why-choose {
+  width: 100%;
+  padding: 36px 30px 38px;
+  background: #160b08;
+  color: #f7eee5;
+  box-sizing: border-box;
+}
+
+.why-choose__header {
+  margin-bottom: 18px;
+}
+
+.why-choose__eyebrow {
+  margin: 0 0 5px;
+  color: #c97850;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.why-choose__header h2 {
+  margin: 0 0 6px;
+  color: #f7eee5;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(27px, 3vw, 38px);
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.why-choose__header h2 span {
+  color: #d87950;
+  font-style: italic;
+}
+
+.why-choose__subtitle {
+  max-width: 620px;
+  margin: 0;
+  color: #a99a92;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.why-choose__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.why-choose__card {
+  min-height: 105px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid rgba(247, 238, 229, 0.12);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.012);
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.why-choose__card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 120, 80, 0.38);
+  background: rgba(201, 120, 80, 0.035);
+}
+
+.why-choose__icon {
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(201, 120, 80, 0.42);
+  border-radius: 50%;
+  color: #d87950;
+}
+
+.why-choose__content {
+  min-width: 0;
+}
+
+.why-choose__content h3 {
+  margin: 1px 0 5px;
+  color: #f2e5dc;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.why-choose__content p {
+  margin: 0;
+  color: #9f9189;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .why-choose {
+    padding: 32px 20px;
+  }
+
+  .why-choose__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .why-choose__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .why-choose__card {
+    min-height: auto;
+  }
+}

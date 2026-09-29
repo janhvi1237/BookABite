@@ -1,0 +1,812 @@
+/* =========================================================
+   BOOKABITE — RESTAURANTS PAGE
+========================================================= */
+
+.bab-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 120px 0 100px;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(190, 91, 57, 0.08),
+      transparent 30%
+    ),
+    #f7f2eb;
+  color: #211b18;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.bab-page__header {
+  max-width: 760px;
+  margin-bottom: 34px;
+}
+
+.bab-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #a64b31 !important;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  opacity: 1 !important;
+}
+
+.bab-page__header h1 {
+  margin: 0;
+  font-family:
+    "Cabinet Grotesk",
+    "Inter",
+    Arial,
+    sans-serif;
+  font-size: clamp(42px, 6vw, 76px);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+  color: #211b18 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.bab-page__header p {
+  max-width: 620px;
+  margin: 22px 0 0;
+  color: #746a63 !important;
+  font-size: 17px;
+  line-height: 1.7;
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   FILTER BAR
+========================================================= */
+
+.bab-filter-bar {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.bab-filter-bar__desktop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* =========================================================
+   FILTER SELECT
+========================================================= */
+
+.bab-filter-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 145px;
+}
+
+.bab-filter-control select {
+  width: 100%;
+  min-height: 43px;
+  appearance: none;
+  padding: 0 35px 0 13px;
+  border: 1px solid rgba(100, 70, 57, 0.13);
+  border-radius: 11px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.82);
+  color: #594a42;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bab-filter-control select:hover {
+  border-color: rgba(166, 75, 49, 0.3);
+  background: #ffffff;
+}
+
+.bab-filter-control select:focus {
+  border-color: rgba(166, 75, 49, 0.5);
+  box-shadow: 0 0 0 3px rgba(166, 75, 49, 0.08);
+}
+
+.bab-filter-control svg {
+  position: absolute;
+  right: 11px;
+  pointer-events: none;
+  color: #97776a;
+}
+
+.bab-filter-control--sort {
+  min-width: 178px;
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+.bab-filter-reset {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 13px;
+  border: 1px solid rgba(166, 75, 49, 0.16);
+  border-radius: 11px;
+  background: transparent;
+  color: #9a5138;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.bab-filter-reset:hover {
+  border-color: rgba(166, 75, 49, 0.3);
+  background: rgba(255, 255, 255, 0.65);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MOBILE FILTER BUTTON
+========================================================= */
+
+.bab-mobile-filter-button {
+  display: none;
+}
+
+/* =========================================================
+   MOBILE FILTER PANEL
+========================================================= */
+
+.bab-mobile-filter-panel {
+  display: none;
+}
+
+/* =========================================================
+   ACTIVE FILTERS
+========================================================= */
+
+.bab-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 27px;
+}
+
+.bab-page__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px 8px 13px;
+  border: 1px solid rgba(166, 75, 49, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #8e432f !important;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.bab-page__filter button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(166, 75, 49, 0.1);
+  color: #a64b31;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.bab-page__filter button:hover {
+  background: #a64b31;
+  color: #ffffff;
+}
+
+/* =========================================================
+   RESULTS HEADER
+========================================================= */
+
+.bab-results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  color: #746a63 !important;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   RESTAURANT GRID
+========================================================= */
+
+.bab-restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    3,
+    minmax(0, 1fr)
+  );
+  gap: 24px;
+}
+
+/* =========================================================
+   RESTAURANT CARD
+========================================================= */
+
+.bab-restaurant-card {
+  overflow: hidden;
+  border: 1px solid rgba(51, 40, 35, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 16px 40px rgba(49, 34, 28, 0.06);
+  cursor: pointer;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.bab-restaurant-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 24px 55px rgba(49, 34, 28, 0.11);
+}
+
+.bab-restaurant-card:focus-visible {
+  outline: 3px solid rgba(166, 75, 49, 0.35);
+  outline-offset: 4px;
+}
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.bab-restaurant-card__image-wrap {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  background: #e9dfd6;
+}
+
+.bab-restaurant-card__image-wrap img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 500ms ease;
+}
+
+.bab-restaurant-card:hover
+.bab-restaurant-card__image-wrap img {
+  transform: scale(1.045);
+}
+
+.bab-restaurant-card__image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-family:
+    "Cabinet Grotesk",
+    "Inter",
+    Arial,
+    sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: #9d604d;
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.8),
+      transparent 40%
+    ),
+    #eaded4;
+}
+
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.bab-restaurant-card__body {
+  padding: 22px;
+}
+
+.bab-restaurant-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.bab-restaurant-card__top h2 {
+  min-width: 0;
+  margin: 0;
+  font-family:
+    "Cabinet Grotesk",
+    "Inter",
+    Arial,
+    sans-serif;
+  font-size: 23px;
+  line-height: 1.1;
+  color: #241d19 !important;
+  opacity: 1 !important;
+}
+
+.bab-restaurant-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #f1e6db;
+  color: #9c563c !important;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bab-restaurant-card__cuisine {
+  margin: 9px 0 0;
+  color: #8e6e60 !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bab-restaurant-card__area {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 10px 0 0;
+  color: #766b65 !important;
+  font-size: 13px;
+}
+
+.bab-restaurant-card__area svg {
+  flex-shrink: 0;
+  color: #a64b31;
+}
+
+/* =========================================================
+   TAGS
+========================================================= */
+
+.bab-restaurant-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.bab-restaurant-card__tag {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #f3ede7;
+  color: #75665e !important;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.bab-empty-state {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border: 1px dashed rgba(100, 70, 57, 0.2);
+  border-radius: 28px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  color: #2a211d;
+  box-sizing: border-box;
+}
+
+.bab-empty-state__icon {
+  margin-bottom: 15px;
+  color: #ad593c !important;
+  font-size: 28px;
+  line-height: 1;
+  opacity: 1 !important;
+}
+
+.bab-empty-state h2 {
+  margin: 0;
+  font-family:
+    "Cabinet Grotesk",
+    "Inter",
+    Arial,
+    sans-serif;
+  font-size: 30px;
+  line-height: 1.1;
+  color: #2a211d !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.bab-empty-state p {
+  margin: 10px 0 0;
+  color: #766b65 !important;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 1 !important;
+}
+
+.bab-empty-state__button {
+  margin-top: 18px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #b45e39;
+  color: #fffaf6;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.bab-empty-state__button:hover {
+  background: #9f4e2f;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   SKELETON
+========================================================= */
+
+.bab-restaurant-card--skeleton {
+  pointer-events: none;
+}
+
+.bab-restaurant-card--skeleton
+.bab-restaurant-card__image-wrap {
+  background:
+    linear-gradient(
+      90deg,
+      #eadfd7 25%,
+      #f4ede8 50%,
+      #eadfd7 75%
+    );
+  background-size: 200% 100%;
+  animation: babSkeleton 1.5s infinite;
+}
+
+.bab-skeleton-line {
+  height: 17px;
+  width: 72%;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: #e9ded6;
+}
+
+.bab-skeleton-line--short {
+  width: 48%;
+}
+
+.bab-skeleton-line--tiny {
+  width: 60%;
+}
+
+@keyframes babSkeleton {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .bab-filter-bar__desktop {
+    gap: 8px;
+  }
+
+  .bab-filter-control {
+    min-width: 135px;
+  }
+
+  .bab-filter-control--sort {
+    min-width: 160px;
+  }
+}
+
+/* =========================================================
+   TABLET / SMALL DESKTOP
+========================================================= */
+
+@media (max-width: 991px) {
+  .bab-restaurant-grid {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  }
+
+  .bab-page {
+    padding-top: 100px;
+  }
+
+  .bab-filter-bar__desktop {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bab-filter-control,
+  .bab-filter-control--sort {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .bab-filter-reset {
+    width: fit-content;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+  .bab-page {
+    padding: 90px 0 70px;
+  }
+
+  .bab-page__header {
+    margin-bottom: 26px;
+  }
+
+  .bab-page__header h1 {
+    font-size: 44px;
+  }
+
+  .bab-page__header p {
+    font-size: 15px;
+  }
+
+  /* Hide desktop controls */
+
+  .bab-filter-bar__desktop {
+    display: none;
+  }
+
+  /* Mobile filter button */
+
+  .bab-mobile-filter-button {
+    width: 100%;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 15px;
+    border: 1px solid rgba(100, 70, 57, 0.14);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.84);
+    color: #5c4c43;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow:
+      0 8px 24px rgba(49, 34, 28, 0.045);
+  }
+
+  .bab-mobile-filter-button > span {
+    flex: 1;
+    text-align: left;
+  }
+
+  /* Mobile panel */
+
+  .bab-mobile-filter-panel {
+    display: block;
+    margin-top: 10px;
+    padding: 19px;
+    border: 1px solid rgba(100, 70, 57, 0.12);
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow:
+      0 18px 45px rgba(49, 34, 28, 0.1);
+  }
+
+  .bab-mobile-filter-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .bab-mobile-filter-header > div > span {
+    display: block;
+    margin-bottom: 6px;
+    color: #a64b31;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.14em;
+  }
+
+  .bab-mobile-filter-header h2 {
+    margin: 0;
+    color: #2d2521;
+    font-family:
+      "Cabinet Grotesk",
+      "Inter",
+      Arial,
+      sans-serif;
+    font-size: 21px;
+    line-height: 1.15;
+  }
+
+  .bab-mobile-filter-header > button {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: #f4eee9;
+    color: #685950;
+    cursor: pointer;
+  }
+
+  .bab-mobile-filter-field {
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .bab-mobile-filter-field > span {
+    display: block;
+    margin-bottom: 7px;
+    color: #5e5048;
+    font-size: 11px;
+    font-weight: 750;
+  }
+
+  .bab-mobile-filter-field select {
+    width: 100%;
+    min-height: 45px;
+    box-sizing: border-box;
+    padding: 0 12px;
+    border: 1px solid #e1d8d1;
+    border-radius: 10px;
+    outline: none;
+    background: #fbf8f5;
+    color: #50443d;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .bab-mobile-filter-field select:focus {
+    border-color: rgba(166, 75, 49, 0.45);
+    box-shadow:
+      0 0 0 3px rgba(166, 75, 49, 0.08);
+  }
+
+  .bab-mobile-filter-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 9px;
+    margin-top: 20px;
+  }
+
+  .bab-mobile-filter-reset,
+  .bab-mobile-filter-done {
+    min-height: 44px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  .bab-mobile-filter-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid #ddd3cb;
+    background: #ffffff;
+    color: #695950;
+  }
+
+  .bab-mobile-filter-done {
+    border: 1px solid #a64b31;
+    background: #a64b31;
+    color: #ffffff;
+  }
+
+  /* Active filters */
+
+  .bab-page__filters {
+    gap: 7px;
+    margin-top: 14px;
+    margin-bottom: 22px;
+  }
+
+  .bab-page__filter {
+    font-size: 10px;
+  }
+
+  /* Grid */
+
+  .bab-restaurant-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bab-restaurant-card__image-wrap {
+    height: 230px;
+  }
+
+  .bab-empty-state {
+    min-height: 260px;
+    padding: 30px 20px;
+  }
+
+  .bab-empty-state h2 {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+  .bab-page {
+    padding-top: 82px;
+  }
+
+  .bab-page__header h1 {
+    font-size: 40px;
+  }
+
+  .bab-mobile-filter-panel {
+    padding: 16px;
+  }
+
+  .bab-mobile-filter-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .bab-restaurant-card__body {
+    padding: 18px;
+  }
+
+  .bab-restaurant-card__top h2 {
+    font-size: 21px;
+  }
+}
