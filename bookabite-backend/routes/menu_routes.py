@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from extensions import db
 from models import MenuItem, Restaurant
 from utils.exceptions import AppError
+from utils.auth import roles_required, current_user, can_manage_restaurant, forbidden
 
 menu_bp = Blueprint("menu", __name__, url_prefix="/api")
 
@@ -51,10 +52,13 @@ def get_restaurant_menu(restaurant_id):
 # POST /api/restaurants/<restaurant_id>/menu
 # ============================================================
 @menu_bp.route("/restaurants/<int:restaurant_id>/menu", methods=["POST"])
+@roles_required("owner", "admin")
 def add_menu_item(restaurant_id):
     restaurant = Restaurant.query.get(restaurant_id)
     if not restaurant:
         return jsonify({"error": "Restaurant not found"}), 404
+    if not can_manage_restaurant(current_user(), restaurant):
+        return forbidden("You can only change the menu of your own restaurants.")
 
     data = request.get_json(silent=True) or {}
     name = data.get("name")
@@ -155,10 +159,14 @@ def get_menu_item(item_id):
 # PUT /api/menu/<item_id>
 # ============================================================
 @menu_bp.route("/menu/<int:item_id>", methods=["PUT"])
+@roles_required("owner", "admin")
 def update_menu_item(item_id):
     item = MenuItem.query.get(item_id)
     if not item:
         return jsonify({"error": "Dish not found"}), 404
+    restaurant = Restaurant.query.get(item.restaurant_id)
+    if not restaurant or not can_manage_restaurant(current_user(), restaurant):
+        return forbidden("You can only change the menu of your own restaurants.")
 
     data = request.get_json(silent=True) or {}
     if "name" in data:
@@ -191,10 +199,14 @@ def update_menu_item(item_id):
 # PATCH /api/menu/<item_id>/availability
 # ============================================================
 @menu_bp.route("/menu/<int:item_id>/availability", methods=["PATCH"])
+@roles_required("owner", "admin")
 def toggle_availability(item_id):
     item = MenuItem.query.get(item_id)
     if not item:
         return jsonify({"error": "Dish not found"}), 404
+    restaurant = Restaurant.query.get(item.restaurant_id)
+    if not restaurant or not can_manage_restaurant(current_user(), restaurant):
+        return forbidden("You can only change the menu of your own restaurants.")
 
     item.is_available = not item.is_available
     db.session.commit()
@@ -214,10 +226,14 @@ def toggle_availability(item_id):
 # DELETE /api/menu/<item_id>
 # ============================================================
 @menu_bp.route("/menu/<int:item_id>", methods=["DELETE"])
+@roles_required("owner", "admin")
 def delete_menu_item(item_id):
     item = MenuItem.query.get(item_id)
     if not item:
         return jsonify({"error": "Dish not found"}), 404
+    restaurant = Restaurant.query.get(item.restaurant_id)
+    if not restaurant or not can_manage_restaurant(current_user(), restaurant):
+        return forbidden("You can only change the menu of your own restaurants.")
 
     db.session.delete(item)
     db.session.commit()

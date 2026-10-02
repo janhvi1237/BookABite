@@ -51,8 +51,6 @@ def create_app():
     def health_check():
         return jsonify({"status": "ok", "service": "BookABite API"}), 200
 
-    # Global error handlers — ensures every error returns clean, consistent JSON
-    # instead of an HTML error page or a leaked stack trace.
     @app.errorhandler(AppError)
     def handle_app_error(e):
         return jsonify(e.to_dict()), e.status_code
@@ -75,3 +73,5 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
+    # Debug mode exposes an interactive console: only enable it locally via FLASK_DEBUG=1
+    app.run(debug=os.getenv("FLASK_DEBUG", "0") == "1", port=5000)

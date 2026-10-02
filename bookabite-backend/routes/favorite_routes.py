@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Favorite, Restaurant, User
+from utils.auth import login_required, current_user, optional_user
 
 favorite_bp = Blueprint("favorites", __name__, url_prefix="/api/favorites")
 
@@ -10,10 +11,9 @@ favorite_bp = Blueprint("favorites", __name__, url_prefix="/api/favorites")
 # GET /api/favorites?user_id=...
 # ============================================================
 @favorite_bp.route("", methods=["GET"])
+@login_required
 def get_favorites():
-    user_id = request.args.get("user_id")
-    if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
+    user_id = current_user().user_id  # always the logged-in user
 
     try:
         user_id = int(user_id)
@@ -37,13 +37,14 @@ def get_favorites():
 # POST /api/favorites
 # ============================================================
 @favorite_bp.route("", methods=["POST"])
+@login_required
 def toggle_favorite():
     data = request.get_json(silent=True) or {}
-    user_id = data.get("user_id")
+    user_id = current_user().user_id  # always the logged-in user
     restaurant_id = data.get("restaurant_id")
 
-    if not user_id or not restaurant_id:
-        return jsonify({"error": "user_id and restaurant_id are required"}), 400
+    if not restaurant_id:
+        return jsonify({"error": "restaurant_id is required"}), 400
 
     try:
         user_id = int(user_id)
@@ -69,7 +70,8 @@ def toggle_favorite():
 # ============================================================
 @favorite_bp.route("/check", methods=["GET"])
 def check_favorite():
-    user_id = request.args.get("user_id")
+    me = optional_user()  # visitors who are not logged in simply get False
+    user_id = me.user_id if me else None
     restaurant_id = request.args.get("restaurant_id")
 
     if not user_id or not restaurant_id:

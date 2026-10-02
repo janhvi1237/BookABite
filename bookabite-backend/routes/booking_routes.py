@@ -1,8 +1,9 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from datetime import datetime, date, time, timedelta
 
 from extensions import db
 from models.booking import Booking
+from utils.auth import login_required, roles_required, current_user, is_admin, can_manage_restaurant, forbidden
 
 
 booking_bp = Blueprint(
@@ -310,11 +311,11 @@ def get_availability():
         }), 200
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         print("BOOKING AVAILABILITY ERROR:", e)
 
         return jsonify({
-            "error": "Failed to fetch booking availability",
-            "details": str(e)
+            "error": "Failed to fetch booking availability"
         }), 500
 
 
@@ -324,6 +325,7 @@ def get_availability():
 # ============================================================
 
 @booking_bp.route("", methods=["POST"])
+@login_required
 def create_booking():
     try:
         data = request.get_json()
@@ -334,7 +336,6 @@ def create_booking():
             }), 400
 
         required_fields = [
-            "user_id",
             "restaurant_id",
             "booking_date",
             "booking_time",
@@ -522,10 +523,27 @@ def create_booking():
         # Create booking
         # ----------------------------------------------------
 
+        table_id = data.get("table_id")
+        if table_id is not None:
+            try:
+                table_id = int(table_id)
+            except (TypeError, ValueError):
+                return jsonify({"error": "Invalid table_id"}), 400
+
+            from models.restaurant import RestaurantTable
+
+            table = RestaurantTable.query.filter_by(
+                table_id=table_id, restaurant_id=restaurant_id
+            ).first()
+            if not table:
+                return jsonify({
+                    "error": "Selected table does not belong to this restaurant"
+                }), 400
+
         booking = Booking(
-            user_id=int(data["user_id"]),
+            user_id=current_user().user_id,  # always the logged-in user
             restaurant_id=restaurant_id,
-            table_id=data.get("table_id"),
+            table_id=table_id,
             booking_date=booking_date,
             booking_time=booking_time,
             party_size=party_size,
@@ -550,13 +568,13 @@ def create_booking():
         }), 400
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         db.session.rollback()
 
         print("BOOKING CREATE ERROR:", e)
 
         return jsonify({
-            "error": "Failed to create booking",
-            "details": str(e)
+            "error": "Failed to create booking"
         }), 500
 
 
@@ -566,21 +584,18 @@ def create_booking():
 # ============================================================
 
 @booking_bp.route("", methods=["GET"])
+@login_required
 def get_bookings():
     try:
-        user_id = request.args.get("user_id")
-
-        if not user_id:
-            return jsonify({
-                "error": "user_id is required"
-            }), 400
-
-        try:
-            user_id = int(user_id)
-        except ValueError:
-            return jsonify({
-                "error": "Invalid user_id"
-            }), 400
+        # Always the logged-in user's own bookings (an admin may pass ?user_id=)
+        user_id = current_user().user_id
+        if is_admin(current_user()) and request.args.get("user_id"):
+            try:
+                user_id = int(request.args.get("user_id"))
+            except ValueError:
+                return jsonify({
+                    "error": "Invalid user_id"
+                }), 400
 
         bookings = (
             Booking.query
@@ -609,11 +624,11 @@ def get_bookings():
         return jsonify(results), 200
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         print("BOOKING GET ERROR:", e)
 
         return jsonify({
-            "error": "Failed to fetch bookings",
-            "details": str(e)
+            "error": "Failed to fetch bookings"
         }), 500
 
 
@@ -623,21 +638,18 @@ def get_bookings():
 # ============================================================
 
 @booking_bp.route("/owner", methods=["GET"])
+@roles_required("owner", "admin")
 def get_owner_bookings():
     try:
-        owner_id = request.args.get("owner_id")
-
-        if not owner_id:
-            return jsonify({
-                "error": "owner_id is required"
-            }), 400
-
-        try:
-            owner_id = int(owner_id)
-        except ValueError:
-            return jsonify({
-                "error": "Invalid owner_id"
-            }), 400
+        # Always the logged-in owner's restaurants (an admin may pass ?owner_id=)
+        owner_id = current_user().user_id
+        if is_admin(current_user()) and request.args.get("owner_id"):
+            try:
+                owner_id = int(request.args.get("owner_id"))
+            except ValueError:
+                return jsonify({
+                    "error": "Invalid owner_id"
+                }), 400
 
         from models.restaurant import Restaurant
 
@@ -685,11 +697,11 @@ def get_owner_bookings():
         return jsonify(results), 200
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         print("OWNER BOOKINGS ERROR:", e)
 
         return jsonify({
-            "error": "Failed to fetch owner bookings",
-            "details": str(e)
+            "error": "Failed to fetch owner bookings"
         }), 500
 
 
@@ -699,6 +711,7 @@ def get_owner_bookings():
 # ============================================================
 
 @booking_bp.route("/<int:booking_id>", methods=["GET"])
+@login_required
 def get_booking(booking_id):
     try:
         booking = Booking.query.get(booking_id)
@@ -707,6 +720,12 @@ def get_booking(booking_id):
             return jsonify({
                 "error": "Booking not found"
             }), 404
+
+        # Allowed: the customer who booked, the restaurant's owner, or an admin.
+        me = current_user()
+        owns_restaurant = booking.restaurant is not None and booking.restaurant.owner_id == me.user_id
+        if not (booking.user_id == me.user_id or owns_restaurant or is_admin(me)):
+            return forbidden("You cannot view this booking.")
 
         b_dict = booking.to_dict()
 
@@ -725,11 +744,11 @@ def get_booking(booking_id):
         return jsonify(b_dict), 200
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         print("BOOKING DETAILS ERROR:", e)
 
         return jsonify({
-            "error": "Failed to fetch booking",
-            "details": str(e)
+            "error": "Failed to fetch booking"
         }), 500
 
 
@@ -742,6 +761,7 @@ def get_booking(booking_id):
     "/<int:booking_id>/cancel",
     methods=["PATCH"]
 )
+@login_required
 def cancel_booking(booking_id):
     try:
         booking = Booking.query.get(booking_id)
@@ -750,6 +770,12 @@ def cancel_booking(booking_id):
             return jsonify({
                 "error": "Booking not found"
             }), 404
+
+        # Allowed: the customer who booked, the restaurant's owner, or an admin.
+        me = current_user()
+        owns_restaurant = booking.restaurant is not None and booking.restaurant.owner_id == me.user_id
+        if not (booking.user_id == me.user_id or owns_restaurant or is_admin(me)):
+            return forbidden("You cannot cancel this booking.")
 
         if booking.status == "Cancelled":
             return jsonify({
@@ -771,13 +797,13 @@ def cancel_booking(booking_id):
         }), 200
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         db.session.rollback()
 
         print("BOOKING CANCEL ERROR:", e)
 
         return jsonify({
-            "error": "Failed to cancel booking",
-            "details": str(e)
+            "error": "Failed to cancel booking"
         }), 500
 
 
@@ -790,6 +816,7 @@ def cancel_booking(booking_id):
     "/<int:booking_id>/status",
     methods=["PATCH"]
 )
+@roles_required("owner", "admin")
 def update_booking_status(booking_id):
     try:
         booking = Booking.query.get(booking_id)
@@ -798,6 +825,10 @@ def update_booking_status(booking_id):
             return jsonify({
                 "error": "Booking not found"
             }), 404
+
+        # Only the restaurant's owner (or an admin) may confirm / complete bookings.
+        if not (booking.restaurant and can_manage_restaurant(current_user(), booking.restaurant)):
+            return forbidden("You can only manage bookings of your own restaurants.")
 
         data = request.get_json(silent=True) or {}
 
@@ -818,6 +849,23 @@ def update_booking_status(booking_id):
                 )
             }), 400
 
+        if booking.status == "Cancelled" and new_status in ("Pending", "Confirmed"):
+            total_capacity = get_restaurant_capacity(booking.restaurant)
+            used_capacity = sum(
+                int(b.party_size or 0)
+                for b in Booking.query.filter(
+                    Booking.restaurant_id == booking.restaurant_id,
+                    Booking.booking_date == booking.booking_date,
+                    Booking.booking_time == booking.booking_time,
+                    Booking.status.in_(["Pending", "Confirmed"]),
+                    Booking.booking_id != booking.booking_id,
+                ).all()
+            )
+            if int(booking.party_size or 0) > total_capacity - used_capacity:
+                return jsonify({
+                    "error": "Cannot re-open: not enough seating left for this time slot"
+                }), 409
+
         booking.status = new_status
 
         db.session.commit()
@@ -830,9 +878,9 @@ def update_booking_status(booking_id):
         }), 200
 
     except Exception as e:
+        current_app.logger.exception("Booking route error")
         db.session.rollback()
 
         return jsonify({
-            "error": "Failed to update booking status",
-            "details": str(e)
+            "error": "Failed to update booking status"
         }), 500
