@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models import Restaurant, Amenity, RestaurantImage
+from sqlalchemy import func
+from models import Restaurant, Amenity, RestaurantImage, Review
+from models.restaurant import serialize_restaurants
 from datetime import time
 from utils.auth import roles_required, current_user, is_admin, can_manage_restaurant, forbidden
 
@@ -26,7 +28,20 @@ def list_restaurants():
     amenity = request.args.get("amenity")
     sort_by = request.args.get("sort_by", "rating_desc")
 
-    query = Restaurant.query.filter(Restaurant.is_active == True)
+    review_stats = (
+        db.session.query(
+            Review.restaurant_id.label("restaurant_id"),
+            func.avg(Review.rating).label("rating"),
+            func.count(Review.review_id).label("total_reviews"),
+        )
+        .group_by(Review.restaurant_id)
+        .subquery()
+    )
+    query = (
+        Restaurant.query
+        .outerjoin(review_stats, review_stats.c.restaurant_id == Restaurant.restaurant_id)
+        .filter(Restaurant.is_active == True)
+    )
 
     if city and city.lower() != "all":
         query = query.filter(
@@ -46,7 +61,7 @@ def list_restaurants():
     if min_rating:
         try:
             query = query.filter(
-                Restaurant.rating >= float(min_rating)
+                func.coalesce(review_stats.c.rating, 0) >= float(min_rating)
             )
         except ValueError:
             pass
@@ -82,8 +97,8 @@ def list_restaurants():
     # --------------------------------------------------------
     if sort_by == "rating_desc":
         query = query.order_by(
-            Restaurant.rating.desc(),
-            Restaurant.total_reviews.desc()
+            func.coalesce(review_stats.c.rating, 0).desc(),
+            func.coalesce(review_stats.c.total_reviews, 0).desc(),
         )
 
     elif sort_by == "price_asc":
@@ -103,14 +118,12 @@ def list_restaurants():
 
     else:
         query = query.order_by(
-            Restaurant.rating.desc()
+            func.coalesce(review_stats.c.rating, 0).desc()
         )
 
     restaurants = query.all()
 
-    return jsonify(
-        [restaurant.to_dict() for restaurant in restaurants]
-    ), 200
+    return jsonify(serialize_restaurants(restaurants)), 200
 
 
 # ============================================================
@@ -143,9 +156,7 @@ def get_owner_restaurants():
         .all()
     )
 
-    return jsonify(
-        [restaurant.to_dict() for restaurant in restaurants]
-    ), 200
+    return jsonify(serialize_restaurants(restaurants)), 200
 
 
 # ============================================================
@@ -167,7 +178,7 @@ def get_restaurant(restaurant_id):
             "error": "Restaurant not found"
         }), 404
 
-    data = restaurant.to_dict()
+    data = serialize_restaurants([restaurant])[0]
 
     # Include reviews
     reviews = [
@@ -266,13 +277,8 @@ def create_restaurant():
             data.get("avg_budget_for_two", 1200)
         ),
 
-        rating=float(
-            data.get("rating", 4.5)
-        ),
-
-        total_reviews=int(
-            data.get("total_reviews", 0)
-        ),
+        rating=0,
+        total_reviews=0,
 
         opening_time=opening_time,
 
@@ -346,7 +352,7 @@ def create_restaurant():
 
         return jsonify({
             "message": "Restaurant registered successfully",
-            "restaurant": restaurant.to_dict()
+            "restaurant": serialize_restaurants([restaurant])[0]
         }), 201
 
     except Exception as error:
@@ -509,7 +515,7 @@ def update_restaurant(restaurant_id):
 
         return jsonify({
             "message": "Restaurant updated successfully",
-            "restaurant": restaurant.to_dict()
+            "restaurant": serialize_restaurants([restaurant])[0]
         }), 200
 
     except Exception as error:

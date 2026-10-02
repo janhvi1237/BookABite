@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiX, HiStar, HiHeart, HiOutlineHeart, HiOutlineSparkles, HiPlus, HiMinus } from 'react-icons/hi';
+import { HiX, HiStar, HiHeart, HiOutlineHeart, HiOutlineSparkles } from 'react-icons/hi';
 import FoodMascot from '../mascot/FoodMascot';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../common/Toast';
@@ -8,7 +8,6 @@ export default function FoodItemModal({ item, onClose }) {
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
   const [isFav, setIsFav] = useState(false);
-  const [qty, setQty] = useState(1);
 
   if (!item) return null;
 
@@ -18,12 +17,6 @@ export default function FoodItemModal({ item, onClose }) {
       triggerReaction('happy', `Saved ${item.name} to cravings!`, 3000);
       showToast(`Added ${item.name} to favourites`, 'success');
     }
-  };
-
-  const handleAddPlan = () => {
-    triggerReaction('celebrating', `Chef Pierre noted ${qty}x ${item.name} for your reservation!`, 4000);
-    showToast(`Added ${qty}x ${item.name} to your table plan`, 'success');
-    onClose();
   };
 
   return (
@@ -166,21 +159,15 @@ export default function FoodItemModal({ item, onClose }) {
               >
                 {isFav ? <HiHeart size={22} color="#D65A3A" /> : <HiOutlineHeart size={22} />}
               </button>
-
-              <div className="bab-food-qty-stepper" style={{ height: 44, padding: '0 14px' }}>
-                <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))}><HiMinus size={14} /></button>
-                <span style={{ fontSize: '1rem', minWidth: 24, textAlign: 'center' }}>{qty}</span>
-                <button type="button" onClick={() => setQty((q) => q + 1)}><HiPlus size={14} /></button>
-              </div>
             </div>
 
             <button
               type="button"
               className="bab-btn bab-btn--secondary"
-              onClick={handleAddPlan}
+              onClick={onClose}
               style={{ flex: 1, padding: '12px 20px' }}
             >
-              Add to Reservation Plan
+              Close
             </button>
           </div>
         </div>

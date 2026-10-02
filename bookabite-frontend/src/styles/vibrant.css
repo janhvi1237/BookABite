@@ -1,0 +1,296 @@
+/* ============================================================
+   BookABite — Vibrant layer
+   Loaded LAST (after cafe-theme.css). Same cream / navy /
+   terracotta palette, plus warm amber, fresh sage and a soft
+   sky-blue for life and depth.
+
+   Part 1 also defines the --color-* / --space-* / --radius-* /
+   --text-* variables that several pages (My Bookings, Profile,
+   Favorites, Owner, About, Contact, Help, Search, 404) already
+   used but that were never defined, which is why they looked flat.
+   ============================================================ */
+
+:root {
+  /* ---- New accent colours (added to the existing palette) ---- */
+  --vb-amber: #e3a33b;
+  --vb-amber-soft: #fbefd5;
+  --vb-sage: #5e8f7c;
+  --vb-sage-soft: #e3f0ea;
+  --vb-sky: #3f86ad;
+  --vb-sky-soft: #e1eff6;
+  --vb-rose: #c85a54;
+  --vb-rose-soft: #f8e4e1;
+  --vb-navy-2: #234a63;
+
+  --vb-grad-warm: linear-gradient(135deg, #c9744f 0%, #e3a33b 100%);
+  --vb-grad-terracotta: linear-gradient(135deg, #b96848 0%, #d27d52 100%);
+  --vb-grad-navy: linear-gradient(135deg, #183247 0%, #234a63 100%);
+  --vb-ring: 0 0 0 4px rgba(185, 104, 72, 0.18);
+
+  /* ---- Bridge for the previously undefined variables ---- */
+  --color-primary: #183247;
+  --color-secondary: #b96848;
+  --color-secondary-dark: #995038;
+  --color-accent-gold: #e3a33b;
+  --color-text-dark: #122738;
+  --color-text-muted: #756960;
+  --color-border: rgba(24, 50, 71, 0.12);
+  --color-border-light: rgba(24, 50, 71, 0.07);
+  --color-bg-cream: #f6efe5;
+  --color-bg-soft: #fbf7f1;
+  --color-success: #3f8f6b;
+
+  --font-heading: Georgia, "Times New Roman", serif;
+  --bab-font-utility: "Plus Jakarta Sans", "Inter", -apple-system, sans-serif;
+  --bab-terracotta: #b96848;
+  --bab-terracotta-soft: #f0ddd1;
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+  --space-12: 48px;
+  --bab-space-2: 8px; --bab-space-4: 16px; --bab-space-5: 20px;
+  --bab-space-6: 24px; --bab-space-8: 32px;
+
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 26px; --radius-full: 9999px;
+
+  --text-xs: 0.78rem; --text-sm: 0.88rem; --text-base: 1rem;
+  --text-lg: 1.15rem; --text-xl: 1.4rem; --text-2xl: 1.75rem;
+  --text-3xl: 2.2rem; --text-4xl: 2.8rem;
+  --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700;
+
+  --shadow-sm: 0 2px 10px rgba(45, 36, 30, 0.06);
+  --shadow-md: 0 10px 28px rgba(45, 36, 30, 0.10);
+  --shadow-lg: 0 18px 44px rgba(45, 36, 30, 0.14);
+  --shadow-xl: 0 26px 60px rgba(45, 36, 30, 0.18);
+  --bab-shadow: 0 18px 44px rgba(45, 36, 30, 0.14);
+
+  --transition-fast: 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-normal: 300ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  --container-lg: 1040px;
+  --container-xl: 1240px;
+}
+
+/* ============================================================
+   2. GLOBAL POLISH
+   ============================================================ */
+
+::selection { background: var(--vb-amber); color: #122738; }
+
+html { scroll-behavior: smooth; }
+
+* { scrollbar-width: thin; scrollbar-color: #d8b9a6 transparent; }
+
+/* Buttons: warm gradients + lift */
+.bab-btn {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+              background var(--transition-fast), border-color var(--transition-fast) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+}
+.bab-btn:active { transform: translateY(0) scale(0.98) !important; }
+
+.bab-btn--secondary {
+  background: var(--vb-grad-terracotta) !important;
+  box-shadow: 0 6px 16px rgba(185, 104, 72, 0.28) !important;
+}
+.bab-btn--secondary:hover {
+  background: linear-gradient(135deg, #a95a3c 0%, #c96f45 100%) !important;
+  box-shadow: 0 10px 22px rgba(185, 104, 72, 0.38) !important;
+  transform: translateY(-2px);
+}
+.bab-btn--primary {
+  background: var(--vb-grad-navy) !important;
+  box-shadow: 0 6px 16px rgba(24, 50, 71, 0.25) !important;
+}
+.bab-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(24, 50, 71, 0.34) !important; }
+.bab-btn--gold {
+  background: var(--vb-grad-warm) !important;
+  color: #1d2a33 !important;
+}
+.bab-btn:disabled, .bab-btn[disabled] {
+  opacity: 0.55; cursor: not-allowed; transform: none !important; box-shadow: none !important;
+}
+
+/* Inputs: friendly focus ring */
+.bab-form-input:focus, input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--cafe-terracotta, #b96848) !important;
+  box-shadow: var(--vb-ring);
+}
+
+/* Badges */
+.bab-badge { font-weight: 700; letter-spacing: 0.02em; }
+.bab-badge--terracotta { background: var(--cafe-terracotta-soft, #f0ddd1); color: #8d4f37; }
+.bab-badge--gold { background: var(--vb-amber-soft); color: #8a5d0f; }
+.bab-badge--success { background: var(--vb-sage-soft); color: #2f6b55; }
+
+/* Navbar: amber accent on the active link, glass effect */
+.bab-navbar { backdrop-filter: saturate(1.4) blur(10px); }
+.bab-navbar__links a.active::after { background: var(--vb-grad-warm) !important; height: 3px !important; border-radius: 3px; }
+.bab-navbar__logo-mark { background: var(--vb-grad-terracotta) !important; box-shadow: 0 4px 12px rgba(185, 104, 72, 0.35); }
+.bab-navbar__book { background: var(--vb-grad-terracotta) !important; box-shadow: 0 6px 14px rgba(185, 104, 72, 0.3); }
+
+/* ============================================================
+   3. HOME: livelier hero and sections
+   ============================================================ */
+
+.bab-home-hero {
+  background:
+    radial-gradient(520px 320px at 8% 12%, rgba(227, 163, 59, 0.22), transparent 70%),
+    radial-gradient(560px 360px at 92% 8%, rgba(185, 104, 72, 0.20), transparent 70%),
+    radial-gradient(520px 380px at 70% 105%, rgba(94, 143, 124, 0.20), transparent 70%),
+    radial-gradient(420px 300px at 0% 100%, rgba(63, 134, 173, 0.14), transparent 70%),
+    linear-gradient(180deg, #fbf3e6 0%, #f6efe5 100%) !important;
+}
+.bab-home-hero__eyebrow {
+  background: var(--vb-amber-soft) !important;
+  color: #8a5d0f !important;
+  border: 1px solid rgba(227, 163, 59, 0.45);
+}
+.bab-home-hero__headline em, .bab-home-hero__headline span {
+  background: var(--vb-grad-warm);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.bab-hero-search-bar {
+  box-shadow: 0 22px 48px rgba(24, 50, 71, 0.14) !important;
+  border: 1px solid rgba(185, 104, 72, 0.18) !important;
+}
+.bab-home-stat strong { color: var(--cafe-terracotta, #b96848) !important; }
+
+.bab-section-eyebrow::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px;
+  border-radius: 50%; background: var(--vb-amber); vertical-align: 1px;
+}
+.bab-home-section--alt { background: linear-gradient(180deg, #f1e6d8 0%, #eadccb 100%) !important; }
+
+/* Navy feature blocks get depth + a warm glow */
+.categories-section, .why-choose, .bab-owner-banner-card {
+  background:
+    radial-gradient(600px 300px at 90% 0%, rgba(227, 163, 59, 0.16), transparent 70%),
+    radial-gradient(500px 300px at 0% 100%, rgba(63, 134, 173, 0.22), transparent 70%),
+    linear-gradient(135deg, #152d40 0%, #1d4059 100%) !important;
+}
+.category-icon, .why-choose__icon { color: var(--vb-amber) !important; border-color: rgba(227, 163, 59, 0.5) !important; }
+.categories-eyebrow, .why-choose__eyebrow { color: var(--vb-amber) !important; }
+
+/* Restaurant cards */
+.restaurant-card { overflow: hidden; transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal) !important; }
+.restaurant-card:hover { transform: translateY(-6px); box-shadow: 0 22px 44px rgba(45, 36, 30, 0.16) !important; }
+.restaurant-card img { transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1); }
+.restaurant-card:hover img { transform: scale(1.06); }
+.restaurant-card__button { background: var(--vb-grad-terracotta) !important; }
+.restaurant-card__button:hover { background: linear-gradient(135deg, #a95a3c, #c96f45) !important; }
+
+/* ============================================================
+   4. RESTAURANT DETAILS + BOOKING WIZARD
+   ============================================================ */
+
+.bab-details-tab-btn--active {
+  color: var(--cafe-terracotta, #b96848) !important;
+  border-bottom-color: var(--vb-amber) !important;
+}
+.bab-amenity-item {
+  background: var(--vb-sage-soft); border-radius: 12px; padding: 10px 14px;
+  color: #2f5a4a; font-weight: 600;
+}
+.bab-chef-highlight-box {
+  background: linear-gradient(135deg, var(--vb-amber-soft), #fff6e8) !important;
+  border: 1px solid rgba(227, 163, 59, 0.35) !important;
+  border-radius: 18px !important;
+}
+
+.bab-sticky-booking-card, .bab-booking-card {
+  position: relative; overflow: hidden;
+  border-radius: 20px !important;
+  box-shadow: 0 22px 50px rgba(24, 50, 71, 0.14) !important;
+}
+.bab-sticky-booking-card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 5px; background: var(--vb-grad-warm);
+}
+
+/* Time slot pills (details page + wizard) */
+.bab-time-slot-btn, .bab-slot-pill {
+  border-radius: 12px !important; font-weight: 600; transition: all var(--transition-fast);
+}
+.bab-time-slot-btn:hover, .bab-slot-pill:hover:not(:disabled) {
+  border-color: var(--vb-amber) !important; background: var(--vb-amber-soft) !important; transform: translateY(-1px);
+}
+.bab-time-slot-btn--selected, .bab-slot-pill--selected {
+  background: var(--vb-grad-terracotta) !important; border-color: transparent !important;
+  color: #fff !important; box-shadow: 0 6px 14px rgba(185, 104, 72, 0.32);
+}
+.bab-party-btn--selected { background: var(--vb-grad-terracotta) !important; box-shadow: 0 6px 14px rgba(185, 104, 72, 0.3); }
+.bab-seating-card--selected { background: var(--vb-amber-soft) !important; border-color: var(--vb-amber) !important; }
+
+.bab-progress-circle--active { background: var(--vb-grad-terracotta) !important; color: #fff !important; box-shadow: 0 6px 14px rgba(185, 104, 72, 0.3); }
+.bab-progress-line--active { background: var(--vb-grad-warm) !important; }
+
+.bab-slots-state {
+  margin: 12px 0 0; padding: 14px 16px; border-radius: 14px; font-size: 0.92rem; line-height: 1.5;
+  background: var(--vb-sky-soft); color: #25536d; border: 1px solid rgba(63, 134, 173, 0.25);
+}
+.bab-slots-state--warn { background: var(--vb-amber-soft); color: #7a520c; border-color: rgba(227, 163, 59, 0.4); }
+.bab-slots-loading { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+.bab-slots-loading span {
+  height: 40px; border-radius: 12px;
+  background: linear-gradient(90deg, #efe4d6 25%, #f8f0e4 50%, #efe4d6 75%);
+  background-size: 200% 100%; animation: vb-shimmer 1.2s infinite linear;
+}
+@keyframes vb-shimmer { to { background-position: -200% 0; } }
+
+/* Fee + payment */
+.bab-fee-box {
+  margin-top: 6px; padding: 18px 20px; border-radius: 16px;
+  background: linear-gradient(135deg, #fff9ee, #fdf1dd);
+  border: 1px dashed rgba(227, 163, 59, 0.7);
+}
+.bab-fee-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 0.95rem; color: var(--cafe-muted, #756960); }
+.bab-fee-row strong { color: var(--cafe-navy, #183247); }
+.bab-fee-row--total {
+  margin-top: 8px; padding-top: 12px; border-top: 1px solid rgba(24, 50, 71, 0.14);
+  font-size: 1.12rem; color: var(--cafe-navy, #183247);
+}
+.bab-fee-row--total strong { font-size: 1.3rem; color: var(--cafe-terracotta, #b96848); }
+.bab-fee-note { margin: 10px 0 0; font-size: 0.82rem; color: var(--cafe-muted, #756960); line-height: 1.5; }
+
+.bab-pay-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+.bab-pay-method {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; cursor: pointer;
+  border: 2px solid var(--color-border); border-radius: 14px; background: #fff;
+  font-weight: 700; font-size: 0.9rem; color: var(--cafe-navy, #183247);
+  transition: all var(--transition-fast);
+}
+.bab-pay-method small { font-weight: 500; color: var(--cafe-muted, #756960); font-size: 0.74rem; }
+.bab-pay-method:hover { border-color: var(--vb-amber); transform: translateY(-2px); }
+.bab-pay-method--selected { border-color: var(--cafe-terracotta, #b96848); background: var(--cafe-terracotta-soft, #f0ddd1); box-shadow: var(--vb-ring); }
+.bab-demo-pill {
+  display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px;
+  background: var(--vb-sky-soft); color: #25536d; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   5. CONFIRMATION TICKET
+   ============================================================ */
+.bab-ticket-card { border-radius: 22px !important; overflow: hidden; }
+.bab-ticket-card__top { background: var(--vb-grad-navy) !important; }
+.bab-ticket-card__top h3, .bab-ticket-card__top .bab-ticket-rest-name { color: #fff8f0 !important; }
+.bab-ticket-card__top .bab-ticket-eyebrow { color: var(--vb-amber) !important; }
+.bab-ticket-card__top .bab-ticket-rest-area, .bab-ticket-card__top span { color: rgba(255, 248, 240, 0.78) !important; }
+.bab-ticket-card__top .bab-ticket-id-tag strong { color: #fff !important; }
+.bab-confirm-badge { background: var(--vb-sage-soft) !important; color: #2f6b55 !important; }
+.bab-paid-strip {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 18px 0 0; padding: 14px 18px; border-radius: 14px;
+  background: var(--vb-sage-soft); color: #2f5a4a; font-size: 0.92rem;
+}
+.bab-paid-strip strong { font-size: 1.05rem; }
+
+/* ============================================================
+   6. MOTION (respects reduced-motion via tokens.css)
+   ============================================================ */
+@keyframes vb-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.bab-booking-item-card, .bab-customer-card, .bab-booking-card, .bab-ticket-card { animation: vb-rise 450ms cubic-bezier(0.22, 1, 0.36, 1) both; }

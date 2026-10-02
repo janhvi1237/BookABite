@@ -10,6 +10,7 @@ import { ToastProvider } from './components/common/Toast';
 import App from './App.jsx';
 import './index.css';
 import './styles/cafe-theme.css';
+import './styles/vibrant.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -103,6 +103,8 @@ CREATE TABLE Bookings (
     special_request NVARCHAR(500) NULL,
     qr_code NVARCHAR(255) NULL,              -- QR booking confirmation
     scratch_card_used BIT DEFAULT 0,
+    booking_fee DECIMAL(10,2) NOT NULL DEFAULT 0,
+    fee_status NVARCHAR(20) NOT NULL DEFAULT 'None',   -- None, Paid, Refunded
     created_at DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Booking_User FOREIGN KEY (user_id) REFERENCES Users(user_id),
     CONSTRAINT FK_Booking_Restaurant FOREIGN KEY (restaurant_id) REFERENCES Restaurants(restaurant_id),

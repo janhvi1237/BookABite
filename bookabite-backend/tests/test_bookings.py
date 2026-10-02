@@ -6,7 +6,7 @@ FUTURE = (date.today() + timedelta(days=3)).isoformat()
 
 def payload(restaurant_id, **overrides):
     body = {"restaurant_id": restaurant_id, "booking_date": FUTURE,
-            "booking_time": "19:00", "party_size": 2}
+            "booking_time": "19:00", "party_size": 2, "payment_method": "upi"}
     body.update(overrides)
     return body
 
@@ -181,3 +181,83 @@ def test_cancelled_booking_cannot_be_reopened_past_capacity(client, customer, ot
 def test_table_id_must_belong_to_restaurant(client, customer, restaurant):
     res = book(client, customer[1], restaurant, table_id=424242)
     assert res.status_code == 400
+
+
+# ---------- same guest, same restaurant, overlapping times ----------
+
+def test_cannot_hold_two_tables_at_the_same_time(client, customer, restaurant):
+    assert book(client, customer[1], restaurant, booking_time="19:00").status_code == 201
+    res = book(client, customer[1], restaurant, booking_time="19:00")
+    assert res.status_code == 409
+    assert "already have a table" in res.get_json()["error"]
+
+
+def test_cannot_book_overlapping_times(client, customer, restaurant):
+    assert book(client, customer[1], restaurant, booking_time="19:00").status_code == 201
+    assert book(client, customer[1], restaurant, booking_time="20:30").status_code == 409
+
+
+def test_can_book_a_later_sitting_or_after_cancelling(client, customer, restaurant):
+    first = book(client, customer[1], restaurant, booking_time="12:00").get_json()["booking"]["booking_id"]
+    assert book(client, customer[1], restaurant, booking_time="19:00").status_code == 201
+    client.patch(f"/api/bookings/{first}/cancel", headers=customer[1])
+    assert book(client, customer[1], restaurant, booking_time="12:30").status_code == 201
+
+
+def test_availability_hides_slots_the_guest_already_holds(client, customer, restaurant):
+    from datetime import date, timedelta
+    book(client, customer[1], restaurant, booking_time="19:00")
+    url = f"/api/bookings/availability?restaurant_id={restaurant}&booking_date={FUTURE}"
+    slots = {s["value"]: s for s in client.get(url, headers=customer[1]).get_json()["slots"]}
+    assert slots["19:00"]["already_booked"] and not slots["19:00"]["available"]
+    assert slots["12:00"]["available"]
+    # a visitor who is not the booker still sees 19:00 as open
+    anon = {s["value"]: s for s in client.get(url).get_json()["slots"]}
+    assert anon["19:00"]["available"]
+
+
+# ---------- booking fee ----------
+
+def test_fee_quote(client):
+    res = client.get("/api/bookings/fee-quote?party_size=4")
+    assert res.status_code == 200
+    assert res.get_json()["fee"] == 200.0
+    assert client.get("/api/bookings/fee-quote?party_size=20").get_json()["capped"] is True
+
+
+def test_fee_is_charged_and_recorded(client, customer, restaurant):
+    res = book(client, customer[1], restaurant, party_size=3)
+    booking = res.get_json()["booking"]
+    assert booking["booking_fee"] == 150.0
+    assert booking["fee_status"] == "Paid"
+    assert booking["invoice_number"].startswith("BAB-")
+
+
+def test_fee_requires_payment_method(client, customer, restaurant):
+    res = book(client, customer[1], restaurant, payment_method="")
+    assert res.status_code == 400
+
+
+def test_client_cannot_set_its_own_fee(client, customer, restaurant):
+    res = book(client, customer[1], restaurant, party_size=2, booking_fee=0)
+    assert res.get_json()["booking"]["booking_fee"] == 100.0
+
+
+def test_guest_cancel_in_time_refunds_fee(client, customer, restaurant):
+    bid = book(client, customer[1], restaurant).get_json()["booking"]["booking_id"]
+    res = client.patch(f"/api/bookings/{bid}/cancel", headers=customer[1]).get_json()
+    assert res["refunded"] is True
+    assert res["booking"]["fee_status"] == "Refunded"
+
+
+def test_owner_cancel_always_refunds(client, customer, owner, restaurant):
+    bid = book(client, customer[1], restaurant).get_json()["booking"]["booking_id"]
+    res = client.patch(f"/api/bookings/{bid}/status", json={"status": "Cancelled"}, headers=owner[1]).get_json()
+    assert res["booking"]["fee_status"] == "Refunded"
+
+
+def test_refunded_booking_cannot_be_reopened(client, customer, owner, restaurant):
+    bid = book(client, customer[1], restaurant).get_json()["booking"]["booking_id"]
+    client.patch(f"/api/bookings/{bid}/cancel", headers=customer[1])
+    res = client.patch(f"/api/bookings/{bid}/status", json={"status": "Confirmed"}, headers=owner[1])
+    assert res.status_code == 409

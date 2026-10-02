@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import MenuItem, Restaurant
+from models.restaurant import serialize_restaurants
 from utils.exceptions import AppError
 from utils.auth import roles_required, current_user, can_manage_restaurant, forbidden
 
@@ -149,7 +150,7 @@ def get_menu_item(item_id):
 
     data = item.to_dict()
     if item.restaurant:
-        data["restaurant"] = item.restaurant.to_dict()
+        data["restaurant"] = serialize_restaurants([item.restaurant])[0]
 
     return jsonify(data), 200
 

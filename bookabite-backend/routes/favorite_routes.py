@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Favorite, Restaurant, User
+from models.restaurant import serialize_restaurants
 from utils.auth import login_required, current_user, optional_user
 
 favorite_bp = Blueprint("favorites", __name__, url_prefix="/api/favorites")
@@ -25,7 +26,7 @@ def get_favorites():
     for fav in favorites:
         restaurant = Restaurant.query.get(fav.restaurant_id)
         if restaurant and restaurant.is_active:
-            r_dict = restaurant.to_dict()
+            r_dict = serialize_restaurants([restaurant])[0]
             r_dict["favorited_at"] = fav.created_at.isoformat() if fav.created_at else None
             results.append(r_dict)
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { HiOutlineMail } from 'react-icons/hi';
-import { FaInstagram, FaTwitter, FaFacebookF } from 'react-icons/fa';
+import { HiArrowRight } from 'react-icons/hi';
 import SteamMark from './SteamMark';
 import './Footer.css';
 
@@ -37,6 +36,17 @@ export default function Footer() {
   return (
     <footer className="bab-footer">
       <div className="bab-footer__inner bab-container">
+        <section className="bab-footer__cta">
+          <div>
+            <span className="bab-footer__eyebrow">MAKE IT A MEAL TO REMEMBER</span>
+            <h2>Good food. Great company. Your table is waiting.</h2>
+            <p>Find a new favourite and make a little more room for the moments that matter.</p>
+          </div>
+          <NavLink to="/explore" className="bab-footer__cta-link">
+            Explore restaurants <HiArrowRight size={18} />
+          </NavLink>
+        </section>
+
         <div className="bab-footer__top">
           <div className="bab-footer__brand">
             <div className="bab-footer__brand-row">
@@ -48,11 +58,7 @@ export default function Footer() {
             <p className="bab-footer__tagline">
               Discover boutique cafés, explore artisan food menus, and reserve the finest tables in just a few clicks.
             </p>
-            <div className="bab-footer__social">
-              <a href="#" aria-label="Instagram" className="bab-footer__social-btn"><FaInstagram size={16} /></a>
-              <a href="#" aria-label="Twitter" className="bab-footer__social-btn"><FaTwitter size={16} /></a>
-              <a href="#" aria-label="Facebook" className="bab-footer__social-btn"><FaFacebookF size={16} /></a>
-            </div>
+            <span className="bab-footer__brand-note">Thoughtful tables across Pune</span>
           </div>
 
           {COLUMNS.map((col) => (
@@ -69,22 +75,11 @@ export default function Footer() {
               </ul>
             </div>
           ))}
-
-          <div className="bab-footer__col bab-footer__newsletter">
-            <h6 className="bab-footer__col-title">Culinary Newsletter</h6>
-            <p className="bab-footer__col-text">Secret tasting menus, chef specials, and weekend tables delivered weekly.</p>
-            <form className="bab-footer__newsletter-form" onSubmit={(e) => { e.preventDefault(); alert("Thank you for subscribing to BookABite newsletter!"); }}>
-              <span className="bab-footer__newsletter-icon"><HiOutlineMail size={16} /></span>
-              <input type="email" placeholder="you@example.com" aria-label="Email address" required />
-              <button type="submit">Join</button>
-            </form>
-          </div>
         </div>
 
         <div className="bab-footer__bottom">
-          <span>© {new Date().getFullYear()} BookABite Technologies Inc. All rights reserved.</span>
-          <span className="bab-footer__bottom-sep" aria-hidden="true">•</span>
-          <span>Crafted with passion for culinary lovers & boutique dining.</span>
+          <span>© {new Date().getFullYear()} BookABite. All rights reserved.</span>
+          <span>Made for memorable meals.</span>
         </div>
       </div>
     </footer>

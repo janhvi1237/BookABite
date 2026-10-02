@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { HiArrowLeft, HiStar, HiHeart, HiOutlineHeart, HiOutlineSparkles, HiPlus, HiMinus, HiOutlineLocationMarker } from 'react-icons/hi';
+import { HiArrowLeft, HiStar, HiHeart, HiOutlineHeart, HiOutlineSparkles, HiOutlineLocationMarker } from 'react-icons/hi';
 import PageLoader from '../../components/common/PageLoader';
 import { ErrorState } from '../../components/common/ErrorState';
 import FoodMascot from '../../components/mascot/FoodMascot';
@@ -19,7 +19,6 @@ export default function FoodDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFav, setIsFav] = useState(false);
-  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     let active = true;
@@ -47,7 +46,7 @@ export default function FoodDetailsPage() {
   };
 
   const handleBookTable = () => {
-    triggerReaction('excited', `Chef Pierre is setting up your table at ${dish.restaurant?.name || 'the restaurant'}!`, 4000);
+    triggerReaction('excited', `Chef Pierre is setting up a table at ${dish.restaurant?.name || 'the restaurant'}!`, 4000);
     navigate(`/restaurants/${dish.restaurant_id}/book`);
   };
 
@@ -152,24 +151,14 @@ export default function FoodDetailsPage() {
               </div>
             </div>
 
-            {/* QUANTITY & ACTIONS */}
+            {/* ACTIONS */}
             <div className="bab-food-actions-row">
-              <div className="bab-food-qty-stepper" style={{ height: 48, padding: '0 16px' }}>
-                <button type="button" onClick={() => setQuantity((q) => Math.max(1, q - 1))} aria-label="Decrease quantity">
-                  <HiMinus size={14} />
-                </button>
-                <span style={{ fontSize: '1.1rem', minWidth: 28, textAlign: 'center' }}>{quantity}</span>
-                <button type="button" onClick={() => setQuantity((q) => q + 1)} aria-label="Increase quantity">
-                  <HiPlus size={14} />
-                </button>
-              </div>
-
               <button
                 type="button"
                 className="bab-btn bab-btn--secondary bab-food-book-cta"
                 onClick={handleBookTable}
               >
-                Reserve Table for this Dish
+                Reserve a Table
               </button>
             </div>
           </div>

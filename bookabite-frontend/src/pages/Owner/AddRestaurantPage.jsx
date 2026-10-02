@@ -165,9 +165,13 @@ export default function AddRestaurantPage() {
         </div>
 
         {/* STEP PROGRESS BAR */}
-        <div className="bab-onboarding-progress">
+        <div className="bab-onboarding-progress" aria-label={`Registration progress, step ${step} of 6`}>
           {['Info', 'Location', 'Details', 'Photos', 'Menu', 'Launch'].map((lbl, idx) => (
-            <div key={lbl} className="bab-onboarding-step-indicator">
+            <div
+              key={lbl}
+              className="bab-onboarding-step-indicator"
+              aria-current={step === idx + 1 ? 'step' : undefined}
+            >
               <div className={`bab-progress-circle ${step >= idx + 1 ? 'bab-progress-circle--active' : ''}`}>
                 {step > idx + 1 ? <HiCheck size={14} /> : idx + 1}
               </div>

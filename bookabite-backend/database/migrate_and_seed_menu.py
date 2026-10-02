@@ -12,12 +12,91 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import create_app
 from extensions import db, bcrypt
 from sqlalchemy import text, inspect
-from models import User, Restaurant, MenuItem, Review
+from models import User, Restaurant, MenuItem
 
 app = create_app()
 
+DEMO_OWNER_EMAIL = "owner@bookabite.com"
+DEMO_OWNER_PASSWORD = "Password@123"
+DEMO_DINER_EMAIL = "diner@bookabite.com"
+DEMO_DINER_PASSWORD = "Password@123"
+
+
+def ensure_demo_owner():
+    owner = User.query.filter_by(email=DEMO_OWNER_EMAIL).first()
+    password_hash = bcrypt.generate_password_hash(DEMO_OWNER_PASSWORD).decode("utf-8")
+
+    if owner is None:
+        owner = User(
+            full_name="Aarav Mehta",
+            email=DEMO_OWNER_EMAIL,
+            phone="9876543210",
+            password_hash=password_hash,
+            role="owner",
+            is_admin=False,
+            is_approved=True,
+        )
+        db.session.add(owner)
+    else:
+        owner.password_hash = password_hash
+        owner.role = "owner"
+        owner.is_admin = False
+        owner.is_approved = True
+
+    db.session.commit()
+    return owner
+
+
+def ensure_demo_diner():
+    diner = User.query.filter_by(email=DEMO_DINER_EMAIL).first()
+    password_hash = bcrypt.generate_password_hash(DEMO_DINER_PASSWORD).decode("utf-8")
+
+    if diner is None:
+        diner = User(
+            full_name="Demo Diner",
+            email=DEMO_DINER_EMAIL,
+            password_hash=password_hash,
+            role="customer",
+            is_admin=False,
+            is_approved=True,
+        )
+        db.session.add(diner)
+    else:
+        diner.password_hash = password_hash
+        diner.role = "customer"
+        diner.is_admin = False
+        diner.is_approved = True
+
+    db.session.commit()
+    return diner
+
+
 MENU_DATA_TEMPLATES = {
     "North Indian": [
+        {
+            "name": "Hyderabadi Chicken Dum Biryani",
+            "category": "Main Course",
+            "price": 420.0,
+            "description": "Slow-cooked basmati layered with marinated chicken, saffron and fried onions.",
+            "is_veg": False,
+            "spice_level": "Spicy",
+            "ingredients": "Chicken, Basmati Rice, Saffron, Fried Onions, Spices",
+            "dietary_info": "Gluten-Free",
+            "rating": 4.7,
+            "image_url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&auto=format&fit=crop&q=80",
+        },
+        {
+            "name": "Tandoori Chicken Tikka",
+            "category": "Starters",
+            "price": 340.0,
+            "description": "Charcoal-grilled chicken marinated in yogurt and Kashmiri chilli.",
+            "is_veg": False,
+            "spice_level": "Medium",
+            "ingredients": "Chicken, Yogurt, Kashmiri Chilli, Ginger, Garlic",
+            "dietary_info": "Gluten-Free",
+            "rating": 4.6,
+            "image_url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800&auto=format&fit=crop&q=80",
+        },
         {
             "name": "Smoked Butter Chicken",
             "category": "Main Course",
@@ -93,6 +172,30 @@ MENU_DATA_TEMPLATES = {
     ],
     "Italian": [
         {
+            "name": "Spaghetti Carbonara",
+            "category": "Main Course",
+            "price": 450.0,
+            "description": "Classic Roman pasta with crisp pancetta, egg yolk and pecorino.",
+            "is_veg": False,
+            "spice_level": "Mild",
+            "ingredients": "Spaghetti, Pancetta, Egg, Pecorino, Black Pepper",
+            "dietary_info": "Nut-Free",
+            "rating": 4.6,
+            "image_url": "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=80",
+        },
+        {
+            "name": "Grilled Chicken Pizza",
+            "category": "Main Course",
+            "price": 520.0,
+            "description": "Wood-fired crust with grilled chicken, mozzarella and basil.",
+            "is_veg": False,
+            "spice_level": "Mild",
+            "ingredients": "Chicken, Mozzarella, Tomato Sauce, Basil",
+            "dietary_info": "Nut-Free",
+            "rating": 4.5,
+            "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
+        },
+        {
             "name": "Truffle Burrata & Heirloom Pizza",
             "category": "Main Course",
             "price": 680.0,
@@ -154,6 +257,30 @@ MENU_DATA_TEMPLATES = {
         },
     ],
     "Default": [
+        {
+            "name": "Herb Grilled Chicken Steak",
+            "category": "Main Course",
+            "price": 490.0,
+            "description": "Juicy grilled chicken breast with herb butter and roasted vegetables.",
+            "is_veg": False,
+            "spice_level": "Mild",
+            "ingredients": "Chicken Breast, Herb Butter, Seasonal Vegetables",
+            "dietary_info": "Gluten-Free",
+            "rating": 4.5,
+            "image_url": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=800&auto=format&fit=crop&q=80",
+        },
+        {
+            "name": "Crispy Fish Fingers",
+            "category": "Starters",
+            "price": 380.0,
+            "description": "Golden crumbed fish with tartare dip and lemon.",
+            "is_veg": False,
+            "spice_level": "Mild",
+            "ingredients": "White Fish, Breadcrumbs, Tartare Sauce, Lemon",
+            "dietary_info": "Nut-Free",
+            "rating": 4.4,
+            "image_url": "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?w=800&auto=format&fit=crop&q=80",
+        },
         {
             "name": "Crispy Avocado & Edamame Crostini",
             "category": "Starters",
@@ -264,33 +391,32 @@ def run_migration():
             print("role column exists on Users.")
 
         # 4. Seed or find demo owner
-        owner = User.query.filter_by(email="owner@bookabite.com").first()
+        owner = User.query.filter_by(email=DEMO_OWNER_EMAIL).first()
         if not owner:
             print("Creating demo owner user...")
-            pwd_hash = bcrypt.generate_password_hash("Password@123").decode("utf-8")
-            owner = User(
-                full_name="Aarav Mehta",
-                email="owner@bookabite.com",
-                phone="9876543210",
-                password_hash=pwd_hash,
-                role="owner",
-                is_admin=False,
-            )
-            db.session.add(owner)
-            db.session.commit()
-            print("Created demo owner user: owner@bookabite.com / Password@123")
+            owner = ensure_demo_owner()
+            print(f"Created demo owner user: {DEMO_OWNER_EMAIL} / {DEMO_OWNER_PASSWORD}")
         else:
-            owner.role = "owner"
-            db.session.commit()
+            owner = ensure_demo_owner()
+            print(f"Reset demo owner credentials: {DEMO_OWNER_EMAIL} / {DEMO_OWNER_PASSWORD}")
 
-        # 5. Link first 2 restaurants to this owner
+        # 5. Seed or reset demo diner
+        diner = User.query.filter_by(email=DEMO_DINER_EMAIL).first()
+        if diner is None:
+            print("Creating demo diner user...")
+        else:
+            print("Resetting demo diner credentials...")
+        ensure_demo_diner()
+        print(f"Demo diner credentials: {DEMO_DINER_EMAIL} / {DEMO_DINER_PASSWORD}")
+
+        # 6. Link first 2 restaurants to this owner
         restaurants = Restaurant.query.all()
         for idx, rest in enumerate(restaurants):
             if idx < 2 and not rest.owner_id:
                 rest.owner_id = owner.user_id
         db.session.commit()
 
-        # 6. Seed menu items for each restaurant if empty
+        # 7. Seed menu items for each restaurant if empty
         existing_menu_count = MenuItem.query.count()
         print(f"Current menu item count: {existing_menu_count}")
         if existing_menu_count < 10:
@@ -323,28 +449,6 @@ def run_migration():
                         db.session.add(menu_item)
             db.session.commit()
             print(f"Seeded menu items successfully! New count: {MenuItem.query.count()}")
-
-        # 7. Seed sample reviews if empty
-        if Review.query.count() == 0 and len(restaurants) > 0:
-            print("Seeding sample reviews...")
-            first_user = User.query.first()
-            if first_user:
-                sample_reviews = [
-                    (5, "Absolutely wonderful experience! The smoked butter chicken and ambiance were sublime."),
-                    (4, "Great food and prompt service. The table booking worked flawlessly."),
-                    (5, "One of the best dining places in Pune. Will definitely reserve again!"),
-                ]
-                for r_idx, rest in enumerate(restaurants[:4]):
-                    rating, comment = sample_reviews[r_idx % len(sample_reviews)]
-                    rev = Review(
-                        user_id=first_user.user_id,
-                        restaurant_id=rest.restaurant_id,
-                        rating=rating,
-                        comment=comment,
-                    )
-                    db.session.add(rev)
-                db.session.commit()
-                print("Seeded reviews!")
 
         print("Migration and seeding finished successfully.")
 

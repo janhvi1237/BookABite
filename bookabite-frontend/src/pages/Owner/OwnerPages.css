@@ -324,6 +324,57 @@
 }
 
 /* Wizard / Onboarding Page */
+.bab-onboarding-progress {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: start;
+  margin: 0 0 var(--space-8);
+}
+
+.bab-onboarding-progress::before {
+  position: absolute;
+  top: 17px;
+  right: 8.33%;
+  left: 8.33%;
+  height: 2px;
+  background: var(--color-border);
+  content: '';
+}
+
+.bab-onboarding-step-indicator {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: var(--weight-medium);
+  text-align: center;
+}
+
+.bab-onboarding-step-indicator[aria-current='step'] {
+  color: var(--color-primary);
+  font-weight: var(--weight-bold);
+}
+
+.bab-onboarding-step-indicator .bab-progress-circle {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  background: #fff;
+  border: 2px solid var(--color-border);
+}
+
+.bab-onboarding-step-indicator .bab-progress-circle--active {
+  border-color: var(--color-secondary);
+  background: var(--color-secondary);
+  color: #fff;
+}
+
 .bab-wizard-page {
   min-height: calc(100vh - 80px);
   background-color: var(--color-bg-cream);
@@ -517,6 +568,24 @@
 }
 
 @media (max-width: 768px) {
+  .bab-onboarding-progress {
+    margin-bottom: var(--space-6);
+  }
+  .bab-onboarding-progress::before {
+    top: 15px;
+  }
+  .bab-onboarding-step-indicator {
+    gap: 6px;
+    font-size: clamp(0.58rem, 2.5vw, 0.7rem);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .bab-onboarding-step-indicator .bab-progress-circle {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    font-size: 0.78rem;
+  }
   .bab-wizard-progress {
     overflow-x: auto;
     padding-bottom: var(--space-2);

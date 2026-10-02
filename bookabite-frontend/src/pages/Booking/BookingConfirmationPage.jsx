@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import {
@@ -12,17 +12,33 @@ import {
   HiOutlineShare,
 } from 'react-icons/hi';
 import FoodMascot from '../../components/mascot/FoodMascot';
+import { fetchBooking } from '../../api/bookings';
+import { formatDate, formatTime, formatMoney } from '../../utils/time';
 import './BookingConfirmationPage.css';
 
 export default function BookingConfirmationPage() {
-  const { bookingId } = useParams();
+  // The route is /booking-confirmation/:id
+  const { id: bookingId } = useParams();
   const [searchParams] = useSearchParams();
+  const [booking, setBooking] = useState(null);
 
-  const restaurantName = searchParams.get('rest') || 'The Spice Terrace';
-  const bookingDate = searchParams.get('date') || new Date().toISOString().split('T')[0];
-  const bookingTime = searchParams.get('time') || '07:30 PM';
-  const partySize = searchParams.get('guests') || '2';
-  const area = searchParams.get('area') || 'Koregaon Park';
+  // Show the real booking (status, fee, invoice) from the server.
+  useEffect(() => {
+    if (!bookingId) return;
+    let active = true;
+    fetchBooking(bookingId)
+      .then((b) => { if (active) setBooking(b); })
+      .catch(() => { /* fall back to the details in the link */ });
+    return () => { active = false; };
+  }, [bookingId]);
+
+  const restaurantName = booking?.restaurant_name || searchParams.get('rest') || 'Your restaurant';
+  const bookingDate = booking?.booking_date || searchParams.get('date') || '';
+  const bookingTime = booking?.booking_time ? formatTime(booking.booking_time) : searchParams.get('time') || '';
+  const partySize = booking?.party_size || searchParams.get('guests') || '';
+  const area = booking?.restaurant_area || searchParams.get('area') || '';
+  const status = booking?.status || 'Pending';
+  const fee = Number(booking?.booking_fee || 0);
 
   // Fire celebratory confetti on mount
   useEffect(() => {
@@ -50,7 +66,7 @@ export default function BookingConfirmationPage() {
           <FoodMascot mood="celebrating" size={130} />
           <div className="bab-confirm-badge">
             <HiCheckCircle size={20} color="#3FA66B" />
-            <span>Table Reserved Successfully</span>
+            <span>{fee > 0 ? 'Payment received · Table reserved' : 'Table reserved'}</span>
           </div>
           <h1 className="bab-confirm-title">Your Table is Reserved!</h1>
           <p className="bab-confirm-subtitle">
@@ -65,7 +81,7 @@ export default function BookingConfirmationPage() {
               <span className="bab-ticket-eyebrow">BOOKABITE RESERVATION PASS</span>
               <h3 className="bab-ticket-rest-name">{restaurantName}</h3>
               <p className="bab-ticket-rest-area">
-                <HiOutlineLocationMarker size={15} /> {area}, Pune
+                <HiOutlineLocationMarker size={15} /> {area ? `${area}, Pune` : 'Pune'}
               </p>
             </div>
             <div className="bab-ticket-id-tag">
@@ -86,7 +102,7 @@ export default function BookingConfirmationPage() {
                 <span className="bab-ticket-label">
                   <HiOutlineCalendar size={14} /> Date
                 </span>
-                <strong>{new Date(bookingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+                <strong>{formatDate(bookingDate, { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
               </div>
 
               <div className="bab-ticket-item">
@@ -105,35 +121,36 @@ export default function BookingConfirmationPage() {
 
               <div className="bab-ticket-item">
                 <span className="bab-ticket-label">Status</span>
-                <span className="bab-badge bab-badge--success" style={{ alignSelf: 'flex-start' }}>
-                  Confirmed
+                <span
+                  className={`bab-badge ${status === 'Confirmed' ? 'bab-badge--success' : 'bab-badge--gold'}`}
+                  style={{ alignSelf: 'flex-start' }}
+                >
+                  {status === 'Pending' ? 'Awaiting restaurant' : status}
                 </span>
               </div>
             </div>
 
-            {/* SIMULATED QR CODE PASS */}
-            <div className="bab-ticket-qr-section">
-              <div className="bab-simulated-qr">
-                <svg viewBox="0 0 100 100" width="80" height="80">
-                  <rect width="100" height="100" fill="#FFF8F0" />
-                  <rect x="10" y="10" width="25" height="25" fill="#2B1712" />
-                  <rect x="15" y="15" width="15" height="15" fill="#FFF8F0" />
-                  <rect x="65" y="10" width="25" height="25" fill="#2B1712" />
-                  <rect x="70" y="15" width="15" height="15" fill="#FFF8F0" />
-                  <rect x="10" y="65" width="25" height="25" fill="#2B1712" />
-                  <rect x="15" y="70" width="15" height="15" fill="#FFF8F0" />
-                  <rect x="42" y="42" width="16" height="16" fill="#D65A3A" />
-                  <rect x="45" y="15" width="8" height="20" fill="#2B1712" />
-                  <rect x="15" y="45" width="20" height="8" fill="#2B1712" />
-                  <rect x="65" y="65" width="15" height="15" fill="#2B1712" />
-                </svg>
+            <div className="bab-ticket-reference-section">
+              <div className="bab-ticket-reference">
+                <span>Booking reference</span>
+                <strong>#{bookingId}</strong>
               </div>
-              <p className="bab-ticket-qr-instruction">
-                Present this QR code or Booking ID at the restaurant reception for VIP fast-track seating.
+              <p className="bab-ticket-reference-instruction">
+                Show this booking reference at the restaurant reception.
               </p>
             </div>
           </div>
         </div>
+
+        {fee > 0 && (
+          <div className="bab-paid-strip">
+            <span>
+              Booking fee paid: <strong>{formatMoney(fee)}</strong>
+              {booking?.invoice_number ? ` · Invoice ${booking.invoice_number}` : ''}
+            </span>
+            <small>Refunded if you cancel 1 hr+ before your booking.</small>
+          </div>
+        )}
 
         {/* ACTIONS */}
         <div className="bab-confirm-actions">
@@ -141,7 +158,7 @@ export default function BookingConfirmationPage() {
             View in My Bookings
           </Link>
           <button type="button" className="bab-btn bab-btn--outline" onClick={handlePrint}>
-            <HiOutlineDownload size={16} /> Save / Print Pass
+            <HiOutlineDownload size={16} /> Print / Save as PDF
           </button>
           <Link to="/explore" className="bab-btn bab-btn--glass">
             Explore More Tables

@@ -117,7 +117,7 @@ export default function OwnerLoginPage() {
               className="bab-btn bab-btn--primary bab-auth-submit"
               disabled={loading}
             >
-              {loading ? 'Entering Portal...' : 'Access Owner Dashboard'}
+              {loading ? 'Signing in...' : 'Sign in as owner'}
             </button>
           </form>
 

@@ -11,7 +11,7 @@ import {
   HiOutlineBadgeCheck,
   HiOutlineHeart,
 } from 'react-icons/hi';
-import Hero3DScene from '../../components/home/Hero3DScene';
+import HeroDiningIllustration from '../../components/home/HeroDiningIllustration';
 import RestaurantCard from '../../components/restaurant/RestaurantCard';
 import { RestaurantCardSkeleton } from '../../components/common/RestaurantCardSkeleton';
 import FoodMascot from '../../components/mascot/FoodMascot';
@@ -136,9 +136,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 3D SCENE CONTAINER */}
-          <div className="bab-home-hero__3d-wrap">
-            <Hero3DScene />
+          {/* HERO FOOD ILLUSTRATION */}
+          <div className="bab-home-hero__visual-wrap">
+            <HeroDiningIllustration />
           </div>
         </div>
 
@@ -346,7 +346,7 @@ export default function HomePage() {
                 <Link to="/owner/register" className="bab-btn bab-btn--gold">
                   Partner with Us
                 </Link>
-                <Link to="/owner/login" className="bab-btn bab-btn--outline" style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)' }}>
+                <Link to="/owner/login" className="bab-btn bab-btn--outline bab-owner-signin">
                   Owner Sign In
                 </Link>
               </div>

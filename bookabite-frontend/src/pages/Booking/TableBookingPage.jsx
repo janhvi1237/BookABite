@@ -16,15 +16,18 @@ import PageLoader from '../../components/common/PageLoader';
 import { ErrorState } from '../../components/common/ErrorState';
 import FoodMascot from '../../components/mascot/FoodMascot';
 import { fetchRestaurantById, fetchRestaurants } from '../../api/restaurants';
-import { createBooking } from '../../api/bookings';
+import { createBooking, fetchFeeQuote } from '../../api/bookings';
+import useAvailability from '../../hooks/useAvailability';
+import { localDateString, formatTime, formatDate, formatMoney, to24 } from '../../utils/time';
 import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../../components/common/Toast';
 import './TableBookingPage.css';
 
-const TIME_OPTIONS = [
-  '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM',
-  '07:00 PM', '07:30 PM', '08:00 PM', '08:30 PM', '09:00 PM', '09:30 PM',
+const PAY_METHODS = [
+  { id: 'upi', label: 'UPI', hint: 'GPay, PhonePe, Paytm' },
+  { id: 'card', label: 'Card', hint: 'Credit / debit' },
+  { id: 'netbanking', label: 'Net banking', hint: 'All major banks' },
 ];
 
 const SEATING_AREAS = [
@@ -50,10 +53,11 @@ export default function TableBookingPage() {
 
   // Form State
   const [bookingDate, setBookingDate] = useState(
-    searchParams.get('date') || new Date().toISOString().split('T')[0]
+    searchParams.get('date') || localDateString()
   );
+  // Always kept as 24h "HH:MM" (the format the API uses)
   const [bookingTime, setBookingTime] = useState(
-    searchParams.get('time') || '07:30 PM'
+    to24(searchParams.get('time'))
   );
   const [partySize, setPartySize] = useState(
     Number(searchParams.get('guests')) || 2
@@ -64,6 +68,8 @@ export default function TableBookingPage() {
   const [guestPhone, setGuestPhone] = useState(user?.phone || '');
   const [specialRequest, setSpecialRequest] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [payMethod, setPayMethod] = useState('upi');
+  const [feeQuote, setFeeQuote] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -91,6 +97,29 @@ export default function TableBookingPage() {
     return () => { active = false; };
   }, [id]);
 
+  // Real availability from the server: only slots that can be booked right now.
+  const availability = useAvailability(restaurant?.id, bookingDate, partySize);
+  const slots = availability.slots;
+
+  // On step 1, keep the selected time valid (prefer 7:30 PM, else the first free slot).
+  useEffect(() => {
+    if (step !== 1 || availability.loading) return;
+    if (slots.length === 0) {
+      setBookingTime('');
+    } else if (!slots.some((s) => s.value === bookingTime)) {
+      setBookingTime((slots.find((s) => s.value === '19:30') || slots[0]).value);
+    }
+  }, [availability.loading, slots, step]);
+
+  // Booking fee for this party size
+  useEffect(() => {
+    let active = true;
+    fetchFeeQuote(partySize)
+      .then((q) => { if (active) setFeeQuote(q); })
+      .catch(() => { if (active) setFeeQuote(null); });
+    return () => { active = false; };
+  }, [partySize]);
+
   // Update guest details if user logs in during booking
   useEffect(() => {
     if (user) {
@@ -106,9 +135,19 @@ export default function TableBookingPage() {
         showToast("Please select your date and time slot", "info");
         return;
       }
+      if (!slots.some((s) => s.value === bookingTime)) {
+        showToast("Please choose an available time slot", "info");
+        return;
+      }
       triggerReaction('thinking', `Checking availability for ${partySize} guests...`, 2500);
     }
     if (step === 2) {
+      // The party size may have changed since a time was picked: make sure there is still room.
+      if (!slots.some((s) => s.value === bookingTime)) {
+        showToast(`There is no room for ${partySize} guests at that time. Please pick another time.`, "info");
+        setStep(1);
+        return;
+      }
       triggerReaction('happy', "Almost there! Please tell us who is dining with us.", 2500);
     }
     if (step === 3) {
@@ -142,31 +181,26 @@ export default function TableBookingPage() {
 
     setSubmitting(true);
     try {
-      // Backend expects: user_id, restaurant_id, booking_date (YYYY-MM-DD), booking_time (HH:MM 24h format), party_size
-      // Convert bookingTime e.g. "07:30 PM" to "19:30"
-      const [timePart, modifier] = bookingTime.split(' ');
-      let [hours, minutes] = timePart.split(':');
-      if (modifier === 'PM' && hours !== '12') hours = String(parseInt(hours, 10) + 12);
-      if (modifier === 'AM' && hours === '12') hours = '00';
-      const time24 = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-
+      // The server calculates the fee itself; we only say how the guest pays.
       const bookingPayload = {
-        user_id: user.user_id,
         restaurant_id: restaurant.id,
         booking_date: bookingDate,
-        booking_time: time24,
+        booking_time: bookingTime,
         party_size: partySize,
+        payment_method: payMethod,
         special_request: `${seatingPref ? `[${seatingPref.toUpperCase()} SEATING] ` : ''}${specialRequest}`.trim(),
       };
 
       const res = await createBooking(bookingPayload);
-      const newBookingId = res.booking?.booking_id || 'BK-' + Math.floor(100000 + Math.random() * 900000);
+      const newBookingId = res.booking?.booking_id;
 
       triggerReaction('celebrating', "Hooray! Your table is booked and reserved!", 5000);
-      navigate(`/booking-confirmation/${newBookingId}?rest=${encodeURIComponent(restaurant.name)}&date=${bookingDate}&time=${encodeURIComponent(bookingTime)}&guests=${partySize}&area=${encodeURIComponent(restaurant.area)}`);
+      navigate(`/booking-confirmation/${newBookingId}`);
     } catch (err) {
       console.error("Booking failed:", err);
       showToast(err.message || "Failed to reserve table. Please try again.", "error");
+      // Someone took the seats or the guest already holds a table: go back and re-pick.
+      if (err.status === 409) setStep(1);
     } finally {
       setSubmitting(false);
     }
@@ -201,7 +235,7 @@ export default function TableBookingPage() {
           <span className="bab-booking-eyebrow">RESERVATION WIZARD</span>
           <h1 className="bab-booking-title">Reserve Your Table at {restaurant.name}</h1>
           <p className="bab-booking-subtitle">
-            {restaurant.area}, {restaurant.city} • ₹{restaurant.priceForTwo} for two
+            {restaurant.area}, {restaurant.city} • ₹{restaurant.priceForTwo} for two (meal)
           </p>
         </div>
 
@@ -253,7 +287,7 @@ export default function TableBookingPage() {
                     id="res-date"
                     type="date"
                     value={bookingDate}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={localDateString()}
                     onChange={(e) => setBookingDate(e.target.value)}
                     className="bab-form-input"
                   />
@@ -261,19 +295,47 @@ export default function TableBookingPage() {
               </div>
 
               <div className="bab-form-group" style={{ marginTop: 24 }}>
-                <label>Select Preferred Time Slot</label>
-                <div className="bab-slots-picker-grid">
-                  {TIME_OPTIONS.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      className={`bab-slot-pill ${bookingTime === slot ? 'bab-slot-pill--selected' : ''}`}
-                      onClick={() => setBookingTime(slot)}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
+                <label>Available Time Slots</label>
+                {restaurant?.openingTime && restaurant?.closingTime && (
+                  <p style={{ fontSize: '0.85rem', color: 'var(--bab-text-muted)', margin: '0 0 12px' }}>
+                    Serving hours: {formatTime(restaurant.openingTime)} – {formatTime(restaurant.closingTime)}
+                  </p>
+                )}
+                {availability.loading ? (
+                  <div className="bab-slots-loading">
+                    {[...Array(8)].map((_, i) => <span key={i} />)}
+                  </div>
+                ) : availability.error ? (
+                  <p className="bab-slots-state bab-slots-state--warn">
+                    We couldn&apos;t load the available times. Please try again in a moment.
+                  </p>
+                ) : slots.length > 0 ? (
+                  <div className="bab-slots-picker-grid">
+                    {slots.map((slot) => (
+                      <button
+                        key={slot.value}
+                        type="button"
+                        className={`bab-slot-pill ${bookingTime === slot.value ? 'bab-slot-pill--selected' : ''}`}
+                        onClick={() => setBookingTime(slot.value)}
+                      >
+                        {slot.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="bab-slots-state bab-slots-state--warn">
+                    {availability.message
+                      ? availability.message
+                      : availability.heldByYou > 0 && availability.totalOpen === 0
+                        ? 'You already have a table at this restaurant on this date. Pick another date to book again.'
+                        : 'No tables are free on this date. Please pick another date.'}
+                  </p>
+                )}
+                {availability.heldByYou > 0 && slots.length > 0 && (
+                  <p className="bab-slots-state">
+                    Times close to a table you already hold here are hidden, so you can&apos;t double-book.
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -407,11 +469,11 @@ export default function TableBookingPage() {
                 </div>
                 <div className="bab-summary-row">
                   <span>Date:</span>
-                  <strong>{new Date(bookingDate).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+                  <strong>{formatDate(bookingDate, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</strong>
                 </div>
                 <div className="bab-summary-row">
                   <span>Time Slot:</span>
-                  <strong>{bookingTime}</strong>
+                  <strong>{formatTime(bookingTime)}</strong>
                 </div>
                 <div className="bab-summary-row">
                   <span>Number of Guests:</span>
@@ -427,10 +489,46 @@ export default function TableBookingPage() {
                     <em>&ldquo;{specialRequest}&rdquo;</em>
                   </div>
                 )}
-                <div className="bab-summary-divider" />
-                <div className="bab-summary-row">
-                  <span>Reservation Fee:</span>
-                  <strong style={{ color: 'var(--bab-success)' }}>₹0 (Complimentary via BookABite)</strong>
+              </div>
+
+              {/* BOOKING FEE */}
+              <div className="bab-fee-box">
+                <div className="bab-fee-row">
+                  <span>Booking fee ({formatMoney(feeQuote?.per_guest ?? 0)} × {partySize} {partySize === 1 ? 'guest' : 'guests'})</span>
+                  <strong>{formatMoney(feeQuote ? feeQuote.guests * feeQuote.per_guest : 0)}</strong>
+                </div>
+                {feeQuote?.capped && (
+                  <div className="bab-fee-row">
+                    <span>Large-party cap applied</span>
+                    <strong>max {formatMoney(feeQuote.max_fee)}</strong>
+                  </div>
+                )}
+                <div className="bab-fee-row bab-fee-row--total">
+                  <span>Total to pay now</span>
+                  <strong>{formatMoney(feeQuote?.fee ?? 0)}</strong>
+                </div>
+                <p className="bab-fee-note">
+                  Your meal is paid at the restaurant. The fee is refunded in full if you cancel at least{' '}
+                  {feeQuote?.refund_cutoff_minutes ?? 60} minutes before your booking, or if the restaurant cancels.
+                </p>
+              </div>
+
+              <div className="bab-form-group" style={{ marginTop: 20 }}>
+                <label>
+                  Pay with <span className="bab-demo-pill">DEMO PAYMENT</span>
+                </label>
+                <div className="bab-pay-methods">
+                  {PAY_METHODS.map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      className={`bab-pay-method ${payMethod === m.id ? 'bab-pay-method--selected' : ''}`}
+                      onClick={() => setPayMethod(m.id)}
+                    >
+                      {m.label}
+                      <small>{m.hint}</small>
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -470,7 +568,7 @@ export default function TableBookingPage() {
                 disabled={submitting}
                 style={{ marginLeft: 'auto', padding: '14px 28px' }}
               >
-                {submitting ? 'Confirming with Restaurant...' : 'Complete Reservation 🎉'}
+                {submitting ? 'Processing payment...' : `Pay ${formatMoney(feeQuote?.fee ?? 0)} & Reserve 🎉`}
               </button>
             )}
           </div>

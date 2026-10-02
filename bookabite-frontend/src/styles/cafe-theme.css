@@ -295,16 +295,9 @@ p {
   background: rgba(24, 50, 71, 0.14) !important;
 }
 
-.bab-home-hero__3d-wrap {
+.bab-home-hero__visual-wrap {
   min-height: 420px;
 }
-
-.bab-hero-3d-fallback {
-  border-radius: 18px !important;
-  box-shadow: var(--cafe-shadow-lg) !important;
-  border: 1px solid rgba(24, 50, 71, 0.08);
-}
-
 
 /* ============================================================
    HOME SEARCH
@@ -648,6 +641,19 @@ p {
   color: rgba(255, 248, 240, 0.78) !important;
 }
 
+.bab-owner-signin,
+.bab-owner-signin:hover,
+.bab-owner-signin:focus-visible {
+  background: transparent !important;
+  border-color: rgba(255, 248, 240, 0.6) !important;
+  color: #fff8f0 !important;
+}
+
+.bab-owner-signin:hover,
+.bab-owner-signin:focus-visible {
+  background: rgba(255, 248, 240, 0.12) !important;
+}
+
 
 /* ============================================================
    POPULAR RESTAURANTS
@@ -793,81 +799,6 @@ p {
 
 
 /* ============================================================
-   FOOTER
-   ============================================================ */
-
-.bab-footer {
-  --bab-bg: var(--cafe-navy);
-  --bab-accent: #d99a76;
-  --bab-accent-hover: #e5ae8d;
-
-  background: var(--cafe-navy) !important;
-  border-top: none !important;
-  color: #fff8f0 !important;
-  margin-top: 70px !important;
-}
-
-.bab-footer__brand-text,
-.bab-footer__brand-text em {
-  color: #fff8f0 !important;
-}
-
-.bab-footer__brand-text {
-  font-family: var(--cafe-serif) !important;
-}
-
-.bab-footer__brand-text em {
-  color: #d99a76 !important;
-}
-
-.bab-footer__tagline,
-.bab-footer__col-title,
-.bab-footer__col-text,
-.bab-footer__bottom {
-  color: rgba(255, 248, 240, 0.66) !important;
-}
-
-.bab-footer__col-link {
-  color: rgba(255, 248, 240, 0.88) !important;
-}
-
-.bab-footer__col-link:hover {
-  color: #d99a76 !important;
-}
-
-.bab-footer__social-btn {
-  color: #fff8f0 !important;
-  border-color: rgba(255, 248, 240, 0.18) !important;
-}
-
-.bab-footer__social-btn:hover {
-  border-color: #d99a76 !important;
-  color: #d99a76 !important;
-}
-
-.bab-footer__newsletter-form {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 248, 240, 0.16) !important;
-}
-
-.bab-footer__newsletter-form input {
-  color: #fff8f0 !important;
-}
-
-.bab-footer__newsletter-form button {
-  background: var(--cafe-terracotta) !important;
-}
-
-.bab-footer__newsletter-form button:hover {
-  background: var(--cafe-terracotta-dark) !important;
-}
-
-.bab-footer__bottom {
-  border-top-color: rgba(255, 248, 240, 0.14) !important;
-}
-
-
-/* ============================================================
    BOOKING / CONFIRMATION / GENERIC CARDS
    ============================================================ */
 
@@ -904,7 +835,7 @@ p {
 .bab-confirm-subtitle,
 .bab-ticket-rest-area,
 .bab-ticket-label,
-.bab-ticket-qr-instruction {
+.bab-ticket-reference-instruction {
   color: var(--cafe-muted) !important;
 }
 
@@ -953,9 +884,9 @@ p {
     font-size: clamp(2.5rem, 10vw, 4rem) !important;
   }
 
-  .bab-home-hero__3d-wrap {
-    min-height: 340px;
-    height: 340px;
+  .bab-home-hero__visual-wrap {
+    min-height: 400px;
+    height: 400px;
   }
 
   .bab-section-header {

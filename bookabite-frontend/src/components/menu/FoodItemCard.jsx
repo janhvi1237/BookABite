@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiStar, HiOutlineHeart, HiHeart, HiPlus, HiMinus, HiSparkles } from 'react-icons/hi';
+import { HiStar, HiOutlineHeart, HiHeart } from 'react-icons/hi';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../common/Toast';
 import './FoodItemCard.css';
@@ -8,11 +8,10 @@ export default function FoodItemCard({ item, onSelect, isSelected = false }) {
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
   const [isFav, setIsFav] = useState(false);
-  const [quantity, setQuantity] = useState(0);
 
   const handleCardClick = () => {
     if (onSelect) onSelect(item);
-    triggerReaction('serving', `You'll love the ${item.name}! Prepared fresh to order.`, 3500);
+    triggerReaction('serving', `You'll love the ${item.name}! `, 3500);
   };
 
   const handleFav = (e) => {
@@ -24,18 +23,6 @@ export default function FoodItemCard({ item, onSelect, isSelected = false }) {
     } else {
       showToast(`Removed from favourites`, 'info');
     }
-  };
-
-  const handleQtyMinus = (e) => {
-    e.stopPropagation();
-    if (quantity > 0) setQuantity((q) => q - 1);
-  };
-
-  const handleQtyPlus = (e) => {
-    e.stopPropagation();
-    setQuantity((q) => q + 1);
-    triggerReaction('excited', `Added ${item.name} to your meal plan! 🍽️`, 3000);
-    showToast(`Added ${item.name} to table plan`, 'success');
   };
 
   return (
@@ -95,28 +82,6 @@ export default function FoodItemCard({ item, onSelect, isSelected = false }) {
 
         <div className="bab-food-card__footer">
           <span className="bab-food-card__price">₹{Number(item.price).toFixed(0)}</span>
-
-          <div className="bab-food-card__controls" onClick={(e) => e.stopPropagation()}>
-            {quantity === 0 ? (
-              <button
-                type="button"
-                className="bab-food-card__add-btn"
-                onClick={handleQtyPlus}
-              >
-                <HiPlus size={14} /> Add
-              </button>
-            ) : (
-              <div className="bab-food-qty-stepper">
-                <button type="button" onClick={handleQtyMinus} aria-label="Decrease quantity">
-                  <HiMinus size={12} />
-                </button>
-                <span>{quantity}</span>
-                <button type="button" onClick={handleQtyPlus} aria-label="Increase quantity">
-                  <HiPlus size={12} />
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 """
 Additional seed script — adds MORE sample Pune restaurants (on top of the
-original 8 from seed_data.py) plus sample reviews, without duplicating
-existing entries.
+original 8 from seed_data.py), without duplicating existing entries.
 
 Usage:
     python database/seed_more_data.py
@@ -17,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app
 from extensions import db
-from models import Restaurant, RestaurantImage, Amenity, RestaurantTable, Review, User
+from models import Restaurant, RestaurantImage, Amenity, RestaurantTable
 
 app = create_app()
 
@@ -228,15 +227,6 @@ MORE_RESTAURANTS = [
     },
 ]
 
-SAMPLE_REVIEW_COMMENTS = [
-    (5, "Amazing experience! The ambience and food both were top notch."),
-    (4, "Really good food, service was a bit slow during peak hours."),
-    (5, "One of the best places we've booked through the app. Highly recommend."),
-    (3, "Decent food but overpriced for the portion sizes."),
-    (4, "Loved the vibe, will definitely come back with friends."),
-]
-
-
 def seed_more_restaurants():
     with app.app_context():
         amenity_lookup = {a.name: a for a in Amenity.query.all()}
@@ -256,8 +246,8 @@ def seed_more_restaurants():
                 cuisine_type=r["cuisine_type"],
                 food_type=r["food_type"],
                 avg_budget_for_two=r["avg_budget_for_two"],
-                rating=r["rating"],
-                total_reviews=r["total_reviews"],
+                rating=0,
+                total_reviews=0,
                 opening_time=r["opening_time"],
                 closing_time=r["closing_time"],
                 cover_image=r["cover_image"],
@@ -285,42 +275,5 @@ def seed_more_restaurants():
         print(f"Added {added} new restaurants (skipped {len(MORE_RESTAURANTS) - added} duplicates).")
 
 
-def seed_sample_reviews():
-    """Attaches a few sample reviews to existing restaurants, using existing users.
-    Skips entirely if there are no users or no restaurants yet (register a user first).
-    """
-    with app.app_context():
-        users = User.query.limit(5).all()
-        restaurants = Restaurant.query.all()
-
-        if not users:
-            print("No users found — skipping review seeding. Register at least one user first.")
-            return
-        if not restaurants:
-            print("No restaurants found — skipping review seeding.")
-            return
-
-        if Review.query.count() > 0:
-            print("Reviews already exist — skipping to avoid duplicates.")
-            return
-
-        count = 0
-        for i, restaurant in enumerate(restaurants):
-            user = users[i % len(users)]
-            rating, comment = SAMPLE_REVIEW_COMMENTS[i % len(SAMPLE_REVIEW_COMMENTS)]
-            review = Review(
-                user_id=user.user_id,
-                restaurant_id=restaurant.restaurant_id,
-                rating=rating,
-                comment=comment,
-            )
-            db.session.add(review)
-            count += 1
-
-        db.session.commit()
-        print(f"Added {count} sample reviews.")
-
-
 if __name__ == "__main__":
     seed_more_restaurants()
-    seed_sample_reviews()

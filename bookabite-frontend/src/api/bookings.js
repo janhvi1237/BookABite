@@ -95,3 +95,14 @@ export async function fetchBookingAvailability(
     `/api/bookings/availability?restaurant_id=${restaurantId}&booking_date=${bookingDate}`
   );
 }
+
+
+// ============================================================
+// BOOKING FEE QUOTE (what the guest will be charged)
+// ============================================================
+
+export async function fetchFeeQuote(partySize) {
+  return api.get(
+    `/api/bookings/fee-quote?party_size=${partySize}`
+  );
+}

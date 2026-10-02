@@ -10,6 +10,7 @@ import {
   HiOutlineXCircle,
   HiOutlineEye,
   HiOutlineSparkles,
+  HiOutlineTicket,
 } from 'react-icons/hi';
 import PageLoader from '../../components/common/PageLoader';
 import FoodMascot from '../../components/mascot/FoodMascot';
@@ -17,6 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../../components/common/Toast';
 import { fetchUserBookings, cancelBooking } from '../../api/bookings';
+import { localDateString, formatDate, formatTime, formatMoney } from '../../utils/time';
 import './CustomerPages.css';
 
 export default function MyBookingsPage() {
@@ -58,17 +60,19 @@ export default function MyBookingsPage() {
 
     try {
       setCancellingId(bookingId);
-      await cancelBooking(bookingId);
+      const res = await cancelBooking(bookingId);
       setBookings((prev) =>
         prev.map((b) =>
-          (b.booking_id || b.id) === bookingId ? { ...b, booking_status: 'Cancelled', status: 'Cancelled' } : b
+          (b.booking_id || b.id) === bookingId
+            ? { ...b, ...(res?.booking || {}), status: 'Cancelled' }
+            : b
         )
       );
       triggerReaction('sad', 'Your table reservation was cancelled.');
-      showToast('Reservation cancelled successfully.', 'info');
+      showToast(res?.message || 'Reservation cancelled successfully.', res?.refunded === false ? 'info' : 'success');
     } catch (err) {
       console.error('Failed to cancel booking:', err);
-      showToast('Could not cancel reservation. Please contact the venue.', 'error');
+      showToast(err.message || 'Could not cancel reservation. Please contact the venue.', 'error');
     } finally {
       setCancellingId(null);
     }
@@ -76,19 +80,27 @@ export default function MyBookingsPage() {
 
   function isUpcoming(bookingDate) {
     if (!bookingDate) return false;
-    const today = new Date().toISOString().split('T')[0];
-    return bookingDate >= today;
+    return bookingDate >= localDateString();
   }
 
   const filteredBookings = bookings.filter((b) => {
-    const status = (b.booking_status || b.status || '').toLowerCase();
+    const status = (b.status || '').toLowerCase();
     const upcoming = isUpcoming(b.booking_date) && status !== 'cancelled' && status !== 'completed';
     if (tabFilter === 'upcoming') return upcoming;
     if (tabFilter === 'past') return !upcoming;
     return true;
   });
 
-  if (loading) return <PageLoader message="Loading your dining reservations..." />;
+  const upcomingCount = bookings.filter((b) => {
+    const st = (b.status || '').toLowerCase();
+    return isUpcoming(b.booking_date) && st !== 'cancelled' && st !== 'completed';
+  }).length;
+  const completedCount = bookings.filter((b) => (b.status || '').toLowerCase() === 'completed').length;
+  const feesPaid = bookings
+    .filter((b) => b.fee_status === 'Paid')
+    .reduce((sum, b) => sum + Number(b.booking_fee || 0), 0);
+
+  if (loading) return <PageLoader text="Loading your dining reservations..." />;
 
   return (
     <div className="bab-customer-page">
@@ -121,29 +133,40 @@ export default function MyBookingsPage() {
           </Link>
         </div>
 
-        {/* Filter subtabs */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
-          <button
-            type="button"
-            className={`bab-owner-tab-btn ${tabFilter === 'upcoming' ? 'bab-owner-tab-btn--active' : ''}`}
-            onClick={() => setTabFilter('upcoming')}
-          >
-            Upcoming Reservations
-          </button>
-          <button
-            type="button"
-            className={`bab-owner-tab-btn ${tabFilter === 'past' ? 'bab-owner-tab-btn--active' : ''}`}
-            onClick={() => setTabFilter('past')}
-          >
-            Past & Cancelled
-          </button>
-          <button
-            type="button"
-            className={`bab-owner-tab-btn ${tabFilter === 'all' ? 'bab-owner-tab-btn--active' : ''}`}
-            onClick={() => setTabFilter('all')}
-          >
-            All ({bookings.length})
-          </button>
+        {/* Quick stats */}
+        <div className="bab-bookings-stats">
+          <div className="bab-bookings-stat bab-bookings-stat--terracotta">
+            <span>Upcoming</span>
+            <strong>{upcomingCount}</strong>
+          </div>
+          <div className="bab-bookings-stat bab-bookings-stat--sage">
+            <span>Completed</span>
+            <strong>{completedCount}</strong>
+          </div>
+          <div className="bab-bookings-stat bab-bookings-stat--amber">
+            <span>Booking fees paid</span>
+            <strong>{formatMoney(feesPaid)}</strong>
+          </div>
+        </div>
+
+        {/* Filter pills */}
+        <div className="bab-filter-pills" role="tablist">
+          {[
+            ['upcoming', 'Upcoming'],
+            ['past', 'Past & Cancelled'],
+            ['all', `All (${bookings.length})`],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={tabFilter === key}
+              className={`bab-filter-pill ${tabFilter === key ? 'bab-filter-pill--active' : ''}`}
+              onClick={() => setTabFilter(key)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         {/* Bookings List */}
@@ -151,45 +174,67 @@ export default function MyBookingsPage() {
           <div className="bab-bookings-list">
             {filteredBookings.map((b) => {
               const bId = b.booking_id || b.id;
-              const status = b.booking_status || b.status || 'Pending';
+              const status = b.status || 'Pending';
+              const statusKey = status.toLowerCase();
               const isCanCancel = (status === 'Pending' || status === 'Confirmed') && isUpcoming(b.booking_date);
+              const fee = Number(b.booking_fee || 0);
 
-              // Date formatting
-              const dateObj = b.booking_date ? new Date(b.booking_date) : new Date();
-              const monthStr = dateObj.toLocaleString('default', { month: 'short' });
-              const dayStr = dateObj.getDate();
+              // Date badge (parsed as a local date so it never shifts a day)
+              const monthStr = formatDate(b.booking_date, { month: 'short' });
+              const dayStr = formatDate(b.booking_date, { day: 'numeric' });
+              const weekday = formatDate(b.booking_date, { weekday: 'long' });
 
               return (
-                <div key={bId} className="bab-booking-item-card">
-                  <div className="bab-booking-item__main">
+                <article key={bId} className={`bab-booking-item-card bab-booking-item-card--${statusKey}`}>
+                  <div
+                    className="bab-booking-item__cover"
+                    style={b.restaurant_cover ? { backgroundImage: `url(${b.restaurant_cover})` } : undefined}
+                  >
                     <div className="bab-booking-date-badge">
                       <span className="bab-booking-date-month">{monthStr}</span>
                       <span className="bab-booking-date-day">{dayStr}</span>
                     </div>
+                  </div>
 
-                    <div className="bab-booking-item__details">
-                      <h4>{b.restaurant_name || 'Restaurant Table'}</h4>
-                      <div className="bab-booking-item__meta">
-                        <span><HiOutlineClock size={13} /> {b.booking_time}</span>
-                        <span><HiOutlineUserGroup size={13} /> {b.number_of_guests || b.guests || 2} Guests</span>
-                        <span className={`bab-status-badge bab-status-badge--${status.toLowerCase()}`}>
-                          {status}
-                        </span>
+                  <div className="bab-booking-item__body">
+                    <div className="bab-booking-item__top">
+                      <div>
+                        <h4>{b.restaurant_name || 'Restaurant Table'}</h4>
+                        {(b.restaurant_area || b.cuisine_type) && (
+                          <p className="bab-booking-item__sub">
+                            <HiOutlineLocationMarker size={13} />
+                            {[b.restaurant_area, b.cuisine_type].filter(Boolean).join(' · ')}
+                          </p>
+                        )}
                       </div>
-                      {b.special_requests && (
-                        <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-                          Note: "{b.special_requests}"
-                        </p>
-                      )}
+                      <span className={`bab-status-badge bab-status-badge--${statusKey}`}>{status}</span>
                     </div>
+
+                    <div className="bab-booking-item__meta">
+                      <span><HiOutlineCalendar size={14} /> {weekday}</span>
+                      <span><HiOutlineClock size={14} /> {formatTime(b.booking_time)}</span>
+                      <span>
+                        <HiOutlineUserGroup size={14} /> {b.party_size || 2} {Number(b.party_size) === 1 ? 'Guest' : 'Guests'}
+                      </span>
+                      <span><HiOutlineTicket size={14} /> #{bId}</span>
+                    </div>
+
+                    {fee > 0 && (
+                      <div className={`bab-booking-item__fee bab-booking-item__fee--${(b.fee_status || '').toLowerCase()}`}>
+                        {b.fee_status === 'Refunded'
+                          ? `Booking fee ${formatMoney(fee)} refunded`
+                          : `Booking fee ${formatMoney(fee)} paid`}
+                        {b.invoice_number ? ` · ${b.invoice_number}` : ''}
+                      </div>
+                    )}
+
+                    {b.special_request && (
+                      <p className="bab-booking-item__note">Note: &ldquo;{b.special_request}&rdquo;</p>
+                    )}
                   </div>
 
                   <div className="bab-booking-item__actions">
-                    <Link
-                      to={`/restaurants/${b.restaurant_id}`}
-                      className="bab-btn bab-btn--outline"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                    >
+                    <Link to={`/restaurants/${b.restaurant_id}`} className="bab-btn bab-btn--outline bab-btn--sm">
                       <HiOutlineEye size={14} /> Restaurant
                     </Link>
 
@@ -198,24 +243,19 @@ export default function MyBookingsPage() {
                         type="button"
                         onClick={() => handleCancelReservation(bId, b.restaurant_name)}
                         disabled={cancellingId === bId}
-                        className="bab-btn bab-btn--outline"
-                        style={{ padding: '6px 14px', fontSize: '0.8rem', color: '#CF1322', borderColor: '#FFA39E' }}
+                        className="bab-btn bab-btn--outline bab-btn--sm bab-btn--danger"
                       >
-                        {cancellingId === bId ? 'Cancelling...' : 'Cancel Table'}
+                        <HiOutlineXCircle size={14} /> {cancellingId === bId ? 'Cancelling...' : 'Cancel'}
                       </button>
                     )}
 
                     {!isCanCancel && status === 'Completed' && (
-                      <Link
-                        to={`/restaurants/${b.restaurant_id}#reviews`}
-                        className="bab-btn bab-btn--secondary"
-                        style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      >
-                        Rate & Review
+                      <Link to={`/restaurants/${b.restaurant_id}#reviews`} className="bab-btn bab-btn--secondary bab-btn--sm">
+                        Rate &amp; Review
                       </Link>
                     )}
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>

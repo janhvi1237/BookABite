@@ -179,7 +179,7 @@
   color: var(--bab-primary);
 }
 
-.bab-ticket-qr-section {
+.bab-ticket-reference-section {
   display: flex;
   align-items: center;
   gap: 20px;
@@ -188,19 +188,52 @@
   padding: 16px 20px;
 }
 
-.bab-simulated-qr {
-  padding: 6px;
-  background: #FFFFFF;
-  border-radius: 8px;
-  border: 1px solid var(--bab-border);
+.bab-ticket-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 1px dashed var(--bab-border);
+  border-radius: var(--bab-radius-sm);
+  background: #fff;
   flex-shrink: 0;
 }
 
-.bab-ticket-qr-instruction {
+.bab-ticket-reference span {
+  color: var(--bab-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bab-ticket-reference strong {
+  color: var(--bab-primary);
+  font-size: 1.1rem;
+}
+
+.bab-ticket-reference-instruction {
   font-size: 0.85rem;
   color: var(--bab-text-muted);
   margin: 0;
   line-height: 1.5;
+}
+
+.bab-paid-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -12px 0 24px;
+  padding: 14px 18px;
+  border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-sm);
+  background: var(--bab-bg-soft);
+  color: var(--bab-primary);
+}
+
+.bab-paid-strip small {
+  color: var(--bab-text-muted);
+  text-align: right;
 }
 
 .bab-confirm-actions {
@@ -209,4 +242,83 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
+}
+
+@media (max-width: 599px) {
+  .bab-ticket-card__top {
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+  }
+
+  .bab-ticket-id-tag {
+    align-items: flex-start;
+  }
+
+  .bab-ticket-card__bottom {
+    padding: 20px 24px 24px;
+  }
+
+  .bab-ticket-reference-section,
+  .bab-paid-strip {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bab-paid-strip small {
+    text-align: left;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm;
+  }
+
+  html,
+  body,
+  #root,
+  .bab-app,
+  .bab-app__main {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  .bab-navbar,
+  .bab-footer,
+  .bab-mobile-bottom-nav,
+  .bab-mascot-widget,
+  [aria-label='Mobile Navigation'],
+  .bab-confirm-header,
+  .bab-confirm-actions {
+    display: none !important;
+  }
+
+  .bab-confirm-page {
+    padding: 0 !important;
+  }
+
+  .bab-confirm-page > .bab-container {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .bab-ticket-card {
+    margin: 0;
+    border-color: #b9ada4;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .bab-ticket-card__top {
+    background: #fff !important;
+  }
+
+  .bab-paid-strip {
+    margin: 16px 0 0;
+    break-inside: avoid;
+  }
 }

@@ -1,5 +1,6 @@
 from repositories import RestaurantRepository
 from utils.exceptions import NotFoundError
+from models.restaurant import serialize_restaurants
 
 
 class RestaurantService:
@@ -10,11 +11,11 @@ class RestaurantService:
     @staticmethod
     def list_restaurants(city="Pune"):
         restaurants = RestaurantRepository.find_all_active(city=city)
-        return [r.to_dict() for r in restaurants]
+        return serialize_restaurants(restaurants)
 
     @staticmethod
     def get_restaurant(restaurant_id):
         restaurant = RestaurantRepository.find_by_id(restaurant_id)
         if not restaurant:
             raise NotFoundError(f"Restaurant with id {restaurant_id} not found.")
-        return restaurant.to_dict()
+        return serialize_restaurants([restaurant])[0]

@@ -190,6 +190,20 @@
   color: var(--bab-secondary);
 }
 
+.bab-slot-pill:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--bab-bg-soft);
+  color: var(--bab-text-muted);
+  border-color: var(--bab-border);
+  text-decoration: line-through;
+}
+
+.bab-slot-pill:disabled:hover {
+  border-color: var(--bab-border);
+  color: var(--bab-text-muted);
+}
+
 .bab-slot-pill--selected {
   background: var(--bab-secondary);
   color: #FFFFFF;

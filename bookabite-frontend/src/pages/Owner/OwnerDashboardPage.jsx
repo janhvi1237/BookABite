@@ -5,17 +5,19 @@ import {
   HiOutlineCalendar,
   HiOutlineBookOpen,
   HiOutlineUserGroup,
+  HiOutlineClock,
   HiOutlineEye,
   HiOutlineCheck,
   HiOutlineX,
   HiPlus,
+  HiOutlineTrash,
   HiOutlineTrendingUp,
   HiOutlineStar,
   HiOutlineLocationMarker,
 } from 'react-icons/hi';
 import PageLoader from '../../components/common/PageLoader';
 import FoodMascot from '../../components/mascot/FoodMascot';
-import { fetchOwnerRestaurants } from '../../api/restaurants';
+import { fetchOwnerRestaurants, deleteRestaurant } from '../../api/restaurants';
 import { fetchOwnerBookings, updateBookingStatus } from '../../api/bookings';
 import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
@@ -24,13 +26,14 @@ import './OwnerPages.css';
 
 export default function OwnerDashboardPage() {
   const navigate = useNavigate();
-  const { user, isOwner } = useAuth();
+  const { user } = useAuth();
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
 
   const [restaurants, setRestaurants] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingRestaurantId, setDeletingRestaurantId] = useState(null);
 
   useEffect(() => {
     if (!user) {
@@ -72,6 +75,25 @@ export default function OwnerDashboardPage() {
       }
     } catch {
       showToast("Could not update booking status", "error");
+    }
+  };
+
+  const handleDeleteRestaurant = async (restaurant) => {
+    const confirmed = window.confirm(
+      `Remove "${restaurant.name}" from BookABite? It will no longer be listed publicly, but existing booking history will be preserved.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeletingRestaurantId(restaurant.id);
+      await deleteRestaurant(restaurant.id);
+      setRestaurants((prev) => prev.filter((item) => item.id !== restaurant.id));
+      showToast(`${restaurant.name} was removed from BookABite.`, 'success');
+    } catch (err) {
+      console.error('Failed to delete restaurant:', err);
+      showToast(err.message || 'Could not delete this restaurant. Please try again.', 'error');
+    } finally {
+      setDeletingRestaurantId(null);
     }
   };
 
@@ -209,6 +231,23 @@ export default function OwnerDashboardPage() {
                         <Link to="/owner/menu" className="bab-btn bab-btn--glass" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
                           Manage Menu
                         </Link>
+                        <button
+                          type="button"
+                          className="bab-btn bab-btn--outline"
+                          onClick={() => handleDeleteRestaurant(rest)}
+                          disabled={deletingRestaurantId !== null}
+                          aria-label={`Delete ${rest.name}`}
+                          title="Remove restaurant"
+                          style={{
+                            padding: '6px 10px',
+                            fontSize: '0.8rem',
+                            color: '#CF1322',
+                            borderColor: '#FFA39E',
+                          }}
+                        >
+                          <HiOutlineTrash size={15} />
+                          {deletingRestaurantId === rest.id ? 'Removing...' : 'Delete'}
+                        </button>
                       </div>
                     </div>
                   </div>

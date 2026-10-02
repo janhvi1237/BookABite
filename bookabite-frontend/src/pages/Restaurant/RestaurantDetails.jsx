@@ -21,15 +21,13 @@ import { fetchRestaurantById } from '../../api/restaurants';
 import { fetchRestaurantMenu } from '../../api/menu';
 import { fetchRestaurantReviews, submitReview } from '../../api/reviews';
 import { toggleFavorite } from '../../api/favorites';
+import useAvailability from '../../hooks/useAvailability';
+import { fetchFeeQuote } from '../../api/bookings';
+import { localDateString, formatTime, formatMoney } from '../../utils/time';
 import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../../components/common/Toast';
 import './RestaurantDetails.css';
-
-const TIME_SLOTS = [
-  '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM',
-  '07:00 PM', '07:30 PM', '08:00 PM', '08:30 PM', '09:00 PM',
-];
 
 export default function RestaurantDetails() {
   const { id } = useParams();
@@ -41,6 +39,8 @@ export default function RestaurantDetails() {
   const [restaurant, setRestaurant] = useState(null);
   const [menuData, setMenuData] = useState({ categories: {}, items: [] });
   const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -51,9 +51,35 @@ export default function RestaurantDetails() {
   const [selectedFoodItem, setSelectedFoodItem] = useState(null);
 
   // Sticky Booking Card state
-  const [bookDate, setBookDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [bookTime, setBookTime] = useState('07:30 PM');
+  const [bookDate, setBookDate] = useState(() => localDateString());
+  const [bookTime, setBookTime] = useState('');
   const [bookGuests, setBookGuests] = useState('2');
+  const [feeQuote, setFeeQuote] = useState(null);
+
+  // Real availability from the server: only slots that can actually be booked.
+  const availability = useAvailability(restaurant?.id, bookDate, bookGuests);
+  const slots = availability.slots;
+
+  // Keep the chosen time valid when the date / guests / availability change.
+  useEffect(() => {
+    if (availability.loading) return;
+    if (slots.length === 0) {
+      setBookTime('');
+    } else if (!slots.some((s) => s.value === bookTime)) {
+      // Prefer an evening slot (19:30) if it is free, otherwise the first free slot.
+      const preferred = slots.find((s) => s.value === '19:30') || slots[0];
+      setBookTime(preferred.value);
+    }
+  }, [availability.loading, slots]);
+
+  // Booking fee shown before the guest continues.
+  useEffect(() => {
+    let active = true;
+    fetchFeeQuote(Number(bookGuests) || 2)
+      .then((q) => { if (active) setFeeQuote(q); })
+      .catch(() => { if (active) setFeeQuote(null); });
+    return () => { active = false; };
+  }, [bookGuests]);
 
   // Favorites
   const [isFav, setIsFav] = useState(false);
@@ -69,21 +95,31 @@ export default function RestaurantDetails() {
       try {
         setLoading(true);
         setError(null);
+        setReviewsLoading(true);
+        setReviewsError('');
         const [restRes, menuRes, reviewsRes] = await Promise.all([
           fetchRestaurantById(id),
           fetchRestaurantMenu(id).catch(() => ({ categories: {}, items: [] })),
-          fetchRestaurantReviews(id).catch(() => ({ reviews: [] })),
+          fetchRestaurantReviews(id).catch((err) => ({ error: err })),
         ]);
 
         if (!active) return;
         setRestaurant(restRes);
         setMenuData(menuRes);
-        setReviews(reviewsRes.reviews || []);
+        if (reviewsRes.error) {
+          setReviews([]);
+          setReviewsError(reviewsRes.error.message || 'Failed to load reviews');
+        } else {
+          setReviews(Array.isArray(reviewsRes.reviews) ? reviewsRes.reviews : []);
+        }
       } catch (err) {
         console.error("Failed to load restaurant details:", err);
         if (active) setError(err.message || "Failed to load restaurant details");
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+          setReviewsLoading(false);
+        }
       }
     }
     loadAll();
@@ -111,7 +147,11 @@ export default function RestaurantDetails() {
   };
 
   const handleProceedBooking = () => {
-    triggerReaction('excited', `Setting up reservation for ${bookGuests} guests on ${bookDate} at ${bookTime}!`, 4000);
+    if (!bookTime) {
+      showToast('No free table for this date and party size. Please try another date.', 'info');
+      return;
+    }
+    triggerReaction('excited', `Setting up reservation for ${bookGuests} guests on ${bookDate} at ${formatTime(bookTime)}!`, 4000);
     navigate(`/restaurants/${restaurant.id}/book?date=${bookDate}&time=${encodeURIComponent(bookTime)}&guests=${bookGuests}`);
   };
 
@@ -134,7 +174,12 @@ export default function RestaurantDetails() {
         rating: newRating,
         comment: newComment,
       });
-      setReviews((prev) => [res.review, ...prev]);
+      setReviews((prev) => [res.review, ...prev.filter((review) => review.review_id !== res.review.review_id)]);
+      setRestaurant((prev) => ({
+        ...prev,
+        rating: Number(res.rating),
+        totalReviews: Number(res.total_reviews),
+      }));
       setNewComment('');
       showToast("Thank you! Review submitted successfully", "success");
       triggerReaction('celebrating', "Thank you for sharing your dining review!", 3500);
@@ -216,7 +261,7 @@ export default function RestaurantDetails() {
                 </span>
                 <span className="bab-submeta-item">
                   <HiOutlineClock size={16} color="#D65A3A" />
-                  {restaurant.openingTime} - {restaurant.closingTime}
+                  {formatTime(restaurant.openingTime)} - {formatTime(restaurant.closingTime)}
                 </span>
                 <span className="bab-submeta-item">
                   ₹{restaurant.priceForTwo} for two
@@ -253,7 +298,11 @@ export default function RestaurantDetails() {
                 {tab === 'about' && 'About'}
                 {tab === 'menu' && `Menu (${menuData.items ? menuData.items.length : 0})`}
                 {tab === 'photos' && 'Photos'}
-                {tab === 'reviews' && `Reviews (${reviews.length})`}
+                {tab === 'reviews' && (
+                  reviewsLoading || reviewsError
+                    ? 'Reviews'
+                    : `Reviews (${reviews.length})`
+                )}
                 {tab === 'location' && 'Location & Hours'}
               </button>
             ))}
@@ -301,7 +350,7 @@ export default function RestaurantDetails() {
                 <div>
                   <h3 className="bab-tab-heading" style={{ margin: 0 }}>Artisan Food & Drinks</h3>
                   <p style={{ fontSize: '0.88rem', color: 'var(--bab-text-muted)', margin: 0 }}>
-                    Click any item to inspect ingredients, dietary highlights, and add to your reservation plan.
+                    Click any item to view its ingredients and dietary highlights.
                   </p>
                 </div>
               </div>
@@ -392,9 +441,13 @@ export default function RestaurantDetails() {
 
               {/* REVIEW LIST */}
               <div className="bab-reviews-list">
-                {reviews.length > 0 ? (
+                {reviewsLoading ? (
+                  <p style={{ color: 'var(--bab-text-muted)' }}>Loading reviews...</p>
+                ) : reviewsError ? (
+                  <p role="alert" style={{ color: 'var(--bab-text-muted)' }}>{reviewsError}</p>
+                ) : reviews.length > 0 ? (
                   reviews.map((rev, i) => (
-                    <div key={i} className="bab-review-item">
+                    <div key={rev.review_id || `${rev.user_id}-${rev.created_at}`} className="bab-review-item">
                       <div className="bab-review-item__header">
                         <div className="bab-review-user">
                           <div className="bab-review-avatar">
@@ -406,12 +459,12 @@ export default function RestaurantDetails() {
                           </div>
                         </div>
                         <div className="bab-review-stars">
-                          {[...Array(rev.rating || 5)].map((_, s) => (
+                          {[...Array(Math.max(0, Number(rev.rating) || 0))].map((_, s) => (
                             <HiStar key={s} size={16} color="#E9B44C" />
                           ))}
                         </div>
                       </div>
-                      <p className="bab-review-comment">{rev.comment}</p>
+                      {rev.comment && <p className="bab-review-comment">{rev.comment}</p>}
                     </div>
                   ))
                 ) : (
@@ -432,16 +485,9 @@ export default function RestaurantDetails() {
                 <strong>Area / Neighborhood:</strong> {restaurant.area}, {restaurant.city}
               </p>
               <p style={{ fontSize: '1.05rem', color: 'var(--bab-text)' }}>
-                <strong>Hours:</strong> Open daily from {restaurant.openingTime} to {restaurant.closingTime}
+                <strong>Hours:</strong> Open daily from {formatTime(restaurant.openingTime)} to {formatTime(restaurant.closingTime)}
               </p>
 
-              {/* Simulated Map Visual */}
-              <div className="bab-simulated-map">
-                <div className="bab-map-pin">
-                  <HiOutlineLocationMarker size={28} color="#D65A3A" />
-                  <span>{restaurant.name}</span>
-                </div>
-              </div>
             </div>
           )}
         </div>
@@ -463,7 +509,7 @@ export default function RestaurantDetails() {
                   id="book-date"
                   type="date"
                   value={bookDate}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={localDateString()}
                   onChange={(e) => setBookDate(e.target.value)}
                 />
               </div>
@@ -488,32 +534,58 @@ export default function RestaurantDetails() {
             </div>
 
             <div className="bab-booking-form-group">
-              <label>Select Time Slot</label>
-              <div className="bab-time-slots-grid">
-                {TIME_SLOTS.map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    className={`bab-time-slot-btn ${bookTime === slot ? 'bab-time-slot-btn--selected' : ''}`}
-                    onClick={() => setBookTime(slot)}
-                  >
-                    {slot}
-                  </button>
-                ))}
-              </div>
+              <label>Available Time Slots</label>
+              {availability.loading ? (
+                <div className="bab-slots-loading" aria-label="Loading available times">
+                  {[...Array(6)].map((_, i) => <span key={i} />)}
+                </div>
+              ) : availability.error ? (
+                <p className="bab-slots-state bab-slots-state--warn">
+                  We couldn&apos;t load the available times. Please try again in a moment.
+                </p>
+              ) : slots.length > 0 ? (
+                <div className="bab-time-slots-grid">
+                  {slots.map((slot) => (
+                    <button
+                      key={slot.value}
+                      type="button"
+                      className={`bab-time-slot-btn ${bookTime === slot.value ? 'bab-time-slot-btn--selected' : ''}`}
+                      onClick={() => setBookTime(slot.value)}
+                    >
+                      {slot.label}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="bab-slots-state bab-slots-state--warn">
+                  {availability.message
+                    ? availability.message
+                    : availability.heldByYou > 0 && availability.totalOpen === 0
+                      ? 'You already have a table here on this date. Pick another date to book again.'
+                      : `No tables are free for ${bookGuests} ${Number(bookGuests) === 1 ? 'guest' : 'guests'} on this date. Try another date or a smaller party.`}
+                </p>
+              )}
             </div>
 
             <button
               type="button"
               className="bab-btn bab-btn--secondary bab-booking-submit-btn"
               onClick={handleProceedBooking}
+              disabled={availability.loading || !bookTime}
             >
               Continue to Reservation
             </button>
 
+            {feeQuote && (
+              <p className="bab-fee-note" style={{ textAlign: 'center' }}>
+                Booking fee {formatMoney(feeQuote.fee)} for {bookGuests} {Number(bookGuests) === 1 ? 'guest' : 'guests'}
+                {' '}({formatMoney(feeQuote.per_guest)} per guest). Fully refunded if you cancel in time.
+              </p>
+            )}
+
             <div className="bab-booking-card__guarantees">
-              <span>✦ Instant table confirmation</span>
-              <span>✦ Free cancellation up to 1 hr prior</span>
+              <span>✦ Only genuinely free times are shown</span>
+              <span>✦ Booking fee refunded if you cancel 1 hr+ before</span>
             </div>
           </div>
         </aside>

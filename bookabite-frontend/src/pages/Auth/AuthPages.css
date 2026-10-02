@@ -140,9 +140,16 @@
 }
 
 .bab-auth-submit {
+  display: flex;
   width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
   padding: 14px;
   font-size: 1rem;
+  line-height: 1.25;
+  white-space: normal;
+  color: #fff;
   margin-top: 8px;
 }
 

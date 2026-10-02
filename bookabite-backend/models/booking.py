@@ -64,6 +64,19 @@ class Booking(db.Model):
         default=False
     )
 
+    # Booking fee (INR). fee_status: None (no fee), Paid, Refunded
+    booking_fee = db.Column(
+        db.Numeric(10, 2),
+        nullable=False,
+        default=0
+    )
+
+    fee_status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="None"
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
@@ -125,9 +138,21 @@ class Booking(db.Model):
                 self.scratch_card_used
             ),
 
+            "booking_fee": float(self.booking_fee or 0),
+
+            "fee_status": self.fee_status or "None",
+
+            "invoice_number": self._invoice_number(),
+
             "created_at": (
                 self.created_at.isoformat()
                 if self.created_at
                 else None
             ),
         }
+
+    def _invoice_number(self):
+        for payment in self.payments or []:
+            if payment.invoice_number:
+                return payment.invoice_number
+        return None

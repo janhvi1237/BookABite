@@ -36,6 +36,18 @@ export function mapMenuItem(item) {
     popularity: Number(item.popularity || 0),
 
     createdAt: item.created_at || null,
+
+    // snake_case aliases: FoodItemCard, FoodItemModal and FoodDetailsPage
+    // read these names, so keep them alongside the camelCase fields above.
+    image_url: item.image_url || "",
+    is_veg: Boolean(item.is_veg),
+    is_available: Boolean(item.is_available),
+    spice_level: item.spice_level || "Medium",
+    dietary_info: item.dietary_info || "",
+    restaurant_id: item.restaurant_id,
+    restaurant_name: item.restaurant_name || "",
+    restaurant_area: item.restaurant_area || "",
+    restaurant_city: item.restaurant_city || "",
   };
 }
 

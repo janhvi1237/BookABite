@@ -3,7 +3,14 @@ from datetime import datetime, date, time, timedelta
 
 from extensions import db
 from models.booking import Booking
-from utils.auth import login_required, roles_required, current_user, is_admin, can_manage_restaurant, forbidden
+from models.payment import Payment
+from services.fee_service import (
+    calculate_fee, make_invoice_number, is_refundable, PAYMENT_METHODS
+)
+from utils.auth import (
+    login_required, roles_required, current_user, optional_user,
+    is_admin, can_manage_restaurant, forbidden
+)
 
 
 booking_bp = Blueprint(
@@ -111,6 +118,50 @@ def get_restaurant_capacity(restaurant):
             continue
 
     return total_capacity
+
+
+# A guest cannot hold two tables at the same restaurant on the same day
+# if the times are closer than this (a normal dining sitting).
+SITTING_MINUTES = 120
+
+
+def find_clashing_booking(user_id, restaurant_id, booking_date, booking_time, ignore_id=None):
+    """Return this user's active booking at the same restaurant that overlaps the
+    requested time, or None."""
+    wanted = datetime.combine(booking_date, booking_time)
+    others = Booking.query.filter(
+        Booking.user_id == user_id,
+        Booking.restaurant_id == restaurant_id,
+        Booking.booking_date == booking_date,
+        Booking.status.in_(["Pending", "Confirmed"]),
+    ).all()
+    for other in others:
+        if ignore_id and other.booking_id == ignore_id:
+            continue
+        if not other.booking_time:
+            continue
+        gap = abs((datetime.combine(booking_date, other.booking_time) - wanted).total_seconds())
+        if gap < SITTING_MINUTES * 60:
+            return other
+    return None
+
+
+# ============================================================
+# BOOKING FEE QUOTE
+# GET /api/bookings/fee-quote?party_size=4
+# ============================================================
+
+@booking_bp.route("/fee-quote", methods=["GET"])
+def fee_quote():
+    try:
+        party_size = int(request.args.get("party_size", 2))
+    except (TypeError, ValueError):
+        return jsonify({"error": "party_size must be a number"}), 400
+    if party_size < 1 or party_size > 20:
+        return jsonify({"error": "Party size must be between 1 and 20"}), 400
+    quote = calculate_fee(party_size)
+    quote["payment_methods"] = list(PAYMENT_METHODS)
+    return jsonify(quote), 200
 
 
 # ============================================================
@@ -259,6 +310,16 @@ def get_availability():
 
         now = datetime.now()
 
+        # Slots the logged-in guest cannot take because they already hold a
+        # table here at an overlapping time (token is optional on this route).
+        viewer = optional_user()
+        my_times = []
+        if viewer:
+            my_times = [
+                b.booking_time for b in existing_bookings
+                if b.user_id == viewer.user_id and b.booking_time
+            ]
+
         for slot in slots:
             slot_key = slot.strftime("%H:%M")
 
@@ -279,9 +340,16 @@ def get_availability():
 
             is_past = slot_datetime < now
 
+            already_booked = any(
+                abs((datetime.combine(booking_date, t) - slot_datetime).total_seconds())
+                < SITTING_MINUTES * 60
+                for t in my_times
+            )
+
             available = (
                 remaining_capacity > 0
                 and not is_past
+                and not already_booked
             )
 
             availability.append({
@@ -290,6 +358,7 @@ def get_availability():
                 "total_capacity": total_capacity,
                 "used_capacity": used_capacity,
                 "remaining_capacity": remaining_capacity,
+                "already_booked": already_booked,
                 "available": available
             })
 
@@ -520,6 +589,38 @@ def create_booking():
             }), 409
 
         # ----------------------------------------------------
+        # One table per guest per sitting at the same restaurant
+        # ----------------------------------------------------
+
+        me = current_user()
+        clash = find_clashing_booking(
+            me.user_id, restaurant_id, booking_date, booking_time
+        )
+        if clash:
+            return jsonify({
+                "error": (
+                    "You already have a table at this restaurant around "
+                    f"{format_time_label(clash.booking_time)} on this date. "
+                    "Cancel it first or pick a time at least "
+                    f"{SITTING_MINUTES // 60} hours apart."
+                ),
+                "existing_booking_id": clash.booking_id
+            }), 409
+
+        # ----------------------------------------------------
+        # Booking fee: always calculated here, never trusted from the browser
+        # ----------------------------------------------------
+
+        fee = calculate_fee(party_size)
+        payment_method = str(data.get("payment_method") or "").lower()
+
+        if fee["fee"] > 0 and payment_method not in PAYMENT_METHODS:
+            return jsonify({
+                "error": "Please choose a payment method for the booking fee",
+                "payment_methods": list(PAYMENT_METHODS)
+            }), 400
+
+        # ----------------------------------------------------
         # Create booking
         # ----------------------------------------------------
 
@@ -549,15 +650,37 @@ def create_booking():
             party_size=party_size,
             status="Pending",
             special_request=data.get("special_request"),
-            scratch_card_used=False
+            scratch_card_used=False,
+            booking_fee=fee["fee"],
+            fee_status="Paid" if fee["fee"] > 0 else "None"
         )
 
         db.session.add(booking)
+        db.session.flush()  # booking_id is needed for the payment record
+
+        # DEMO GATEWAY: the payment is recorded as successful straight away.
+        # To use real Razorpay later, create the order here, return it to the
+        # browser, and mark the Payment "Success" only after Razorpay confirms.
+        if fee["fee"] > 0:
+            db.session.add(Payment(
+                booking_id=booking.booking_id,
+                amount=fee["fee"],
+                currency="INR",
+                status="Success",
+                payment_method=payment_method,
+                invoice_number=make_invoice_number(booking.booking_id)
+            ))
+
+        # Restaurants with instant booking confirm automatically.
+        if getattr(restaurant, "is_instant_booking", False):
+            booking.status = "Confirmed"
+
         db.session.commit()
 
         return jsonify({
             "message": "Booking created successfully",
-            "booking": booking.to_dict()
+            "booking": booking.to_dict(),
+            "fee": fee
         }), 201
 
     except ValueError:
@@ -789,10 +912,30 @@ def cancel_booking(booking_id):
 
         booking.status = "Cancelled"
 
+        # Refund rule: the owner/admin cancelling always refunds; the guest is
+        # refunded only if there is still time before the booking.
+        refunded = False
+        if booking.fee_status == "Paid":
+            booking_dt = datetime.combine(booking.booking_date, booking.booking_time)
+            if booking.user_id != me.user_id or is_refundable(booking_dt):
+                booking.fee_status = "Refunded"
+                refunded = True
+                for payment in booking.payments:
+                    if payment.status == "Success":
+                        payment.status = "Refunded"
+
         db.session.commit()
 
+        if refunded:
+            message = "Booking cancelled. Your booking fee will be refunded."
+        elif booking.fee_status == "Paid":
+            message = "Booking cancelled. The booking fee is non-refundable this close to the booking time."
+        else:
+            message = "Booking cancelled successfully"
+
         return jsonify({
-            "message": "Booking cancelled successfully",
+            "message": message,
+            "refunded": refunded,
             "booking": booking.to_dict()
         }), 200
 
@@ -850,6 +993,10 @@ def update_booking_status(booking_id):
             }), 400
 
         if booking.status == "Cancelled" and new_status in ("Pending", "Confirmed"):
+            if booking.fee_status == "Refunded":
+                return jsonify({
+                    "error": "The booking fee was already refunded, so this booking cannot be re-opened. Ask the guest to book again."
+                }), 409
             total_capacity = get_restaurant_capacity(booking.restaurant)
             used_capacity = sum(
                 int(b.party_size or 0)
@@ -867,6 +1014,13 @@ def update_booking_status(booking_id):
                 }), 409
 
         booking.status = new_status
+
+        # Owner/admin cancelling always refunds the booking fee.
+        if new_status == "Cancelled" and booking.fee_status == "Paid":
+            booking.fee_status = "Refunded"
+            for payment in booking.payments:
+                if payment.status == "Success":
+                    payment.status = "Refunded"
 
         db.session.commit()
 

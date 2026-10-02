@@ -1,5 +1,6 @@
 from datetime import datetime
 from extensions import db
+from sqlalchemy import func
 
 # Association table for Restaurant <-> Amenities (many-to-many)
 restaurant_amenities = db.Table(
@@ -64,6 +65,42 @@ class Restaurant(db.Model):
         if include_amenities:
             data["amenities"] = [a.name for a in self.amenities]
         return data
+
+
+def serialize_restaurants(restaurants, include_amenities=True):
+    """Serialize restaurants with ratings calculated from persisted reviews."""
+    restaurants = list(restaurants)
+    if not restaurants:
+        return []
+
+    from models.review import Review
+
+    restaurant_ids = [restaurant.restaurant_id for restaurant in restaurants]
+    review_stats = {
+        restaurant_id: (review_count, average_rating)
+        for restaurant_id, review_count, average_rating in (
+            db.session.query(
+                Review.restaurant_id,
+                func.count(Review.review_id),
+                func.avg(Review.rating),
+            )
+            .filter(Review.restaurant_id.in_(restaurant_ids))
+            .group_by(Review.restaurant_id)
+            .all()
+        )
+    }
+
+    serialized = []
+    for restaurant in restaurants:
+        data = restaurant.to_dict(include_amenities=include_amenities)
+        review_count, average_rating = review_stats.get(
+            restaurant.restaurant_id,
+            (0, None),
+        )
+        data["total_reviews"] = review_count
+        data["rating"] = round(float(average_rating), 1) if review_count else 0
+        serialized.append(data)
+    return serialized
 
 
 class RestaurantImage(db.Model):

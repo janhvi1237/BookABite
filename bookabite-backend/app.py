@@ -14,10 +14,11 @@ from routes.menu_routes import menu_bp
 from routes.review_routes import review_bp
 from routes.favorite_routes import favorite_bp
 from routes.admin_routes import admin_bp
-
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(Config)
 
     # Warn (don't crash) if secrets are missing, default or too short.

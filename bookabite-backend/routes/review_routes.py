@@ -86,4 +86,9 @@ def create_review(restaurant_id):
 
     res = review.to_dict()
     res["user_name"] = user.full_name
-    return jsonify({"message": "Review submitted successfully", "review": res}), 201
+    return jsonify({
+        "message": "Review submitted successfully",
+        "review": res,
+        "rating": float(restaurant.rating),
+        "total_reviews": restaurant.total_reviews,
+    }), 201

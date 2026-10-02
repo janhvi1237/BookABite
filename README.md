@@ -40,7 +40,7 @@ Create the database, in this order:
 python database/migrate_and_seed_menu.py     # menu items, owner column, demo owner
 python database/migrate_owner_approval.py    # owner-approval column
 python database/seed_data.py                 # sample restaurants
-python database/seed_more_data.py            # more restaurants + reviews
+python database/seed_more_data.py            # more restaurants only (reviews are never auto-generated)
 python database/seed_more_data_2.py          # more restaurants + coupons
 python database/create_admin.py admin@bookabite.com "ChooseAStrongPassword" "Admin"
 ```
@@ -72,7 +72,7 @@ They cover login, validation, capacity per time slot, cancel/re-open, and who ma
 
 ## Demo accounts
 
-Seeding creates `owner@bookabite.com` (password set in `database/migrate_and_seed_menu.py`). **These are demo credentials; change or delete them before any real deployment.**
+The menu seeder creates or resets `owner@bookabite.com` and `diner@bookabite.com` to the demo password in `database/migrate_and_seed_menu.py`. Rerun that seeder if either demo account can no longer sign in. **These are demo credentials; change or delete them before any real deployment.**
 
 ## Security notes
 

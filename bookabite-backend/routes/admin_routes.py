@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from extensions import db
 from models import User, Restaurant, Review
 from models.booking import Booking
+from models.restaurant import serialize_restaurants
 from utils.auth import roles_required, current_user, ROLE_ADMIN, ROLE_OWNER, ROLE_CUSTOMER
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/api/admin")
@@ -121,9 +122,8 @@ def list_restaurants():
     if owner_ids:
         owners = {u.user_id: u for u in User.query.filter(User.user_id.in_(owner_ids)).all()}
 
-    results = []
-    for r in restaurants:
-        item = r.to_dict()
+    results = serialize_restaurants(restaurants)
+    for r, item in zip(restaurants, results):
         item["is_active"] = r.is_active
         item["owner_id"] = r.owner_id
         owner = owners.get(r.owner_id)

@@ -166,93 +166,276 @@
   margin: 0;
 }
 
-/* Bookings Cards */
+/* ==========================================================================
+   My Bookings
+   ========================================================================== */
+
+.bab-bookings-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.bab-bookings-stat {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #fffdf9;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.bab-bookings-stat::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: var(--stat-color, #b96848);
+}
+
+.bab-bookings-stat--terracotta { --stat-color: #b96848; }
+.bab-bookings-stat--sage { --stat-color: #5e8f7c; }
+.bab-bookings-stat--amber { --stat-color: #e3a33b; }
+
+.bab-bookings-stat span {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.bab-bookings-stat strong {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+/* Filter pills */
+.bab-customer-page .bab-filter-pills {
+  display: inline-flex;
+  gap: 6px;
+  padding: 5px;
+  margin-bottom: 22px;
+  border-radius: 999px;
+  background: #eadccb;
+  flex-wrap: wrap;
+}
+
+.bab-customer-page .bab-filter-pill {
+  border: 0;
+  background: transparent;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #6a5a50;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bab-customer-page .bab-filter-pill:hover { color: var(--color-primary); }
+
+.bab-customer-page .bab-filter-pill--active {
+  background: #fffdf9;
+  color: var(--color-secondary);
+  box-shadow: 0 3px 10px rgba(45, 36, 30, 0.12);
+}
+
+/* Booking cards */
 .bab-bookings-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 18px;
 }
 
 .bab-booking-item-card {
-  background: white;
-  border-radius: var(--radius-xl);
+  position: relative;
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: stretch;
+  background: #fffdf9;
   border: 1px solid var(--color-border);
-  padding: var(--space-5);
+  border-radius: 22px;
+  overflow: hidden;
   box-shadow: var(--shadow-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-5);
-  flex-wrap: wrap;
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.bab-booking-item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+.bab-booking-item-card::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: var(--card-accent, #e3a33b);
 }
 
-.bab-booking-item__main {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
+.bab-booking-item-card--confirmed { --card-accent: #5e8f7c; }
+.bab-booking-item-card--pending { --card-accent: #e3a33b; }
+.bab-booking-item-card--completed { --card-accent: #3f86ad; }
+.bab-booking-item-card--cancelled { --card-accent: #c85a54; }
+.bab-booking-item-card--cancelled .bab-booking-item__cover { filter: grayscale(0.85); opacity: 0.8; }
+
+.bab-booking-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.bab-booking-item__cover {
+  position: relative;
+  min-height: 150px;
+  background-color: #d8c3ae;
+  background-image: linear-gradient(135deg, #c9744f, #e3a33b);
+  background-size: cover;
+  background-position: center;
 }
 
 .bab-booking-date-badge {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-soft);
-  border: 1px solid var(--color-border);
+  position: absolute;
+  left: 14px; top: 14px;
+  width: 58px;
+  padding: 7px 0 8px;
+  border-radius: 14px;
+  background: rgba(255, 253, 249, 0.96);
+  box-shadow: 0 6px 16px rgba(24, 50, 71, 0.22);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
 .bab-booking-date-month {
-  font-size: 0.65rem;
-  font-weight: var(--weight-bold);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-secondary);
 }
 
 .bab-booking-date-day {
   font-family: var(--font-heading);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
+  font-size: 1.5rem;
+  line-height: 1.05;
   color: var(--color-primary);
-  line-height: 1;
 }
 
-.bab-booking-item__details h4 {
+.bab-booking-item__body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.bab-booking-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bab-booking-item__body h4 {
+  margin: 0;
   font-family: var(--font-heading);
-  font-size: var(--text-lg);
-  color: var(--color-text-dark);
-  margin: 0 0 4px;
+  font-size: 1.28rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.bab-booking-item__sub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
 }
 
 .bab-booking-item__meta {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 .bab-booking-item__meta span {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #f3eadf;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5a4c43;
+}
+
+.bab-booking-item__meta svg { color: var(--color-secondary); }
+
+.bab-booking-item__fee {
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #e3f0ea;
+  color: #2f6b55;
+}
+
+.bab-booking-item__fee--refunded { background: #e1eff6; color: #25536d; }
+
+.bab-booking-item__note {
+  margin: 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-text-muted);
 }
 
 .bab-booking-item__actions {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 20px 18px 0;
 }
+
+.bab-booking-item__actions .bab-btn { width: 100%; white-space: nowrap; }
+
+.bab-btn--sm { padding: 8px 16px !important; font-size: 0.82rem !important; }
+
+.bab-btn--danger { color: #b3413b !important; border-color: rgba(200, 90, 84, 0.45) !important; }
+.bab-btn--danger:hover { background: #f8e4e1 !important; border-color: #c85a54 !important; color: #9c2f2a !important; }
+
+/* Status pills (also used on other pages) */
+.bab-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: #fbefd5;
+  color: #8a5d0f;
+}
+
+.bab-status-badge::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.bab-status-badge--confirmed { background: #e3f0ea; color: #2f6b55; }
+.bab-status-badge--completed { background: #e1eff6; color: #25536d; }
+.bab-status-badge--cancelled { background: #f8e4e1; color: #9c2f2a; }
 
 /* Favorites Grid */
 .bab-favorites-grid {
@@ -261,17 +444,17 @@
   gap: var(--space-6);
 }
 
+@media (max-width: 760px) {
+  .bab-booking-item-card { grid-template-columns: 1fr; }
+  .bab-booking-item__cover { min-height: 120px; }
+  .bab-booking-item__actions { flex-direction: row; padding: 0 20px 18px; }
+  .bab-booking-item__actions .bab-btn { flex: 1; }
+  .bab-bookings-stats { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
   .bab-customer-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-  .bab-booking-item-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .bab-booking-item__actions {
-    width: 100%;
-    justify-content: flex-end;
   }
 }

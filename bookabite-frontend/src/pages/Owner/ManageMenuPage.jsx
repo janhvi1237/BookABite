@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   HiPlus,
   HiOutlinePencil,
   HiOutlineTrash,
   HiOutlineSearch,
   HiArrowLeft,
-  HiOutlineCheck,
   HiOutlineX,
-  HiOutlineSparkles,
 } from 'react-icons/hi';
 import PageLoader from '../../components/common/PageLoader';
 import FoodMascot from '../../components/mascot/FoodMascot';
@@ -43,6 +41,7 @@ const initialDishForm = {
 
 export default function ManageMenuPage() {
   const { user } = useAuth();
+  const { restaurantId } = useParams();
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
 
@@ -51,6 +50,8 @@ export default function ManageMenuPage() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [itemsLoading, setItemsLoading] = useState(false);
+  const [menuLoadError, setMenuLoadError] = useState(false);
+  const [menuReloadKey, setMenuReloadKey] = useState(0);
 
   // Filters
   const [activeCategory, setActiveCategory] = useState('All');
@@ -62,45 +63,83 @@ export default function ManageMenuPage() {
   const [formData, setFormData] = useState(initialDishForm);
   const [saving, setSaving] = useState(false);
 
-  // Load restaurants
+  // Load restaurants and select the restaurant addressed by the current route.
   useEffect(() => {
+    let active = true;
+
     async function loadOwnerVenues() {
+      if (!user?.user_id) {
+        setRestaurants([]);
+        setSelectedRestId(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        if (user?.id) {
-          const list = await fetchOwnerRestaurants(user.id);
+        const list = await fetchOwnerRestaurants(user.user_id);
+        if (active) {
           setRestaurants(list);
-          if (list.length > 0) {
-            setSelectedRestId(list[0].id);
-          }
+          setActiveCategory('All');
+          setSearchQuery('');
+          const routeRestaurant = restaurantId
+            ? list.find((restaurant) => restaurant.id === Number(restaurantId))
+            : null;
+          setSelectedRestId(routeRestaurant?.id ?? (restaurantId ? null : list[0]?.id ?? null));
         }
       } catch (err) {
         console.error('Failed to load owner venues:', err);
-        showToast('Could not load your restaurants.', 'error');
+        if (active) {
+          setRestaurants([]);
+          setSelectedRestId(null);
+          showToast('Could not load your restaurants.', 'error');
+        }
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
+
     loadOwnerVenues();
-  }, [user?.id]);
+    return () => { active = false; };
+  }, [restaurantId, user?.user_id]);
 
   // Load menu for selected restaurant
   useEffect(() => {
-    if (!selectedRestId) return;
+    let active = true;
+    setMenuItems([]);
+    setMenuLoadError(false);
+
+    if (!selectedRestId) {
+      setItemsLoading(false);
+      return () => { active = false; };
+    }
+
     async function loadMenu() {
       try {
         setItemsLoading(true);
         const res = await fetchRestaurantMenu(selectedRestId);
-        setMenuItems(res.items || []);
+        if (active) setMenuItems(res.items);
       } catch (err) {
         console.error('Failed to load menu:', err);
-        showToast('Failed to load menu items.', 'error');
+        if (active) {
+          setMenuItems([]);
+          setMenuLoadError(true);
+          showToast('Failed to load menu items.', 'error');
+        }
       } finally {
-        setItemsLoading(false);
+        if (active) setItemsLoading(false);
       }
     }
+
     loadMenu();
-  }, [selectedRestId]);
+    return () => { active = false; };
+  }, [menuReloadKey, selectedRestId]);
+
+  function handleRestaurantChange(restaurantId) {
+    setSelectedRestId(restaurantId);
+    setActiveCategory('All');
+    setSearchQuery('');
+  }
 
   function handleOpenAdd() {
     setEditingItem(null);
@@ -184,7 +223,7 @@ export default function ManageMenuPage() {
   }
 
   const filteredItems = menuItems.filter((item) => {
-    const matchesCategory = activeCategory === 'All' || item.category.toLowerCase() === activeCategory.toLowerCase();
+    const matchesCategory = activeCategory === 'All' || item.category?.toLowerCase() === activeCategory.toLowerCase();
     const matchesSearch =
       !searchQuery ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -193,6 +232,8 @@ export default function ManageMenuPage() {
   });
 
   if (loading) return <PageLoader message="Loading menu manager..." />;
+
+  const selectedRestaurant = restaurants.find((restaurant) => restaurant.id === selectedRestId);
 
   return (
     <div className="bab-owner-page">
@@ -205,15 +246,17 @@ export default function ManageMenuPage() {
             </Link>
             <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)' }}>Manage Restaurant Menus</h1>
             <p style={{ color: 'var(--color-text-muted)' }}>
-              Curate delicious dishes, set prices, and control real-time stock availability.
+              {selectedRestaurant
+                ? `Manage dishes and availability for ${selectedRestaurant.name}.`
+                : 'Curate delicious dishes, set prices, and control real-time stock availability.'}
             </p>
           </div>
 
           <div className="bab-owner-header__actions">
-            {restaurants.length > 1 && (
+            {restaurants.length > 1 && !restaurantId && (
               <select
                 value={selectedRestId || ''}
-                onChange={(e) => setSelectedRestId(Number(e.target.value))}
+                onChange={(e) => handleRestaurantChange(Number(e.target.value))}
                 style={{
                   padding: '8px 14px',
                   borderRadius: 'var(--radius-lg)',
@@ -230,17 +273,40 @@ export default function ManageMenuPage() {
               </select>
             )}
 
-            <button
-              className="bab-btn bab-btn--secondary"
-              onClick={handleOpenAdd}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              <HiPlus size={18} /> Add Dish
-            </button>
+            {selectedRestaurant && (
+              <button
+                type="button"
+                className="bab-btn bab-btn--secondary"
+                onClick={handleOpenAdd}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <HiPlus size={18} /> Add Dish
+              </button>
+            )}
           </div>
         </div>
 
+        {!selectedRestaurant ? (
+          <div className="bab-owner-empty-box" style={{ background: 'white', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)' }}>
+            <FoodMascot mood="thinking" size={70} />
+            <h4>{restaurants.length ? 'Restaurant not found' : 'No restaurants to manage yet'}</h4>
+            <p>
+              {restaurants.length
+                ? 'This restaurant is not associated with your owner account.'
+                : 'Register a restaurant first, then add dishes to its menu.'}
+            </p>
+            <Link to={restaurants.length ? '/owner/dashboard' : '/owner/restaurants/new'} className="bab-btn bab-btn--secondary" style={{ marginTop: 8 }}>
+              {restaurants.length ? 'Back to Dashboard' : 'Register Restaurant'}
+            </Link>
+          </div>
+        ) : (
+          <>
         {/* Search & Category Filter */}
+        <div className="bab-owner-section__header">
+          <h3>{selectedRestaurant.name} menu</h3>
+          <span>{menuItems.length} {menuItems.length === 1 ? 'dish' : 'dishes'}</span>
+        </div>
+
         <div className="bab-owner-filter-bar">
           <div className="bab-owner-tabs">
             {CATEGORIES.map((cat) => (
@@ -271,6 +337,19 @@ export default function ManageMenuPage() {
         {/* Items List */}
         {itemsLoading ? (
           <PageLoader message="Fetching dishes..." />
+        ) : menuLoadError ? (
+          <div className="bab-owner-empty-box" style={{ background: 'white', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)' }}>
+            <h4>Menu items could not be loaded</h4>
+            <p>Please check your connection and try again.</p>
+            <button
+              type="button"
+              className="bab-btn bab-btn--secondary"
+              onClick={() => setMenuReloadKey((key) => key + 1)}
+              style={{ marginTop: 8 }}
+            >
+              Retry
+            </button>
+          </div>
         ) : filteredItems.length > 0 ? (
           <div className="bab-owner-table-wrap" style={{ background: 'white' }}>
             <table className="bab-owner-table">
@@ -377,8 +456,12 @@ export default function ManageMenuPage() {
         ) : (
           <div className="bab-owner-empty-box" style={{ background: 'white', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)' }}>
             <FoodMascot mood="thinking" size={70} />
-            <h4>No dishes found</h4>
-            <p>You haven't added any dishes matching this filter yet.</p>
+            <h4>{menuItems.length ? 'No dishes match these filters' : 'This restaurant has no menu items yet'}</h4>
+            <p>
+              {menuItems.length
+                ? 'Try another category or search term.'
+                : `Add the first dish to the ${selectedRestaurant.name} menu.`}
+            </p>
             <button className="bab-btn bab-btn--secondary" onClick={handleOpenAdd} style={{ marginTop: 8 }}>
               + Add First Dish
             </button>
@@ -552,6 +635,8 @@ export default function ManageMenuPage() {
               </form>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>
