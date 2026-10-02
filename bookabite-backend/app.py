@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -11,11 +13,22 @@ from routes.booking_routes import booking_bp
 from routes.menu_routes import menu_bp
 from routes.review_routes import review_bp
 from routes.favorite_routes import favorite_bp
+from routes.admin_routes import admin_bp
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Warn (don't crash) if secrets are missing, default or too short.
+    if not app.config.get("TESTING"):
+        for key in ("SECRET_KEY", "JWT_SECRET_KEY"):
+            value = app.config.get(key) or ""
+            if value.startswith("dev-") or len(value) < 32:
+                app.logger.warning(
+                    "%s is a default or short value. Generate a real one: "
+                    "python -c \"import secrets; print(secrets.token_hex(32))\"", key
+                )
 
     # Init extensions
     db.init_app(app)
@@ -30,6 +43,7 @@ def create_app():
     app.register_blueprint(menu_bp)
     app.register_blueprint(review_bp)
     app.register_blueprint(favorite_bp)
+    app.register_blueprint(admin_bp)
 
     app.json.sort_keys = False
 
@@ -59,4 +73,5 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True, port=5000)
+    # Debug mode exposes an interactive console: only enable it locally via FLASK_DEBUG=1
+    app.run(debug=os.getenv("FLASK_DEBUG", "0") == "1", port=5000)

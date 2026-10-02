@@ -4,7 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const isOwnerAccount = user?.role === 'owner';
 
   return (
     <header className="bab-navbar">
@@ -50,6 +51,18 @@ export default function Navbar() {
               My Bookings
             </NavLink>
           )}
+
+          {isAuthenticated && isOwnerAccount && (
+            <NavLink to="/owner/dashboard" className={({ isActive }) => (isActive ? 'active' : '')}>
+              My Restaurant
+            </NavLink>
+          )}
+
+          {isAuthenticated && isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => (isActive ? 'active' : '')}>
+              Admin
+            </NavLink>
+          )}
         </nav>
 
         {/* Right side */}
@@ -68,11 +81,11 @@ export default function Navbar() {
 
               <div className="bab-navbar__user">
                 <div className="bab-navbar__avatar">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {(user?.full_name || user?.name)?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
 
                 <span className="bab-navbar__user-name">
-                  {user?.name || 'User'}
+                  {user?.full_name || user?.name || 'User'}
                 </span>
               </div>
 

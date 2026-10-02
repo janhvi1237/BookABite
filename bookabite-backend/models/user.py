@@ -13,6 +13,7 @@ class User(db.Model):
     profile_image = db.Column("profile_image", db.String(255), nullable=True)
     is_admin = db.Column("is_admin", db.Boolean, default=False)
     role = db.Column("role", db.String(20), default="customer")  # customer, owner, admin
+    is_approved = db.Column("is_approved", db.Boolean, nullable=False, default=True)  # new owners start False
     created_at = db.Column("created_at", db.DateTime, default=datetime.utcnow)
     updated_at = db.Column("updated_at", db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -30,5 +31,6 @@ class User(db.Model):
             "profile_image": self.profile_image,
             "is_admin": self.is_admin,
             "role": self.role or ("admin" if self.is_admin else "customer"),
+            "is_approved": self.is_approved is not False,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

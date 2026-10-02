@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services import AuthService
+from utils.auth import login_required, current_user
 from utils.exceptions import AppError
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
@@ -33,32 +34,19 @@ def login():
 
 
 @auth_bp.route("/me", methods=["GET"])
+@login_required
 def get_current_user():
-    user_id = request.args.get("user_id")
-    if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
-
-    try:
-        user_id = int(user_id)
-        result = AuthService.get_profile(user_id)
-    except AppError as e:
-        return jsonify(e.to_dict()), e.status_code
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-    return jsonify(result), 200
+    # Always the logged-in user (the user_id sent by the browser is ignored).
+    return jsonify(current_user().to_dict()), 200
 
 
 @auth_bp.route("/profile", methods=["PUT"])
+@login_required
 def update_profile():
     data = request.get_json(silent=True) or {}
-    user_id = data.get("user_id")
-    if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
 
     try:
-        user_id = int(user_id)
-        result = AuthService.update_profile(user_id, data)
+        result = AuthService.update_profile(current_user().user_id, data)
     except AppError as e:
         return jsonify(e.to_dict()), e.status_code
     except Exception as e:

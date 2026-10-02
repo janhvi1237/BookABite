@@ -35,6 +35,12 @@ class AuthError(AppError):
     status_code = 401
 
 
+class ForbiddenError(AppError):
+    """Raised when the user is logged in but their role is not allowed to do this."""
+
+    status_code = 403
+
+
 class NotFoundError(AppError):
     """Raised when a requested resource doesn't exist."""
 

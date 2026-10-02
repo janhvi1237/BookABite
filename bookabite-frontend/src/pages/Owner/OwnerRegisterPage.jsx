@@ -42,9 +42,9 @@ export default function OwnerRegisterPage() {
         password,
         role: 'owner',
       });
-      showToast(`Partner account created! Let's set up your restaurant profile.`, 'success');
+      showToast('Partner account created! An admin will approve it shortly.', 'success');
       triggerReaction('celebrating', `Welcome to the BookABite family, Chef ${fullName.split(' ')[0]}!`, 4000);
-      navigate('/owner/onboarding');
+      navigate('/owner/pending');
     } catch (err) {
       console.error("Owner register error:", err);
       setErrorMsg(err.message || 'Registration failed.');

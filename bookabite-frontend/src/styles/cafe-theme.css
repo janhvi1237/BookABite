@@ -1,0 +1,1009 @@
+/* ============================================================
+   BookABite — Café Editorial Theme
+   Built specifically for the current BookABite frontend.
+
+   This is an override layer only.
+   Do NOT replace tokens.css or existing component CSS.
+   No new images are introduced.
+   ============================================================ */
+
+:root {
+  --cafe-cream: #f6efe5;
+  --cafe-cream-light: #fbf7f1;
+  --cafe-paper: #fffdf9;
+  --cafe-white: #ffffff;
+
+  --cafe-navy: #183247;
+  --cafe-navy-deep: #122738;
+
+  --cafe-terracotta: #b96848;
+  --cafe-terracotta-dark: #995038;
+  --cafe-terracotta-soft: #f0ddd1;
+
+  --cafe-sand: #e9ddcf;
+  --cafe-muted: #756960;
+
+  --cafe-border: rgba(24, 50, 71, 0.12);
+
+  --cafe-shadow:
+    0 12px 32px rgba(45, 36, 30, 0.08);
+
+  --cafe-shadow-lg:
+    0 20px 48px rgba(45, 36, 30, 0.12);
+
+  --cafe-serif:
+    Georgia, "Times New Roman", serif;
+
+  --cafe-sans:
+    "Plus Jakarta Sans",
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+
+html,
+body,
+#root,
+.bab-app {
+  background: var(--cafe-cream) !important;
+  color: #243746 !important;
+}
+
+body {
+  background-image:
+    radial-gradient(
+      ellipse 700px 400px at 95% -5%,
+      rgba(185, 104, 72, 0.08),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 650px 430px at -8% 30%,
+      rgba(24, 50, 71, 0.035),
+      transparent 60%
+    ) !important;
+
+  font-family: var(--cafe-sans) !important;
+}
+
+/*
+   Your ThemeContext can automatically set data-theme="dark"
+   when the computer/browser prefers dark mode.
+
+   This project design is intentionally kept light.
+*/
+
+[data-theme="dark"] body,
+[data-theme="dark"] #root,
+[data-theme="dark"] .bab-app,
+[data-theme="dark"] .bab-app__main {
+  background: var(--cafe-cream) !important;
+  color: #243746 !important;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--cafe-serif) !important;
+  color: var(--cafe-navy) !important;
+}
+
+p {
+  color: var(--cafe-muted);
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.bab-btn {
+  border-radius: 8px !important;
+  font-family: var(--cafe-sans) !important;
+  box-shadow: none;
+}
+
+.bab-btn--primary,
+.bab-btn--gold {
+  background: var(--cafe-navy) !important;
+  color: #fff !important;
+}
+
+.bab-btn--primary:hover,
+.bab-btn--gold:hover {
+  background: var(--cafe-navy-deep) !important;
+  color: #fff !important;
+}
+
+.bab-btn--secondary {
+  background: var(--cafe-terracotta) !important;
+  color: #fff !important;
+}
+
+.bab-btn--secondary:hover {
+  background: var(--cafe-terracotta-dark) !important;
+  color: #fff !important;
+}
+
+.bab-btn--outline {
+  background: transparent !important;
+  border-color: rgba(24, 50, 71, 0.25) !important;
+  color: var(--cafe-navy) !important;
+}
+
+.bab-btn--outline:hover {
+  background: var(--cafe-terracotta-soft) !important;
+  border-color: var(--cafe-terracotta) !important;
+  color: var(--cafe-terracotta-dark) !important;
+}
+
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+
+.bab-navbar {
+  background: rgba(255, 253, 249, 0.97) !important;
+  border-bottom: 1px solid var(--cafe-border) !important;
+  box-shadow: 0 3px 18px rgba(45, 36, 30, 0.045) !important;
+}
+
+[data-theme="dark"] .bab-navbar {
+  background: rgba(255, 253, 249, 0.97) !important;
+  border-bottom-color: var(--cafe-border) !important;
+}
+
+.bab-navbar__logo,
+.bab-navbar__logo:hover {
+  color: var(--cafe-navy) !important;
+}
+
+.bab-navbar__logo-mark {
+  background: var(--cafe-terracotta) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+
+.bab-navbar__brand {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+}
+
+.bab-navbar__brand span {
+  color: var(--cafe-terracotta) !important;
+}
+
+.bab-navbar__links a,
+.bab-navbar__login,
+.bab-navbar__logout,
+.bab-navbar__user-name,
+.bab-navbar__icon-button {
+  color: #675d56 !important;
+}
+
+.bab-navbar__links a:hover,
+.bab-navbar__links a.active,
+.bab-navbar__login:hover,
+.bab-navbar__logout:hover,
+.bab-navbar__icon-button:hover {
+  color: var(--cafe-terracotta) !important;
+}
+
+.bab-navbar__links a.active::after {
+  background: var(--cafe-terracotta) !important;
+}
+
+.bab-navbar__icon-button:hover {
+  background: var(--cafe-terracotta-soft) !important;
+}
+
+.bab-navbar__avatar {
+  background: #ead8ca !important;
+  color: #8d4f37 !important;
+}
+
+.bab-navbar__book {
+  background: var(--cafe-terracotta) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+
+.bab-navbar__book:hover {
+  background: var(--cafe-terracotta-dark) !important;
+  color: #fff !important;
+}
+
+
+/* ============================================================
+   HOME HERO
+   ============================================================ */
+
+.bab-home {
+  gap: 0 !important;
+  background: var(--cafe-cream) !important;
+}
+
+.bab-home-hero {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(246, 239, 229, 0.98) 0%,
+      rgba(246, 239, 229, 0.96) 48%,
+      rgba(246, 239, 229, 0.80) 100%
+    ) !important;
+
+  padding: 72px 0 64px !important;
+}
+
+.bab-home-hero__grid {
+  min-height: 500px;
+  gap: 56px !important;
+}
+
+.bab-home-hero__content {
+  gap: 18px !important;
+}
+
+.bab-home-hero__eyebrow {
+  background: var(--cafe-terracotta-soft) !important;
+  color: var(--cafe-terracotta-dark) !important;
+  border-radius: 999px !important;
+  letter-spacing: 0.08em !important;
+}
+
+.bab-home-hero__headline {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-size: clamp(2.8rem, 5.4vw, 4.8rem) !important;
+  font-weight: 500 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.bab-home-hero__subheading {
+  color: #71665e !important;
+  font-size: 1.04rem !important;
+  line-height: 1.7 !important;
+}
+
+.bab-home-hero__cta-group {
+  margin-top: 8px !important;
+}
+
+.bab-home-hero__stats {
+  border-top-color: rgba(24, 50, 71, 0.14) !important;
+}
+
+.bab-home-stat strong {
+  color: var(--cafe-navy) !important;
+}
+
+.bab-home-stat span {
+  color: var(--cafe-muted) !important;
+}
+
+.bab-home-stat__divider {
+  background: rgba(24, 50, 71, 0.14) !important;
+}
+
+.bab-home-hero__3d-wrap {
+  min-height: 420px;
+}
+
+.bab-hero-3d-fallback {
+  border-radius: 18px !important;
+  box-shadow: var(--cafe-shadow-lg) !important;
+  border: 1px solid rgba(24, 50, 71, 0.08);
+}
+
+
+/* ============================================================
+   HOME SEARCH
+   ============================================================ */
+
+.bab-hero-search-bar {
+  background: #fffdf9 !important;
+  border: 1px solid var(--cafe-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 36px rgba(45, 36, 30, 0.09) !important;
+}
+
+.bab-search-field__inner label {
+  color: #81756d !important;
+}
+
+.bab-search-field__inner input,
+.bab-search-field__inner select {
+  color: var(--cafe-navy) !important;
+}
+
+.bab-search-icon {
+  color: var(--cafe-terracotta) !important;
+}
+
+.bab-search-field__divider {
+  background: rgba(24, 50, 71, 0.12) !important;
+}
+
+.bab-search-submit {
+  background: var(--cafe-terracotta) !important;
+}
+
+.bab-search-submit:hover {
+  background: var(--cafe-terracotta-dark) !important;
+}
+
+
+/* ============================================================
+   HOME SECTIONS
+   ============================================================ */
+
+.bab-home-section {
+  background: var(--cafe-cream-light) !important;
+  padding: 82px 0 !important;
+}
+
+.bab-home-section--alt {
+  background: #eee3d7 !important;
+}
+
+.bab-section-header {
+  margin-bottom: 38px !important;
+}
+
+.bab-section-eyebrow {
+  color: var(--cafe-terracotta) !important;
+  letter-spacing: 0.14em !important;
+}
+
+.bab-section-title {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-size: clamp(2rem, 3.5vw, 3rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.035em;
+}
+
+.bab-section-link {
+  color: var(--cafe-terracotta) !important;
+}
+
+.bab-section-link:hover {
+  color: var(--cafe-terracotta-dark) !important;
+}
+
+
+/* ============================================================
+   CUISINE CARDS
+   Existing images are preserved.
+   ============================================================ */
+
+.bab-cuisines-grid {
+  gap: 18px !important;
+}
+
+.bab-cuisine-card {
+  border-radius: 10px !important;
+  box-shadow: var(--cafe-shadow) !important;
+}
+
+.bab-cuisine-card__overlay {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(24, 50, 71, 0.02) 15%,
+      rgba(24, 50, 71, 0.82) 100%
+    ) !important;
+}
+
+.bab-cuisine-card__name {
+  font-family: var(--cafe-serif) !important;
+  font-weight: 500 !important;
+}
+
+.bab-cuisine-card__count {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+
+/* ============================================================
+   RESTAURANT CARDS
+   ============================================================ */
+
+.bab-featured-grid {
+  gap: 24px !important;
+}
+
+.restaurant-card {
+  background: #fffdf9 !important;
+  border: 1px solid rgba(24, 50, 71, 0.10) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(45, 36, 30, 0.065) !important;
+}
+
+.restaurant-card:hover {
+  border-color: rgba(185, 104, 72, 0.42) !important;
+  box-shadow: 0 16px 34px rgba(45, 36, 30, 0.10) !important;
+}
+
+.restaurant-card h3 {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-weight: 500 !important;
+}
+
+.restaurant-card__cuisine,
+.restaurant-card__meta,
+.restaurant-card__price {
+  color: var(--cafe-muted) !important;
+}
+
+.restaurant-card__favorite {
+  background: rgba(255, 253, 249, 0.94) !important;
+  color: var(--cafe-navy) !important;
+  border: 1px solid rgba(24, 50, 71, 0.10) !important;
+}
+
+.restaurant-card__favorite:hover {
+  color: var(--cafe-terracotta) !important;
+}
+
+.restaurant-card__button {
+  background: var(--cafe-terracotta) !important;
+  color: #fff !important;
+}
+
+.restaurant-card__button:hover {
+  background: var(--cafe-terracotta-dark) !important;
+}
+
+
+/* ============================================================
+   HOW IT WORKS — BOOKABITE HOME VERSION
+   ============================================================ */
+
+.bab-how-it-works-box {
+  background: #fffdf9 !important;
+  border: 1px solid var(--cafe-border) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--cafe-shadow) !important;
+}
+
+.bab-how-it-works__bubble {
+  background: var(--cafe-terracotta-soft) !important;
+  border-color: rgba(185, 104, 72, 0.20) !important;
+}
+
+.bab-how-it-works__bubble strong,
+.bab-how-step__num {
+  color: var(--cafe-terracotta) !important;
+}
+
+.bab-how-it-works__bubble p,
+.bab-how-step p {
+  color: var(--cafe-muted) !important;
+}
+
+.bab-how-step h4 {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+}
+
+
+/* ============================================================
+   LARGE HOW-IT-WORKS COMPONENT
+   ============================================================ */
+
+.how-it-works {
+  background: #f1e7db !important;
+  color: var(--cafe-navy) !important;
+}
+
+.how-it-works__eyebrow {
+  color: var(--cafe-terracotta) !important;
+}
+
+.how-it-works__heading h2,
+.how-it-works__step h3 {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-weight: 500 !important;
+}
+
+.how-it-works__heading h2 span {
+  color: var(--cafe-terracotta) !important;
+}
+
+.how-it-works__heading p,
+.how-it-works__step p {
+  color: var(--cafe-muted) !important;
+}
+
+.how-it-works__steps {
+  background: rgba(24, 50, 71, 0.12) !important;
+  border-color: rgba(24, 50, 71, 0.12) !important;
+}
+
+.how-it-works__step {
+  background: #f7f0e6 !important;
+}
+
+.how-it-works__step:hover {
+  background: #fffdf9 !important;
+}
+
+.how-it-works__icon {
+  color: var(--cafe-terracotta) !important;
+  border-color: rgba(185, 104, 72, 0.35) !important;
+}
+
+
+/* ============================================================
+   CATEGORIES — NAVY SECTION
+   ============================================================ */
+
+.categories-section {
+  background: var(--cafe-navy) !important;
+  color: #fff8f0 !important;
+}
+
+.categories-eyebrow,
+.categories-heading h2 em,
+.category-icon,
+.category-card:hover .category-arrow {
+  color: #d99a76 !important;
+}
+
+.categories-heading h2,
+.category-card h3,
+.categories-bottom button {
+  color: #fff8f0 !important;
+  font-family: var(--cafe-serif) !important;
+}
+
+.categories-heading > p,
+.category-card p,
+.categories-bottom span {
+  color: rgba(255, 248, 240, 0.70) !important;
+}
+
+.category-card {
+  border-color: rgba(255, 248, 240, 0.15) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+.category-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(217, 154, 118, 0.50) !important;
+}
+
+.category-icon {
+  border-color: rgba(217, 154, 118, 0.45) !important;
+}
+
+
+/* ============================================================
+   WHY CHOOSE US
+   ============================================================ */
+
+.why-choose {
+  background: var(--cafe-navy) !important;
+  color: #f7eee5 !important;
+}
+
+.why-choose__eyebrow,
+.why-choose__header h2 span,
+.why-choose__icon {
+  color: #d99a76 !important;
+}
+
+.why-choose__header h2,
+.why-choose__content h3 {
+  color: #fff8f0 !important;
+  font-family: var(--cafe-serif) !important;
+}
+
+.why-choose__subtitle,
+.why-choose__content p {
+  color: rgba(255, 248, 240, 0.66) !important;
+}
+
+.why-choose__card {
+  border-color: rgba(255, 248, 240, 0.14) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+.why-choose__card:hover {
+  border-color: rgba(217, 154, 118, 0.42) !important;
+  background: rgba(255, 255, 255, 0.065) !important;
+}
+
+
+/* ============================================================
+   OWNER BANNER
+   ============================================================ */
+
+.bab-owner-banner-card {
+  background: var(--cafe-navy) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--cafe-shadow-lg) !important;
+}
+
+.bab-owner-banner__text h2 {
+  color: #fff8f0 !important;
+  font-family: var(--cafe-serif) !important;
+  font-weight: 500 !important;
+}
+
+.bab-owner-banner__text p {
+  color: rgba(255, 248, 240, 0.78) !important;
+}
+
+
+/* ============================================================
+   POPULAR RESTAURANTS
+   ============================================================ */
+
+.popular-restaurants {
+  background: var(--cafe-cream) !important;
+  color: var(--cafe-navy) !important;
+}
+
+.popular-restaurants__eyebrow {
+  color: var(--cafe-terracotta) !important;
+}
+
+.popular-restaurants h2 {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-weight: 500 !important;
+}
+
+.popular-restaurants__subtitle {
+  color: var(--cafe-muted) !important;
+}
+
+.popular-restaurants__view-all {
+  color: var(--cafe-navy) !important;
+}
+
+.popular-restaurants__view-all:hover {
+  color: var(--cafe-terracotta) !important;
+}
+
+
+/* ============================================================
+   HELP / FAQ
+   This directly fixes the dark/washed-out Help screenshot.
+   ============================================================ */
+
+.bab-faq-page {
+  min-height: calc(100vh - 76px);
+  background: var(--cafe-cream) !important;
+  padding: 72px 0 96px !important;
+}
+
+[data-theme="dark"] .bab-faq-page {
+  background: var(--cafe-cream) !important;
+}
+
+.bab-faq-container {
+  max-width: 900px !important;
+}
+
+.bab-faq-header {
+  margin-bottom: 42px !important;
+}
+
+.bab-faq-header h1 {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-size: clamp(2.7rem, 5vw, 4.2rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.bab-faq-header p {
+  color: var(--cafe-muted) !important;
+}
+
+.bab-faq-search-input {
+  background: #fffdf9 !important;
+  border-color: rgba(24, 50, 71, 0.13) !important;
+  color: var(--cafe-navy) !important;
+  box-shadow: 0 10px 26px rgba(45, 36, 30, 0.07) !important;
+}
+
+.bab-faq-search-input::placeholder {
+  color: #9a8e85 !important;
+}
+
+.bab-faq-search-input:focus {
+  border-color: var(--cafe-terracotta) !important;
+  box-shadow: 0 0 0 3px rgba(185, 104, 72, 0.13) !important;
+}
+
+.bab-faq-category-btn {
+  background: #fffdf9 !important;
+  border-color: rgba(24, 50, 71, 0.12) !important;
+  color: var(--cafe-muted) !important;
+}
+
+.bab-faq-category-btn:hover {
+  border-color: var(--cafe-terracotta) !important;
+  color: var(--cafe-terracotta-dark) !important;
+  background: var(--cafe-terracotta-soft) !important;
+}
+
+.bab-faq-category-btn--active {
+  background: var(--cafe-navy) !important;
+  border-color: var(--cafe-navy) !important;
+  color: #fff !important;
+}
+
+.bab-faq-list {
+  gap: 12px !important;
+}
+
+.bab-faq-item {
+  background: #fffdf9 !important;
+  border-color: rgba(24, 50, 71, 0.10) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(45, 36, 30, 0.045) !important;
+}
+
+.bab-faq-item--open {
+  border-color: rgba(185, 104, 72, 0.50) !important;
+}
+
+.bab-faq-question {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+  font-weight: 500 !important;
+}
+
+.bab-faq-answer {
+  color: var(--cafe-muted) !important;
+}
+
+.bab-faq-support-card {
+  background: #fffdf9 !important;
+  border-color: rgba(24, 50, 71, 0.10) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--cafe-shadow) !important;
+}
+
+.bab-faq-support-card h3 {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+}
+
+.bab-faq-support-card p {
+  color: var(--cafe-muted) !important;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.bab-footer {
+  --bab-bg: var(--cafe-navy);
+  --bab-accent: #d99a76;
+  --bab-accent-hover: #e5ae8d;
+
+  background: var(--cafe-navy) !important;
+  border-top: none !important;
+  color: #fff8f0 !important;
+  margin-top: 70px !important;
+}
+
+.bab-footer__brand-text,
+.bab-footer__brand-text em {
+  color: #fff8f0 !important;
+}
+
+.bab-footer__brand-text {
+  font-family: var(--cafe-serif) !important;
+}
+
+.bab-footer__brand-text em {
+  color: #d99a76 !important;
+}
+
+.bab-footer__tagline,
+.bab-footer__col-title,
+.bab-footer__col-text,
+.bab-footer__bottom {
+  color: rgba(255, 248, 240, 0.66) !important;
+}
+
+.bab-footer__col-link {
+  color: rgba(255, 248, 240, 0.88) !important;
+}
+
+.bab-footer__col-link:hover {
+  color: #d99a76 !important;
+}
+
+.bab-footer__social-btn {
+  color: #fff8f0 !important;
+  border-color: rgba(255, 248, 240, 0.18) !important;
+}
+
+.bab-footer__social-btn:hover {
+  border-color: #d99a76 !important;
+  color: #d99a76 !important;
+}
+
+.bab-footer__newsletter-form {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 248, 240, 0.16) !important;
+}
+
+.bab-footer__newsletter-form input {
+  color: #fff8f0 !important;
+}
+
+.bab-footer__newsletter-form button {
+  background: var(--cafe-terracotta) !important;
+}
+
+.bab-footer__newsletter-form button:hover {
+  background: var(--cafe-terracotta-dark) !important;
+}
+
+.bab-footer__bottom {
+  border-top-color: rgba(255, 248, 240, 0.14) !important;
+}
+
+
+/* ============================================================
+   BOOKING / CONFIRMATION / GENERIC CARDS
+   ============================================================ */
+
+.bab-booking-page,
+.bab-confirm-page,
+.bab-page,
+.bab-page-stub {
+  background: transparent !important;
+}
+
+.bab-booking-card,
+.bab-ticket-card,
+.bab-page-stub {
+  background: #fffdf9 !important;
+  border-color: var(--cafe-border) !important;
+  box-shadow: var(--cafe-shadow) !important;
+}
+
+.bab-booking-title,
+.bab-confirm-title,
+.bab-step-heading,
+.bab-ticket-rest-name,
+.bab-ticket-id-tag strong {
+  color: var(--cafe-navy) !important;
+  font-family: var(--cafe-serif) !important;
+}
+
+.bab-booking-eyebrow,
+.bab-ticket-eyebrow {
+  color: var(--cafe-terracotta) !important;
+}
+
+.bab-booking-subtitle,
+.bab-confirm-subtitle,
+.bab-ticket-rest-area,
+.bab-ticket-label,
+.bab-ticket-qr-instruction {
+  color: var(--cafe-muted) !important;
+}
+
+.bab-form-input,
+.bab-slot-pill,
+.bab-party-btn,
+.bab-seating-card {
+  background: #fbf7f1 !important;
+  border-color: var(--cafe-border) !important;
+  color: var(--cafe-navy) !important;
+}
+
+.bab-form-input:focus,
+.bab-slot-pill:hover,
+.bab-party-btn:hover {
+  border-color: var(--cafe-terracotta) !important;
+}
+
+.bab-slot-pill--selected,
+.bab-party-btn--selected {
+  background: var(--cafe-terracotta) !important;
+  border-color: var(--cafe-terracotta) !important;
+  color: #fff !important;
+}
+
+.bab-seating-card--selected {
+  background: var(--cafe-terracotta-soft) !important;
+  border-color: var(--cafe-terracotta) !important;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+  .bab-home-hero {
+    padding: 54px 0 48px !important;
+  }
+
+  .bab-home-hero__grid {
+    gap: 28px !important;
+  }
+
+  .bab-home-hero__headline {
+    font-size: clamp(2.5rem, 10vw, 4rem) !important;
+  }
+
+  .bab-home-hero__3d-wrap {
+    min-height: 340px;
+    height: 340px;
+  }
+
+  .bab-section-header {
+    align-items: flex-start !important;
+    gap: 18px;
+    flex-direction: column;
+  }
+
+  .bab-home-section {
+    padding: 62px 0 !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .bab-home-hero {
+    padding: 42px 0 38px !important;
+  }
+
+  .bab-home-hero__stats {
+    gap: 14px !important;
+  }
+
+  .bab-home-stat strong {
+    font-size: 1.05rem !important;
+  }
+
+  .bab-home-stat span {
+    font-size: 0.72rem !important;
+  }
+
+  .bab-home-section {
+    padding: 56px 0 !important;
+  }
+
+  .bab-faq-page {
+    padding: 50px 0 70px !important;
+  }
+
+  .bab-faq-header h1 {
+    font-size: 2.55rem !important;
+  }
+
+  .bab-faq-question {
+    padding: 18px !important;
+    font-size: 1.05rem !important;
+  }
+
+  .bab-faq-answer {
+    padding: 0 18px 18px !important;
+  }
+}

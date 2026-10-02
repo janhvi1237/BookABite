@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Restaurant, Amenity, RestaurantImage
 from datetime import time
+from utils.auth import roles_required, current_user, is_admin, can_manage_restaurant, forbidden
 
 restaurant_bp = Blueprint(
     "restaurants",
@@ -117,20 +118,18 @@ def list_restaurants():
 # GET /api/restaurants/owner?owner_id=...
 # ============================================================
 @restaurant_bp.route("/owner", methods=["GET"])
+@roles_required("owner", "admin")
 def get_owner_restaurants():
-    owner_id = request.args.get("owner_id")
-
-    if not owner_id:
-        return jsonify({
-            "error": "owner_id query parameter is required"
-        }), 400
-
-    try:
-        owner_id = int(owner_id)
-    except ValueError:
-        return jsonify({
-            "error": "Invalid owner_id"
-        }), 400
+    # The owner comes from the login token, never from the browser.
+    # (An admin may look at a specific owner with ?owner_id=)
+    owner_id = current_user().user_id
+    if is_admin(current_user()) and request.args.get("owner_id"):
+        try:
+            owner_id = int(request.args.get("owner_id"))
+        except ValueError:
+            return jsonify({
+                "error": "Invalid owner_id"
+            }), 400
 
     # Only return ACTIVE restaurants.
     # Deleted/deactivated restaurants will no longer
@@ -186,6 +185,7 @@ def get_restaurant(restaurant_id):
 # POST /api/restaurants
 # ============================================================
 @restaurant_bp.route("", methods=["POST"])
+@roles_required("owner", "admin")
 def create_restaurant():
     data = request.get_json(silent=True) or {}
 
@@ -287,10 +287,11 @@ def create_restaurant():
             data.get("is_instant_booking", True)
         ),
 
+        # An owner always owns what they create. Only an admin may pick another owner.
         owner_id=(
-            int(data.get("owner_id"))
-            if data.get("owner_id")
-            else None
+            (int(data.get("owner_id")) if data.get("owner_id") else None)
+            if is_admin(current_user())
+            else current_user().user_id
         ),
 
         is_active=True,
@@ -367,6 +368,7 @@ def create_restaurant():
 # PUT /api/restaurants/<restaurant_id>
 # ============================================================
 @restaurant_bp.route("/<int:restaurant_id>", methods=["PUT"])
+@roles_required("owner", "admin")
 def update_restaurant(restaurant_id):
     restaurant = Restaurant.query.get(restaurant_id)
 
@@ -374,6 +376,9 @@ def update_restaurant(restaurant_id):
         return jsonify({
             "error": "Restaurant not found"
         }), 404
+
+    if not can_manage_restaurant(current_user(), restaurant):
+        return forbidden("You can only edit your own restaurants.")
 
     data = request.get_json(silent=True) or {}
 
@@ -534,6 +539,7 @@ def update_restaurant(restaurant_id):
 # restaurant disappear from both customer and owner views.
 # ============================================================
 @restaurant_bp.route("/<int:restaurant_id>", methods=["DELETE"])
+@roles_required("owner", "admin")
 def delete_restaurant(restaurant_id):
 
     restaurant = Restaurant.query.get(restaurant_id)
@@ -542,6 +548,9 @@ def delete_restaurant(restaurant_id):
         return jsonify({
             "error": "Restaurant not found"
         }), 404
+
+    if not can_manage_restaurant(current_user(), restaurant):
+        return forbidden("You can only delete your own restaurants.")
 
     try:
 

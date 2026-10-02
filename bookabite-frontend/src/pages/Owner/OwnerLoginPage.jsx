@@ -9,7 +9,7 @@ import '../Auth/AuthPages.css';
 
 export default function OwnerLoginPage() {
   const navigate = useNavigate();
-  const { login, loading } = useAuth();
+  const { login, logout, loading } = useAuth();
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
 
@@ -23,6 +23,16 @@ export default function OwnerLoginPage() {
 
     try {
       const loggedUser = await login(email, password);
+      if (loggedUser.role !== 'owner' && loggedUser.role !== 'admin' && !loggedUser.is_admin) {
+        logout();
+        setErrorMsg('This is not a restaurant owner account. Please use the Diner Sign In.');
+        return;
+      }
+      if (loggedUser.role === 'owner' && loggedUser.is_approved === false) {
+        showToast('Your account is waiting for admin approval.', 'info');
+        navigate('/owner/pending');
+        return;
+      }
       showToast(`Welcome to Owner Portal, ${loggedUser.full_name}!`, 'success');
       triggerReaction('serving', `Ready to manage your restaurant tables and reservations!`, 3500);
       navigate('/owner/dashboard');

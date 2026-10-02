@@ -16,6 +16,20 @@ async function request(path, options = {}) {
 
   const data = await res.json().catch(() => null);
 
+  // Login expired or invalid: clear the saved session and send the person to the right login page.
+  if (res.status === 401 && token && !path.startsWith('/api/auth/login')) {
+    localStorage.removeItem('bookabite_token');
+    localStorage.removeItem('bookabite_user');
+    const here = window.location.pathname;
+    if (!here.includes('login')) {
+      window.location.href = here.startsWith('/admin')
+        ? '/admin/login'
+        : here.startsWith('/owner')
+          ? '/owner/login'
+          : '/login';
+    }
+  }
+
   if (!res.ok) {
     const error = new Error(data?.error || data?.message || 'Request failed');
     error.status = res.status;

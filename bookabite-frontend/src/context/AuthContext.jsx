@@ -72,7 +72,16 @@ export function AuthProvider({ children }) {
     return res.user;
   }, [user]);
 
+  const refreshUser = useCallback(async () => {
+    if (!user?.user_id) return null;
+    const fresh = await fetchCurrentUser(user.user_id);
+    setUser(fresh);
+    localStorage.setItem('bookabite_user', JSON.stringify(fresh));
+    return fresh;
+  }, [user]);
+
   const isOwner = user?.role === 'owner' || user?.is_admin === true;
+  const isAdmin = user?.role === 'admin' || user?.is_admin === true;
 
   return (
     <AuthContext.Provider
@@ -82,10 +91,12 @@ export function AuthProvider({ children }) {
         loading,
         isAuthenticated: Boolean(token && user),
         isOwner,
+        isAdmin,
         login,
         register,
         logout,
         updateProfile,
+        refreshUser,
       }}
     >
       {children}

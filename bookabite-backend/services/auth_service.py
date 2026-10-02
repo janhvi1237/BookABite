@@ -62,7 +62,11 @@ class AuthService:
                 errors={"phone": "Phone already registered."},
             )
 
+        # Public sign-up may only create a customer or an owner.
+        # "admin" can never be requested from outside (use database/create_admin.py).
         role = data.get("role", "customer")
+        if role not in ("customer", "owner"):
+            role = "customer"
         password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
         user = UserRepository.create(
             full_name=full_name.strip(),
@@ -70,6 +74,8 @@ class AuthService:
             phone=phone,
             password_hash=password_hash,
             role=role,
+            # New restaurant owners must be approved by an admin before they can use the owner area.
+            is_approved=(role != "owner"),
         )
 
         token = create_access_token(identity=str(user.user_id))
