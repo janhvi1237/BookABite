@@ -23,6 +23,7 @@ import { fetchRestaurantReviews, submitReview } from '../../api/reviews';
 import { toggleFavorite } from '../../api/favorites';
 import useAvailability from '../../hooks/useAvailability';
 import { fetchFeeQuote } from '../../api/bookings';
+import { fetchCustomerAvailableTables } from '../../api/tables';
 import { localDateString, formatTime, formatMoney } from '../../utils/time';
 import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
@@ -55,10 +56,37 @@ export default function RestaurantDetails() {
   const [bookTime, setBookTime] = useState('');
   const [bookGuests, setBookGuests] = useState('2');
   const [feeQuote, setFeeQuote] = useState(null);
+  const [availableTables, setAvailableTables] = useState([]);
+  const [availableTablesLoading, setAvailableTablesLoading] = useState(false);
+  const [availableTablesError, setAvailableTablesError] = useState('');
 
   // Real availability from the server: only slots that can actually be booked.
   const availability = useAvailability(restaurant?.id, bookDate, bookGuests);
   const slots = availability.slots;
+
+  useEffect(() => {
+    if (!restaurant?.id || !bookDate || !bookTime) {
+      setAvailableTables([]);
+      setAvailableTablesError('');
+      return undefined;
+    }
+    let active = true;
+    setAvailableTablesLoading(true);
+    setAvailableTablesError('');
+    fetchCustomerAvailableTables(restaurant.id, bookDate, bookTime, bookGuests)
+      .then((data) => {
+        if (active) setAvailableTables(Array.isArray(data.tables) ? data.tables : []);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setAvailableTables([]);
+        setAvailableTablesError(err.message || 'Could not load available tables.');
+      })
+      .finally(() => {
+        if (active) setAvailableTablesLoading(false);
+      });
+    return () => { active = false; };
+  }, [restaurant?.id, bookDate, bookTime, bookGuests]);
 
   // Keep the chosen time valid when the date / guests / availability change.
   useEffect(() => {
@@ -566,6 +594,29 @@ export default function RestaurantDetails() {
                 </p>
               )}
             </div>
+
+            <section className="bab-customer-available-tables" aria-live="polite">
+              <h4>Tables for {bookGuests} {Number(bookGuests) === 1 ? 'guest' : 'guests'}</h4>
+              {!bookTime ? (
+                <p>Select an available time to see the tables.</p>
+              ) : availableTablesLoading ? (
+                <p>Checking available tables...</p>
+              ) : availableTablesError ? (
+                <p className="bab-slots-state bab-slots-state--warn">{availableTablesError}</p>
+              ) : availableTables.length > 0 ? (
+                <div className="bab-customer-available-tables__list">
+                  {availableTables.map((table) => (
+                    <article key={table.table_number} className="bab-customer-available-tables__item">
+                      <strong>{table.table_number}</strong>
+                      <span>{table.table_type || 'Restaurant table'}</span>
+                      <span>{table.capacity} seats</span>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p>No tables are currently available for this party at the selected time.</p>
+              )}
+            </section>
 
             <button
               type="button"

@@ -64,6 +64,13 @@ class Booking(db.Model):
         default=False
     )
 
+    # When the sitting ends (booking_time + the restaurant's dining duration).
+    # Stored, so changing the duration later never alters past bookings.
+    end_time = db.Column(
+        db.Time,
+        nullable=True
+    )
+
     # Booking fee (INR). fee_status: None (no fee), Paid, Refunded
     booking_fee = db.Column(
         db.Numeric(10, 2),
@@ -92,6 +99,12 @@ class Booking(db.Model):
         lazy=True
     )
 
+    table = db.relationship(
+        "RestaurantTable",
+        foreign_keys=[table_id],
+        lazy="joined",
+    )
+
     reviews = db.relationship(
         "Review",
         backref="booking",
@@ -112,6 +125,12 @@ class Booking(db.Model):
 
             "table_id": self.table_id,
 
+            "table_number": (
+                self.table.table_number or f"T{self.table.table_id}"
+                if self.table
+                else None
+            ),
+
             "booking_date": (
                 self.booking_date.isoformat()
                 if self.booking_date
@@ -121,6 +140,12 @@ class Booking(db.Model):
             "booking_time": (
                 self.booking_time.isoformat()
                 if self.booking_time
+                else None
+            ),
+
+            "end_time": (
+                self.end_time.isoformat()
+                if self.end_time
                 else None
             ),
 

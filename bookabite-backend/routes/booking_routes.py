@@ -7,6 +7,7 @@ from models.payment import Payment
 from services.fee_service import (
     calculate_fee, make_invoice_number, is_refundable, PAYMENT_METHODS
 )
+from services import table_service
 from utils.auth import (
     login_required, roles_required, current_user, optional_user,
     is_admin, can_manage_restaurant, forbidden
@@ -110,6 +111,8 @@ def get_restaurant_capacity(restaurant):
     total_capacity = 0
 
     for table in getattr(restaurant, "tables", []) or []:
+        if getattr(table, "is_active", True) is False:
+            continue  # switched off by the owner (out of service)
         capacity = getattr(table, "capacity", 0) or 0
 
         try:
@@ -265,9 +268,9 @@ def get_availability():
                 "slots": []
             }), 200
 
-        # ----------------------------------------------------
-        # Get existing Pending / Confirmed bookings
-        # ----------------------------------------------------
+        # Optional ?party_size= shows only times where a table big enough for
+        # that party is free.
+        party_size_arg = request.args.get("party_size", type=int) or 1
 
         existing_bookings = (
             Booking.query
@@ -279,39 +282,12 @@ def get_availability():
             .all()
         )
 
-        # ----------------------------------------------------
-        # Calculate used capacity for every exact time.
-        #
-        # Example:
-        # 7:00 PM -> 4 people
-        # 7:30 PM -> 6 people
-        # ----------------------------------------------------
-
-        used_capacity_by_time = {}
-
-        for booking in existing_bookings:
-            booking_time = booking.booking_time
-
-            if not booking_time:
-                continue
-
-            key = booking_time.strftime("%H:%M")
-
-            used_capacity_by_time[key] = (
-                used_capacity_by_time.get(key, 0)
-                + int(booking.party_size or 0)
-            )
-
-        # ----------------------------------------------------
-        # Build availability response
-        # ----------------------------------------------------
+        day = table_service.day_availability(
+            restaurant, booking_date, slots, party_size_arg
+        )
 
         availability = []
-
         now = datetime.now()
-
-        # Slots the logged-in guest cannot take because they already hold a
-        # table here at an overlapping time (token is optional on this route).
         viewer = optional_user()
         my_times = []
         if viewer:
@@ -321,43 +297,28 @@ def get_availability():
             ]
 
         for slot in slots:
-            slot_key = slot.strftime("%H:%M")
-
-            used_capacity = used_capacity_by_time.get(
-                slot_key,
-                0
-            )
-
-            remaining_capacity = max(
-                total_capacity - used_capacity,
-                0
-            )
-
-            slot_datetime = datetime.combine(
-                booking_date,
-                slot
-            )
-
+            info = day[slot.strftime("%H:%M")]
+            slot_datetime = datetime.combine(booking_date, slot)
             is_past = slot_datetime < now
-
             already_booked = any(
                 abs((datetime.combine(booking_date, t) - slot_datetime).total_seconds())
                 < SITTING_MINUTES * 60
                 for t in my_times
             )
-
             available = (
-                remaining_capacity > 0
+                info["fits_party"]
                 and not is_past
                 and not already_booked
             )
-
             availability.append({
                 "value": slot.strftime("%H:%M"),
                 "label": format_time_label(slot),
                 "total_capacity": total_capacity,
-                "used_capacity": used_capacity,
-                "remaining_capacity": remaining_capacity,
+                "used_capacity": total_capacity - info["free_seats"],
+                "remaining_capacity": info["free_seats"],
+                "tables_total": info["tables_total"],
+                "tables_free": info["tables_free"],
+                "fits_party": info["fits_party"],
                 "already_booked": already_booked,
                 "available": available
             })
@@ -376,6 +337,7 @@ def get_availability():
                 else str(closing_time)
             ),
             "total_capacity": total_capacity,
+            "max_party_size": table_service.max_party(restaurant),
             "slots": availability
         }), 200
 
@@ -551,40 +513,24 @@ def create_booking():
             }), 409
 
         # ----------------------------------------------------
-        # Calculate already-used capacity for this exact time
+        # Booking window and largest table
         # ----------------------------------------------------
 
-        existing_bookings = (
-            Booking.query
-            .filter(
-                Booking.restaurant_id == restaurant_id,
-                Booking.booking_date == booking_date,
-                Booking.booking_time == booking_time,
-                Booking.status.in_(["Pending", "Confirmed"])
-            )
-            .all()
-        )
-
-        used_capacity = sum(
-            int(booking.party_size or 0)
-            for booking in existing_bookings
-        )
-
-        remaining_capacity = max(
-            total_capacity - used_capacity,
-            0
-        )
-
-        # ----------------------------------------------------
-        # Reject if there is not enough capacity
-        # ----------------------------------------------------
-
-        if party_size > remaining_capacity:
+        advance_days = int(restaurant.max_advance_days or 30)
+        if booking_date > date.today() + timedelta(days=advance_days):
             return jsonify({
-                "error": "Not enough seating capacity available for this time",
-                "total_capacity": total_capacity,
-                "used_capacity": used_capacity,
-                "remaining_capacity": remaining_capacity,
+                "error": f"Tables can be booked up to {advance_days} days ahead",
+                "max_advance_days": advance_days
+            }), 400
+
+        largest_table = table_service.max_party(restaurant)
+        if party_size > largest_table:
+            return jsonify({
+                "error": (
+                    f"Our largest table seats {largest_table}. "
+                    "For bigger groups please contact the restaurant directly."
+                ),
+                "max_party_size": largest_table,
                 "requested_party_size": party_size
             }), 409
 
@@ -624,22 +570,44 @@ def create_booking():
         # Create booking
         # ----------------------------------------------------
 
-        table_id = data.get("table_id")
-        if table_id is not None:
+        preferred_table_id = data.get("table_id")
+        if preferred_table_id is not None:
             try:
-                table_id = int(table_id)
+                preferred_table_id = int(preferred_table_id)
             except (TypeError, ValueError):
                 return jsonify({"error": "Invalid table_id"}), 400
 
             from models.restaurant import RestaurantTable
 
-            table = RestaurantTable.query.filter_by(
-                table_id=table_id, restaurant_id=restaurant_id
-            ).first()
-            if not table:
+            if not RestaurantTable.query.filter_by(
+                table_id=preferred_table_id, restaurant_id=restaurant_id
+            ).first():
                 return jsonify({
                     "error": "Selected table does not belong to this restaurant"
                 }), 400
+
+        # AUTOMATIC TABLE ASSIGNMENT
+        # Lock the restaurant first so two guests can never get the same table,
+        # then give the party the smallest free table that fits them.
+        table_service.lock_restaurant(restaurant_id)
+        table, sitting = table_service.allocate_table(
+            restaurant, booking_date, booking_time, party_size,
+            preferred_table_id=preferred_table_id
+        )
+        if not table:
+            if preferred_table_id is not None:
+                return jsonify({
+                    "error": "That table is no longer available for your party. Choose another table or use automatic assignment."
+                }), 409
+            suggestions = table_service.alternative_times(
+                restaurant, booking_date, booking_time, party_size, valid_slots
+            )
+            return jsonify({
+                "error": "No table is free for your party at this time",
+                "requested_party_size": party_size,
+                "suggested_times": suggestions
+            }), 409
+        table_id = table.table_id
 
         booking = Booking(
             user_id=current_user().user_id,  # always the logged-in user
@@ -647,6 +615,7 @@ def create_booking():
             table_id=table_id,
             booking_date=booking_date,
             booking_time=booking_time,
+            end_time=table_service.end_time_for(booking_time, sitting),
             party_size=party_size,
             status="Pending",
             special_request=data.get("special_request"),
@@ -997,21 +966,19 @@ def update_booking_status(booking_id):
                 return jsonify({
                     "error": "The booking fee was already refunded, so this booking cannot be re-opened. Ask the guest to book again."
                 }), 409
-            total_capacity = get_restaurant_capacity(booking.restaurant)
-            used_capacity = sum(
-                int(b.party_size or 0)
-                for b in Booking.query.filter(
-                    Booking.restaurant_id == booking.restaurant_id,
-                    Booking.booking_date == booking.booking_date,
-                    Booking.booking_time == booking.booking_time,
-                    Booking.status.in_(["Pending", "Confirmed"]),
-                    Booking.booking_id != booking.booking_id,
-                ).all()
+            table_service.lock_restaurant(booking.restaurant_id)
+            table, sitting = table_service.allocate_table(
+                booking.restaurant, booking.booking_date, booking.booking_time,
+                int(booking.party_size or 0),
+                ignore_booking_id=booking.booking_id,
+                preferred_table_id=booking.table_id
             )
-            if int(booking.party_size or 0) > total_capacity - used_capacity:
+            if not table:
                 return jsonify({
-                    "error": "Cannot re-open: not enough seating left for this time slot"
+                    "error": "Cannot re-open: no table is free for this party at that time"
                 }), 409
+            booking.table_id = table.table_id
+            booking.end_time = table_service.end_time_for(booking.booking_time, sitting)
 
         booking.status = new_status
 

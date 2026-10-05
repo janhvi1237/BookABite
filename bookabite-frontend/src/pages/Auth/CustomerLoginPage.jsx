@@ -89,7 +89,7 @@ export default function CustomerLoginPage() {
             <div className="bab-auth-field">
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <label htmlFor="auth-pwd">Password</label>
-                <Link to="/help" className="bab-auth-forgot">Forgot?</Link>
+                <Link to="/forgot-password" className="bab-auth-forgot">Forgot?</Link>
               </div>
               <div className="bab-auth-input-wrap">
                 <HiOutlineLockClosed size={18} className="bab-auth-field-icon" />

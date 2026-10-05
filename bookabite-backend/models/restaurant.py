@@ -32,6 +32,9 @@ class Restaurant(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"), nullable=True)
     is_instant_booking = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
+    # How long one party keeps a table (minutes) and how far ahead guests may book (days).
+    dining_duration_minutes = db.Column(db.Integer, nullable=False, default=90)
+    max_advance_days = db.Column(db.Integer, nullable=False, default=30)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -60,6 +63,8 @@ class Restaurant(db.Model):
             "closing_time": self.closing_time.isoformat() if self.closing_time else None,
             "cover_image": self.cover_image,
             "is_instant_booking": self.is_instant_booking,
+            "dining_duration_minutes": self.dining_duration_minutes or 90,
+            "max_advance_days": self.max_advance_days or 30,
             "images": [img.image_url for img in self.images],
         }
         if include_amenities:
@@ -123,5 +128,17 @@ class RestaurantTable(db.Model):
 
     table_id = db.Column(db.Integer, primary_key=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey("Restaurants.restaurant_id"), nullable=False)
+    table_number = db.Column(db.String(20), nullable=True)   # label shown to staff: T1, T2, Window-1
     table_type = db.Column(db.String(50), nullable=True)
     capacity = db.Column(db.Integer, nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)  # False = out of service
+
+    def to_dict(self):
+        return {
+            "table_id": self.table_id,
+            "restaurant_id": self.restaurant_id,
+            "table_number": self.table_number or f"T{self.table_id}",
+            "table_type": self.table_type,
+            "capacity": self.capacity,
+            "is_active": self.is_active is not False,
+        }

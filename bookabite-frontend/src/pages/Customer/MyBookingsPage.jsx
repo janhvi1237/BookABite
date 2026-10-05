@@ -216,6 +216,7 @@ export default function MyBookingsPage() {
                       <span>
                         <HiOutlineUserGroup size={14} /> {b.party_size || 2} {Number(b.party_size) === 1 ? 'Guest' : 'Guests'}
                       </span>
+                      <span><HiOutlineTicket size={14} /> Table {b.table_number || '—'}</span>
                       <span><HiOutlineTicket size={14} /> #{bId}</span>
                     </div>
 

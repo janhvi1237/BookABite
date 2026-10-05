@@ -265,6 +265,25 @@
   transition: all var(--bab-transition-fast);
 }
 
+.bab-table-selection__hint {
+  margin: -2px 0 12px;
+  color: var(--bab-text-muted);
+  font-size: 0.85rem;
+}
+
+.bab-table-selection-card {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  appearance: none;
+}
+
+.bab-table-selection-card:focus-visible {
+  outline: 2px solid var(--bab-secondary);
+  outline-offset: 2px;
+}
+
 .bab-seating-card--selected {
   border-color: var(--bab-secondary);
   background: var(--bab-secondary-light);

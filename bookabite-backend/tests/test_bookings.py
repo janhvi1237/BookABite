@@ -80,26 +80,36 @@ def test_unknown_restaurant(client, customer):
     assert book(client, customer[1], 9999).status_code == 404
 
 
-# ---------- capacity ----------
+# ---------- capacity (real tables: T1 = 2 seats, T2 = 4, T3 = 4) ----------
 
-def test_capacity_is_enforced(client, customer, other_customer, restaurant):
-    assert book(client, customer[1], restaurant, party_size=6).status_code == 201
-    res = book(client, other_customer[1], restaurant, party_size=3)  # only 2 seats left
+def test_every_table_gets_used_then_restaurant_is_full(client, customer, other_customer, admin, owner, restaurant):
+    assert book(client, customer[1], restaurant, party_size=4).status_code == 201        # T2
+    assert book(client, other_customer[1], restaurant, party_size=4).status_code == 201  # T3
+    assert book(client, admin[1], restaurant, party_size=2).status_code == 201           # T1
+    res = book(client, owner[1], restaurant, party_size=2)                               # nothing left
     assert res.status_code == 409
-    assert res.get_json()["remaining_capacity"] == 2
-    assert book(client, other_customer[1], restaurant, party_size=2).status_code == 201
+    assert "No table is free" in res.get_json()["error"]
 
 
-def test_capacity_is_per_time_slot(client, customer, other_customer, restaurant):
-    assert book(client, customer[1], restaurant, party_size=8, booking_time="19:00").status_code == 201
-    assert book(client, other_customer[1], restaurant, party_size=8, booking_time="20:00").status_code == 201
+def test_seats_alone_are_not_enough_party_needs_one_table(client, customer, restaurant):
+    """Total seats = 10, but the biggest table seats 4, so a party of 6 cannot sit together."""
+    res = book(client, customer[1], restaurant, party_size=6)
+    assert res.status_code == 409
+    assert res.get_json()["max_party_size"] == 4
 
 
-def test_cancelled_booking_frees_seats(client, customer, other_customer, restaurant):
-    first = book(client, customer[1], restaurant, party_size=8).get_json()["booking"]["booking_id"]
-    assert book(client, other_customer[1], restaurant, party_size=2).status_code == 409
+def test_sitting_ends_then_table_is_free_again(client, customer, other_customer, small_restaurant):
+    assert book(client, customer[1], small_restaurant, party_size=4, booking_time="19:00").status_code == 201
+    # 19:00 + 90 min = 20:30, so 20:00 is still taken but 21:00 is free
+    assert book(client, other_customer[1], small_restaurant, party_size=4, booking_time="20:00").status_code == 409
+    assert book(client, other_customer[1], small_restaurant, party_size=4, booking_time="21:00").status_code == 201
+
+
+def test_cancelled_booking_frees_the_table(client, customer, other_customer, small_restaurant):
+    first = book(client, customer[1], small_restaurant, party_size=4).get_json()["booking"]["booking_id"]
+    assert book(client, other_customer[1], small_restaurant, party_size=2).status_code == 409
     client.patch(f"/api/bookings/{first}/cancel", headers=customer[1])
-    assert book(client, other_customer[1], restaurant, party_size=2).status_code == 201
+    assert book(client, other_customer[1], small_restaurant, party_size=2).status_code == 201
 
 
 # ---------- cancel ----------
@@ -169,11 +179,11 @@ def test_error_responses_do_not_leak_internals(client, customer, restaurant, mon
     assert "secret-db-detail" not in res.get_data(as_text=True)
 
 
-def test_cancelled_booking_cannot_be_reopened_past_capacity(client, customer, other_customer, owner, restaurant):
-    """Owner re-confirming a cancelled booking must re-check seats."""
-    first = book(client, customer[1], restaurant, party_size=8).get_json()["booking"]["booking_id"]
+def test_cancelled_booking_cannot_be_reopened_if_table_was_taken(client, customer, other_customer, owner, small_restaurant):
+    """Owner re-confirming a cancelled booking must re-check that a table is still free."""
+    first = book(client, customer[1], small_restaurant, party_size=4).get_json()["booking"]["booking_id"]
     client.patch(f"/api/bookings/{first}/cancel", headers=customer[1])
-    assert book(client, other_customer[1], restaurant, party_size=8).status_code == 201
+    assert book(client, other_customer[1], small_restaurant, party_size=4).status_code == 201
     res = client.patch(f"/api/bookings/{first}/status", json={"status": "Confirmed"}, headers=owner[1])
     assert res.status_code in (400, 409)
 

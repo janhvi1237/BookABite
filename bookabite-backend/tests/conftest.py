@@ -89,7 +89,7 @@ def admin(app):
 
 @pytest.fixture()
 def restaurant(app, owner):
-    """Open 10:00-22:00, two tables of 4 seats = capacity 8."""
+    """Open 10:00-22:00 with three real tables: T1 (2 seats), T2 (4), T3 (4)."""
     from extensions import db
     from models.restaurant import Restaurant, RestaurantTable
 
@@ -101,8 +101,28 @@ def restaurant(app, owner):
         db.session.add(r)
         db.session.flush()
         db.session.add_all([
-            RestaurantTable(restaurant_id=r.restaurant_id, table_type="Indoor", capacity=4),
-            RestaurantTable(restaurant_id=r.restaurant_id, table_type="Indoor", capacity=4),
+            RestaurantTable(restaurant_id=r.restaurant_id, table_number="T1", table_type="Indoor", capacity=2),
+            RestaurantTable(restaurant_id=r.restaurant_id, table_number="T2", table_type="Indoor", capacity=4),
+            RestaurantTable(restaurant_id=r.restaurant_id, table_number="T3", table_type="Indoor", capacity=4),
         ])
+        db.session.commit()
+        return r.restaurant_id
+
+
+@pytest.fixture()
+def small_restaurant(app, owner):
+    """Open 10:00-22:00 with exactly ONE table (4 seats) - easy to fill up."""
+    from extensions import db
+    from models.restaurant import Restaurant, RestaurantTable
+
+    with app.app_context():
+        r = Restaurant(
+            name="Tiny Cafe", address="2 Test Road", owner_id=owner[0],
+            opening_time=time(10, 0), closing_time=time(22, 0), is_active=True,
+        )
+        db.session.add(r)
+        db.session.flush()
+        db.session.add(RestaurantTable(
+            restaurant_id=r.restaurant_id, table_number="T1", table_type="Indoor", capacity=4))
         db.session.commit()
         return r.restaurant_id

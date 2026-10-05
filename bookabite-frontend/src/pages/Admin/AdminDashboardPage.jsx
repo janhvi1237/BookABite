@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   HiOutlineUserGroup,
   HiOutlineOfficeBuilding,
@@ -19,6 +20,7 @@ import {
   assignRestaurantOwner,
   fetchAdminBookings,
 } from '../../api/admin';
+import StatisticsReport from '../../components/reports/StatisticsReport';
 import './AdminPages.css';
 
 const TABS = [
@@ -26,6 +28,7 @@ const TABS = [
   ['users', 'Users'],
   ['restaurants', 'Restaurants'],
   ['bookings', 'Bookings'],
+  ['reports', 'Statistics reports'],
 ];
 
 export default function AdminDashboardPage() {
@@ -58,6 +61,7 @@ export default function AdminDashboardPage() {
         setOwners(o);
       }
       if (tab === 'bookings') setBookings(await fetchAdminBookings());
+      if (tab === 'reports') setRestaurants(await fetchAdminRestaurants());
     } catch (err) {
       showToast(err.message || 'Could not load data', 'error');
     } finally {
@@ -268,6 +272,10 @@ export default function AdminDashboardPage() {
                           <button type="button" className="bab-admin__link-btn" onClick={() => toggleActive(r)}>
                             {r.is_active ? 'Hide' : 'Show'}
                           </button>
+                          {' · '}
+                          <Link className="bab-admin__link-btn" to={`/admin/restaurants/${r.restaurant_id}/tables`}>
+                            Tables
+                          </Link>
                         </td>
                       </tr>
                     ))}
@@ -298,6 +306,10 @@ export default function AdminDashboardPage() {
                   </tbody>
                 </table>
               </div>
+            )}
+
+            {tab === 'reports' && (
+              <StatisticsReport restaurants={restaurants} showRestaurantFilter />
             )}
           </>
         )}

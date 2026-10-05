@@ -71,7 +71,10 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="bab-auth-field">
-              <label htmlFor="admin-pwd">Password</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <label htmlFor="admin-pwd">Password</label>
+                <Link to="/forgot-password" className="bab-auth-forgot">Forgot?</Link>
+              </div>
               <div className="bab-auth-input-wrap">
                 <HiOutlineLockClosed size={18} className="bab-auth-field-icon" />
                 <input

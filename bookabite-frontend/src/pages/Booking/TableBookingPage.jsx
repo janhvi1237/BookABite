@@ -17,6 +17,7 @@ import { ErrorState } from '../../components/common/ErrorState';
 import FoodMascot from '../../components/mascot/FoodMascot';
 import { fetchRestaurantById, fetchRestaurants } from '../../api/restaurants';
 import { createBooking, fetchFeeQuote } from '../../api/bookings';
+import { fetchCustomerAvailableTables } from '../../api/tables';
 import useAvailability from '../../hooks/useAvailability';
 import { localDateString, formatTime, formatDate, formatMoney, to24 } from '../../utils/time';
 import { useAuth } from '../../context/AuthContext';
@@ -62,6 +63,10 @@ export default function TableBookingPage() {
   const [partySize, setPartySize] = useState(
     Number(searchParams.get('guests')) || 2
   );
+  const [availableTables, setAvailableTables] = useState([]);
+  const [tablesLoading, setTablesLoading] = useState(false);
+  const [tablesError, setTablesError] = useState('');
+  const [selectedTableId, setSelectedTableId] = useState('');
   const [seatingPref, setSeatingPref] = useState('standard');
   const [guestName, setGuestName] = useState(user?.full_name || '');
   const [guestEmail, setGuestEmail] = useState(user?.email || '');
@@ -100,6 +105,49 @@ export default function TableBookingPage() {
   // Real availability from the server: only slots that can be booked right now.
   const availability = useAvailability(restaurant?.id, bookingDate, partySize);
   const slots = availability.slots;
+  const selectedTable = availableTables.find(
+    (table) => String(table.table_id) === selectedTableId
+  );
+  const tableSelectionSummary = selectedTable
+    ? `${selectedTable.table_number} · ${selectedTable.capacity} seats`
+    : selectedTableId
+      ? 'Selected table (availability will be checked)'
+      : availableTables[0]
+        ? `Automatic assignment · ${availableTables[0].table_number} is the current best fit`
+        : 'Automatic assignment (best fit)';
+
+  useEffect(() => {
+    setSelectedTableId('');
+    if (!restaurant?.id || !bookingDate || !bookingTime) {
+      setAvailableTables([]);
+      setTablesError('');
+      setTablesLoading(false);
+      return undefined;
+    }
+    let active = true;
+    setTablesLoading(true);
+    setTablesError('');
+    fetchCustomerAvailableTables(restaurant.id, bookingDate, bookingTime, partySize)
+      .then((data) => {
+        if (!active) return;
+        const tables = Array.isArray(data.tables) ? data.tables : [];
+        if (tables.some((table) => !Number.isInteger(Number(table.table_id)))) {
+          setAvailableTables([]);
+          setTablesError('Table selection is unavailable. Please restart the BookABite backend and reload this page.');
+          return;
+        }
+        setAvailableTables(tables);
+      })
+      .catch((error) => {
+        if (!active) return;
+        setAvailableTables([]);
+        setTablesError(error.message || 'Could not load tables for this seating time.');
+      })
+      .finally(() => {
+        if (active) setTablesLoading(false);
+      });
+    return () => { active = false; };
+  }, [restaurant?.id, bookingDate, bookingTime, partySize]);
 
   // On step 1, keep the selected time valid (prefer 7:30 PM, else the first free slot).
   useEffect(() => {
@@ -148,6 +196,23 @@ export default function TableBookingPage() {
         setStep(1);
         return;
       }
+      if (tablesLoading || tablesError) {
+        showToast(tablesError || 'Please wait while available tables load.', 'info');
+        return;
+      }
+      if (availableTables.length === 0) {
+        showToast('No tables are available for this party at the selected time. Choose another time.', 'info');
+        setStep(1);
+        return;
+      }
+      if (
+        selectedTableId
+        && !availableTables.some((table) => String(table.table_id) === selectedTableId)
+      ) {
+        showToast('That table is no longer available. Choose another table or automatic assignment.', 'info');
+        setSelectedTableId('');
+        return;
+      }
       triggerReaction('happy', "Almost there! Please tell us who is dining with us.", 2500);
     }
     if (step === 3) {
@@ -173,6 +238,7 @@ export default function TableBookingPage() {
         booking_date: bookingDate,
         booking_time: bookingTime,
         party_size: partySize,
+        ...(selectedTableId ? { table_id: Number(selectedTableId) } : {}),
         special_request: specialRequest,
       }));
       navigate("/login");
@@ -187,6 +253,7 @@ export default function TableBookingPage() {
         booking_date: bookingDate,
         booking_time: bookingTime,
         party_size: partySize,
+        ...(selectedTableId ? { table_id: Number(selectedTableId) } : {}),
         payment_method: payMethod,
         special_request: `${seatingPref ? `[${seatingPref.toUpperCase()} SEATING] ` : ''}${specialRequest}`.trim(),
       };
@@ -200,7 +267,7 @@ export default function TableBookingPage() {
       console.error("Booking failed:", err);
       showToast(err.message || "Failed to reserve table. Please try again.", "error");
       // Someone took the seats or the guest already holds a table: go back and re-pick.
-      if (err.status === 409) setStep(1);
+      if (err.status === 409) setStep(selectedTableId ? 2 : 1);
     } finally {
       setSubmitting(false);
     }
@@ -361,7 +428,52 @@ export default function TableBookingPage() {
               </div>
 
               <div className="bab-form-group" style={{ marginTop: 28 }}>
-                <label>Table Seating Preference</label>
+                <label>Select a Table</label>
+                <p className="bab-table-selection__hint">
+                  Choose a specific available table or let us automatically assign the best fit.
+                </p>
+                {tablesLoading ? (
+                  <p role="status">Loading tables for {formatTime(bookingTime)}...</p>
+                ) : tablesError ? (
+                  <p className="bab-slots-state bab-slots-state--warn">{tablesError}</p>
+                ) : (
+                  <div className="bab-seating-cards-grid">
+                    <button
+                      type="button"
+                      aria-pressed={selectedTableId === ''}
+                      className={`bab-seating-card bab-table-selection-card ${selectedTableId === '' ? 'bab-seating-card--selected' : ''}`}
+                      onClick={() => setSelectedTableId('')}
+                    >
+                      <div>
+                        <strong>Automatic assignment</strong>
+                        <p>We&apos;ll reserve the smallest available table that fits your party.</p>
+                      </div>
+                    </button>
+                    {availableTables.map((table) => (
+                      <button
+                        type="button"
+                        key={table.table_id}
+                        aria-pressed={selectedTableId === String(table.table_id)}
+                        className={`bab-seating-card bab-table-selection-card ${selectedTableId === String(table.table_id) ? 'bab-seating-card--selected' : ''}`}
+                        onClick={() => setSelectedTableId(String(table.table_id))}
+                      >
+                        <div>
+                          <strong>{table.table_number}</strong>
+                          <p>{table.table_type || 'Restaurant table'} · {table.capacity} seats</p>
+                        </div>
+                      </button>
+                    ))}
+                    {availableTables.length === 0 && (
+                      <p className="bab-slots-state bab-slots-state--warn">
+                        No tables are available at this time for your party size.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="bab-form-group" style={{ marginTop: 28 }}>
+                <label>Seating Area Preference</label>
                 <div className="bab-seating-cards-grid">
                   {SEATING_AREAS.map((area) => (
                     <div
@@ -478,6 +590,10 @@ export default function TableBookingPage() {
                 <div className="bab-summary-row">
                   <span>Number of Guests:</span>
                   <strong>{partySize} Guests</strong>
+                </div>
+                <div className="bab-summary-row">
+                  <span>Table selection:</span>
+                  <strong>{tableSelectionSummary}</strong>
                 </div>
                 <div className="bab-summary-row">
                   <span>Diner:</span>

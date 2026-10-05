@@ -1,7 +1,14 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, current_app, request, jsonify
 from services import AuthService
+from services.password_reset_service import (
+    GENERIC_REQUEST_MESSAGE,
+    mail_is_configured,
+    request_password_reset,
+    reset_password,
+)
 from utils.auth import login_required, current_user
 from utils.exceptions import AppError
+from utils.validators import validate_email
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
@@ -31,6 +38,41 @@ def login():
         return jsonify(e.to_dict()), e.status_code
 
     return jsonify({"message": "Login successful", **result}), 200
+
+
+@auth_bp.route("/password/forgot", methods=["POST"])
+def forgot_password():
+    data = request.get_json(silent=True) or {}
+    email = data.get("email")
+    if not isinstance(email, str) or validate_email(email):
+        return jsonify({"error": "Enter a valid email address."}), 400
+    if not mail_is_configured():
+        return jsonify({
+            "error": "Password reset email is not configured. Please contact the site administrator."
+        }), 503
+
+    try:
+        request_password_reset(email)
+    except Exception:
+        current_app.logger.exception("Could not send password reset email")
+        return jsonify({
+            "error": "We could not send a password reset email right now. Please try again later."
+        }), 503
+    return jsonify({"message": GENERIC_REQUEST_MESSAGE}), 200
+
+
+@auth_bp.route("/password/reset", methods=["POST"])
+def reset_password_route():
+    data = request.get_json(silent=True) or {}
+    token = data.get("token")
+    password = data.get("password")
+    if not isinstance(token, str) or not token.strip():
+        return jsonify({"error": "A password reset token is required."}), 400
+    if not isinstance(password, str):
+        return jsonify({"error": "Enter a valid new password."}), 400
+
+    result, status = reset_password(token, password)
+    return jsonify(result), status
 
 
 @auth_bp.route("/me", methods=["GET"])

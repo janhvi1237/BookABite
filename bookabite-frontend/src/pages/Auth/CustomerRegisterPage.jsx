@@ -169,7 +169,7 @@ export default function CustomerRegisterPage() {
           <div className="bab-auth-footer">
             <p>
               Already have an account?{' '}
-              <Link to="/login" className="bab-auth-switch-link">
+              <Link to="/login/customer" className="bab-auth-switch-link">
                 Sign In Instead
               </Link>
             </p>

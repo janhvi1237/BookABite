@@ -120,6 +120,11 @@ export default function BookingConfirmationPage() {
               </div>
 
               <div className="bab-ticket-item">
+                <span className="bab-ticket-label">Table</span>
+                <strong>{booking?.table_number || '—'}</strong>
+              </div>
+
+              <div className="bab-ticket-item">
                 <span className="bab-ticket-label">Status</span>
                 <span
                   className={`bab-badge ${status === 'Confirmed' ? 'bab-badge--success' : 'bab-badge--gold'}`}

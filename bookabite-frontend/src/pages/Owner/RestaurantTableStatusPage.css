@@ -1,0 +1,9 @@
+.bab-table-status__filters { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.bab-table-status__filters label { display: grid; gap: 6px; color: var(--color-text-muted); }
+.bab-table-status__filters input { padding: 9px 11px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; }
+.bab-table-status__summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.bab-table-status__summary span, .bab-table-status__badge { display: inline-block; padding: 5px 10px; border-radius: 999px; font-size: .8rem; text-transform: capitalize; }
+.bab-table-status__summary span { background: var(--color-bg-soft); color: var(--color-text-dark); }
+.bab-table-status__badge.is-available { background: #e6f7ed; color: #247a43; }
+.bab-table-status__badge.is-booked { background: #fff2e8; color: #b54708; }
+.bab-table-status__badge.is-out_of_service { background: #f2f4f7; color: #667085; }

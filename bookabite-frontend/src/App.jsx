@@ -25,8 +25,10 @@ import TableBookingPage from './pages/Booking/TableBookingPage';
 import BookingConfirmationPage from './pages/Booking/BookingConfirmationPage';
 // 8. Customer Login
 import CustomerLoginPage from './pages/Auth/CustomerLoginPage';
+import LoginOptionsPage from './pages/Auth/LoginOptionsPage';
 // 9. Customer Register
 import CustomerRegisterPage from './pages/Auth/CustomerRegisterPage';
+import PasswordRecoveryPage from './pages/Auth/PasswordRecoveryPage';
 // 10. Owner Login
 import OwnerLoginPage from './pages/Owner/OwnerLoginPage';
 // 11. Owner Register
@@ -34,6 +36,8 @@ import OwnerRegisterPage from './pages/Owner/OwnerRegisterPage';
 import OwnerPendingPage from './pages/Owner/OwnerPendingPage';
 // 12. Owner Dashboard
 import OwnerDashboardPage from './pages/Owner/OwnerDashboardPage';
+import OwnerReportsPage from './pages/Owner/OwnerReportsPage';
+import RestaurantTableStatusPage from './pages/Owner/RestaurantTableStatusPage';
 // 13. Add Restaurant
 import AddRestaurantPage from './pages/Owner/AddRestaurantPage';
 // 14. Edit Restaurant
@@ -100,10 +104,12 @@ export default function App() {
           <Route path="/booking-confirmation" element={<BookingConfirmationPage />} />
 
           {/* 8. Customer Login */}
-          <Route path="/login" element={<CustomerLoginPage />} />
+          <Route path="/login" element={<LoginOptionsPage />} />
+          <Route path="/login/customer" element={<CustomerLoginPage />} />
 
           {/* 9. Customer Register */}
           <Route path="/register" element={<CustomerRegisterPage />} />
+          <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
 
           {/* 10. Owner Login */}
           <Route path="/owner/login" element={<OwnerLoginPage />} />
@@ -115,6 +121,9 @@ export default function App() {
           {/* 12. Owner Dashboard */}
           <Route path="/owner/dashboard" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerDashboardPage /></RequireRole>} />
           <Route path="/owner" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerDashboardPage /></RequireRole>} />
+          <Route path="/owner/reports" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerReportsPage /></RequireRole>} />
+          <Route path="/owner/restaurants/:id/tables" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><RestaurantTableStatusPage /></RequireRole>} />
+          <Route path="/admin/restaurants/:id/tables" element={<RequireRole roles={['admin']} loginPath="/admin/login"><RestaurantTableStatusPage /></RequireRole>} />
 
           {/* 13. Add Restaurant */}
           <Route path="/owner/restaurants/new" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><AddRestaurantPage /></RequireRole>} />

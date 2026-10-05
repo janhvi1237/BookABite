@@ -1,0 +1,15 @@
+.bab-report { display: grid; gap: 20px; }
+.bab-report__filters { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.bab-report__filters label { display: grid; gap: 5px; color: var(--bab-text-muted); font-size: .85rem; }
+.bab-report__filters input, .bab-report__filters select {
+  min-height: 40px; padding: 7px 10px; border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-sm); background: var(--bab-bg-card); color: var(--bab-text); font: inherit;
+}
+.bab-report__metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+.bab-report__metric { display: grid; gap: 6px; padding: 16px; border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-lg); background: var(--bab-bg-card); }
+.bab-report__metric span { color: var(--bab-text-muted); font-size: .82rem; }
+.bab-report__metric strong { color: var(--bab-text); font-size: 1.35rem; }
+.bab-report__tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+.bab-report__tables h3 { padding: 14px 14px 0; margin: 0; color: var(--bab-text); font-size: 1rem; }
+.bab-report__tables .bab-admin__table-wrap { overflow-x: auto; }

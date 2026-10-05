@@ -67,6 +67,16 @@
   margin-bottom: 20px;
 }
 
+.bab-auth-success-banner {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border: 1px solid rgba(63, 166, 107, 0.25);
+  border-radius: var(--bab-radius-sm);
+  background: rgba(63, 166, 107, 0.1);
+  color: #247a43;
+  font-size: 0.88rem;
+}
+
 .bab-demo-owner-hint {
   background: var(--bab-accent-gold-soft);
   border: 1px dashed rgba(233, 180, 76, 0.6);
@@ -209,4 +219,77 @@
 .bab-auth-owner-portal-btn:hover {
   background: var(--bab-primary);
   color: #FFF8F0;
+}
+
+.bab-login-options {
+  max-width: 620px;
+}
+
+.bab-login-options__list {
+  display: grid;
+  gap: 12px;
+}
+
+.bab-login-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--bab-border);
+  border-radius: var(--bab-radius-md);
+  background: var(--bab-bg-soft);
+  color: var(--bab-text);
+  text-decoration: none;
+  transition: border-color var(--bab-transition-fast), transform var(--bab-transition-fast);
+}
+
+.bab-login-option:hover {
+  border-color: var(--bab-secondary);
+  color: var(--bab-text);
+  transform: translateY(-2px);
+}
+
+.bab-login-option:focus-visible {
+  outline: 2px solid var(--bab-secondary);
+  outline-offset: 2px;
+}
+
+.bab-login-option__icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border-radius: var(--bab-radius-md);
+  background: var(--bab-secondary-light);
+  color: var(--bab-primary);
+}
+
+.bab-login-option--owner .bab-login-option__icon {
+  background: var(--bab-accent-gold-soft);
+}
+
+.bab-login-option--admin .bab-login-option__icon {
+  background: var(--bab-bg-card);
+}
+
+.bab-login-option__copy {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.bab-login-option__copy strong {
+  color: var(--bab-primary);
+  font-size: 1rem;
+}
+
+.bab-login-option__copy small {
+  color: var(--bab-text-muted);
+  line-height: 1.4;
+}
+
+.bab-login-option__arrow {
+  flex: 0 0 auto;
+  color: var(--bab-secondary);
 }

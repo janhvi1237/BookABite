@@ -43,4 +43,16 @@ class Config:
     RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
     RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
 
+    MAIL_SERVER = os.getenv("MAIL_SERVER", "")
+    MAIL_PORT = int(os.getenv("MAIL_PORT", "587"))
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME", "")
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "")
+    MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "")
+    MAIL_USE_TLS = os.getenv("MAIL_USE_TLS", "1").lower() in ("1", "true", "yes")
+    MAIL_USE_SSL = os.getenv("MAIL_USE_SSL", "0").lower() in ("1", "true", "yes")
+    PASSWORD_RESET_FRONTEND_URL = os.getenv(
+        "PASSWORD_RESET_FRONTEND_URL", "http://localhost:5173"
+    )
+    PASSWORD_RESET_TOKEN_MAX_AGE = 3600
+
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")

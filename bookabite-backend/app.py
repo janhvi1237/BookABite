@@ -14,6 +14,8 @@ from routes.menu_routes import menu_bp
 from routes.review_routes import review_bp
 from routes.favorite_routes import favorite_bp
 from routes.admin_routes import admin_bp
+from routes.table_routes import table_bp
+from routes.report_routes import reports_bp
 from flask_cors import CORS
 
 def create_app():
@@ -45,6 +47,8 @@ def create_app():
     app.register_blueprint(review_bp)
     app.register_blueprint(favorite_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(table_bp)
+    app.register_blueprint(reports_bp)
 
     app.json.sort_keys = False
 

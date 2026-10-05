@@ -131,6 +131,9 @@ export default function OwnerDashboardPage() {
             <Link to="/owner/menu" className="bab-owner-nav-item">
               <HiOutlineBookOpen size={18} /> Menu Management
             </Link>
+            <Link to="/owner/reports" className="bab-owner-nav-item">
+              <HiOutlineTrendingUp size={18} /> Statistics Reports
+            </Link>
             <Link to="/owner/restaurants/new" className="bab-owner-nav-item">
               <HiPlus size={18} /> Add New Restaurant
             </Link>
@@ -222,6 +225,9 @@ export default function OwnerDashboardPage() {
                       <p className="bab-venue-card__cuisine">{rest.cuisine} • ₹{rest.priceForTwo} for two</p>
 
                       <div className="bab-venue-card__actions">
+                        <Link to={`/owner/restaurants/${rest.id}/tables`} className="bab-btn bab-btn--outline" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+                          View Table Status
+                        </Link>
                         <Link to={`/restaurants/${rest.id}`} className="bab-btn bab-btn--outline" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
                           View Public Page
                         </Link>

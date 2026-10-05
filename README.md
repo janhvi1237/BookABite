@@ -12,6 +12,8 @@ Restaurant table-booking platform for Pune. Customers discover restaurants and b
 | Owner | Manage own restaurants, menu, bookings. New owners wait for admin approval |
 | Admin | Approve / reject owners, manage anything |
 
+Customers can view available table types, labels and seat counts while choosing a restaurant date, time and party size. Owners can review per-table availability for a selected restaurant date and time and generate date-range statistics reports. Admins can view table status for any restaurant and generate reports across all restaurants or filter to one venue. Reports include booking and guest counts by status, paid booking fees, reviews, ratings and daily activity, with CSV export.
+
 ## Prerequisites
 
 - Python 3.10+ and Node 18+
@@ -57,6 +59,16 @@ npm run dev                      # http://localhost:5173
 ```
 
 Make sure `CORS_ORIGINS` in the backend `.env` includes the frontend URL.
+
+### Password recovery email
+
+Configure the SMTP settings in `bookabite-backend/.env` (`MAIL_SERVER`,
+`MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, and `MAIL_DEFAULT_SENDER`).
+The default is STARTTLS on port 587; set `MAIL_USE_SSL=1` and `MAIL_USE_TLS=0`
+for an SSL SMTP endpoint. Set `PASSWORD_RESET_FRONTEND_URL` to the public
+frontend origin so reset links point to the right site. Password reset links
+expire after one hour and become invalid after use. Forgot-password requests
+return the same message whether or not the email belongs to an account.
 
 ## 3. Tests
 
