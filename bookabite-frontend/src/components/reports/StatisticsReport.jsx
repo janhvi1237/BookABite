@@ -80,6 +80,7 @@ export default function StatisticsReport({ restaurants = [], showRestaurantFilte
     ['Confirmed', report.summary.confirmed],
     ['Avg. party size', report.summary.average_party_size],
     ['Paid booking fees', `₹${report.summary.paid_booking_fees.toFixed(2)}`],
+    ['Platform fee due (completed bookings)', `₹${(report.summary.platform_fee_due || 0).toFixed(2)}`],
     ['Reviews', report.summary.reviews],
     ['Average rating', report.summary.average_rating],
   ] : [];

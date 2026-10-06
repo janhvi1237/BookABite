@@ -26,3 +26,8 @@ export const assignRestaurantOwner = (restaurantId, ownerId) =>
   api.put(`/api/admin/restaurants/${restaurantId}/owner`, { owner_id: ownerId });
 
 export const fetchAdminBookings = () => api.get('/api/admin/bookings');
+
+export const fetchFeeSettings = () => api.get('/api/admin/settings');
+export const saveFeeSettings = (settings) => api.put('/api/admin/settings', settings);
+export const fetchOwnerBilling = (month) =>
+  api.get(`/api/admin/owner-billing${month ? `?month=${month}` : ''}`);

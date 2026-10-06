@@ -84,6 +84,13 @@ class Booking(db.Model):
         default="None"
     )
 
+    # Platform fee charged to the owner (INR), saved when the booking is marked Completed
+    owner_fee = db.Column(
+        db.Numeric(10, 2),
+        nullable=False,
+        default=0
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
@@ -166,6 +173,7 @@ class Booking(db.Model):
             "booking_fee": float(self.booking_fee or 0),
 
             "fee_status": self.fee_status or "None",
+            "owner_fee": float(self.owner_fee or 0),
 
             "invoice_number": self._invoice_number(),
 

@@ -7,6 +7,8 @@ import os
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 
+from services.settings_service import get_settings
+
 FEE_PER_GUEST = Decimal(os.getenv("BOOKING_FEE_PER_GUEST", "50"))
 FEE_MAX = Decimal(os.getenv("BOOKING_FEE_MAX", "500"))
 REFUND_CUTOFF_MINUTES = int(os.getenv("BOOKING_REFUND_CUTOFF_MINUTES", "60"))
@@ -20,6 +22,8 @@ def _money(value):
 def calculate_fee(party_size):
     """Fee breakdown for a party. Returns plain numbers ready for JSON."""
     party_size = max(int(party_size), 1)
+    cfg = get_settings()  # admin-editable, .env values are the defaults
+    FEE_PER_GUEST, FEE_MAX = cfg["customer_fee_per_guest"], cfg["customer_fee_max"]
     raw = FEE_PER_GUEST * party_size
     fee = _money(min(raw, FEE_MAX))
     return {

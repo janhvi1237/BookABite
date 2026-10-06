@@ -600,3 +600,552 @@
     width: 100%;
   }
 }
+
+/* Shared owner workspace */
+.bab-owner-page {
+  padding-top: clamp(24px, 4vw, 48px);
+  background:
+    radial-gradient(ellipse at 92% 0, rgba(214, 90, 58, 0.08), transparent 32rem),
+    var(--color-bg-cream);
+}
+
+.bab-owner-container {
+  max-width: 1360px;
+}
+
+.bab-owner-layout {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(20px, 3vw, 36px);
+}
+
+.bab-owner-sidebar {
+  position: sticky;
+  top: 96px;
+  padding: 20px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-sm);
+}
+
+.bab-owner-profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px 18px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.bab-owner-avatar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--color-secondary);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.bab-owner-name {
+  margin: 0 0 5px;
+  overflow-wrap: anywhere;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+}
+
+.bab-owner-nav {
+  display: grid;
+  gap: 5px;
+  padding-top: 14px;
+}
+
+.bab-owner-nav-item {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  font-weight: var(--weight-medium);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.bab-owner-nav-item:hover,
+.bab-owner-nav-item--active {
+  background: rgba(185, 104, 72, 0.12);
+  color: var(--color-secondary-dark);
+}
+
+.bab-owner-nav-badge {
+  max-width: 100px;
+  margin-left: auto;
+  overflow: hidden;
+  color: var(--color-secondary);
+  font-size: 0.72rem;
+  font-weight: var(--weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bab-owner-mascot-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 12px 8px 0;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.bab-owner-mascot-tip p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.bab-owner-main {
+  min-width: 0;
+}
+
+.bab-owner-title {
+  margin: 2px 0 8px;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 3.6vw, 2.7rem);
+  line-height: 1.12;
+}
+
+.bab-owner-header p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.bab-owner-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.bab-owner-section {
+  padding: clamp(18px, 2.5vw, 28px);
+}
+
+.bab-owner-section__header {
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.bab-owner-section__header p {
+  margin: 5px 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.bab-owner-table th {
+  white-space: nowrap;
+}
+
+.bab-venue-card__img {
+  background: var(--color-bg-soft);
+}
+
+.bab-venue-card__info > div:first-child {
+  gap: 10px;
+}
+
+.bab-venue-action {
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 0.78rem;
+}
+
+.bab-owner-due-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border: 1px solid rgba(214, 90, 58, 0.18);
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(110deg, #fff 0%, #fff5ed 100%);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.bab-owner-due-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.bab-owner-due-card__icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(185, 104, 72, 0.12);
+  color: var(--color-secondary);
+}
+
+.bab-owner-due-card__copy {
+  display: grid;
+  gap: 1px;
+}
+
+.bab-owner-due-card__copy span {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+
+.bab-owner-due-card__copy strong {
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+}
+
+.bab-owner-due-card__action {
+  margin-left: auto;
+  color: var(--color-secondary);
+  font-size: 0.84rem;
+  font-weight: var(--weight-bold);
+}
+
+.bab-owner-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.bab-owner-error {
+  text-align: center;
+}
+
+.bab-owner-error h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+}
+
+.bab-owner-error p {
+  margin: 0 0 18px;
+  color: var(--color-text-muted);
+}
+
+/* Owner dues and demo checkout */
+.bab-billing-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.8fr);
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.bab-billing-balance,
+.bab-billing-summary {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.bab-billing-balance {
+  background: linear-gradient(140deg, #fff 0%, #fff7ef 100%);
+}
+
+.bab-billing-balance__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bab-billing-label {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.bab-billing-badge,
+.bab-billing-paid-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  background: #fff1e8;
+  color: #a7462e;
+  font-size: 0.74rem;
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+.bab-billing-amount {
+  display: block;
+  margin: 10px 0;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+}
+
+.bab-billing-balance > p {
+  max-width: 560px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.bab-billing-summary h2,
+.bab-billing-history h2 {
+  margin: 0;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+}
+
+.bab-billing-summary__row,
+.bab-billing-summary__total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.bab-billing-summary__row strong {
+  color: var(--color-text-dark);
+}
+
+.bab-billing-summary__total {
+  margin-top: 4px;
+  border-bottom: 0;
+  color: var(--color-primary);
+  font-weight: var(--weight-bold);
+}
+
+.bab-billing-summary__total strong {
+  font-size: 1.12rem;
+}
+
+.bab-billing-checkout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.bab-payment-methods {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bab-payment-methods legend {
+  width: 100%;
+  margin-bottom: 2px;
+  color: var(--color-text-dark);
+  font-size: 0.8rem;
+  font-weight: var(--weight-semibold);
+}
+
+.bab-payment-option {
+  display: flex;
+  min-width: 112px;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  cursor: pointer;
+}
+
+.bab-payment-option--selected {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(214, 90, 58, 0.1);
+}
+
+.bab-payment-option input {
+  margin: 4px 0 0;
+  accent-color: var(--color-secondary);
+}
+
+.bab-payment-option span {
+  display: grid;
+  gap: 1px;
+}
+
+.bab-payment-option strong {
+  color: var(--color-text-dark);
+  font-size: 0.8rem;
+}
+
+.bab-payment-option small {
+  color: var(--color-text-muted);
+  font-size: 0.67rem;
+}
+
+.bab-billing-pay-button {
+  min-height: 46px;
+  white-space: nowrap;
+}
+
+.bab-billing-pay-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.bab-demo-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 18px;
+  color: #746047;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.bab-demo-notice svg {
+  flex: 0 0 auto;
+  color: var(--color-success);
+}
+
+.bab-billing-history {
+  margin-bottom: 0;
+}
+
+.bab-billing-table-amount {
+  text-align: right !important;
+  font-weight: var(--weight-bold);
+}
+
+.bab-billing-paid-status {
+  background: #e9f7ef;
+  color: #287a4b;
+}
+
+.bab-billing-history-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 4px 8px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.bab-billing-history-empty svg {
+  color: var(--color-secondary);
+}
+
+@media (max-width: 1100px) {
+  .bab-owner-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .bab-owner-layout {
+      grid-template-columns: minmax(0, 1fr);
+      min-width: 0;
+    }
+
+    .bab-owner-sidebar {
+    position: static;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+  .bab-owner-profile-summary,
+  .bab-owner-mascot-tip {
+    display: none;
+  }
+
+  .bab-owner-nav {
+    display: flex;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0;
+    scrollbar-width: thin;
+  }
+
+  .bab-owner-nav-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .bab-billing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bab-billing-checkout {
+    grid-template-columns: 1fr;
+  }
+
+  .bab-billing-pay-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .bab-owner-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .bab-metric-card {
+    padding: 13px 11px;
+    gap: 9px;
+  }
+
+  .bab-metric-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .bab-metric-value {
+    font-size: 1.3rem;
+  }
+
+  .bab-owner-due-card {
+    flex-wrap: wrap;
+    padding: 14px;
+  }
+
+  .bab-owner-due-card__action {
+    width: 100%;
+    margin-left: 58px;
+  }
+
+  .bab-owner-section__header {
+    flex-direction: column;
+  }
+
+  .bab-payment-option {
+    min-width: calc(50% - 4px);
+    flex: 1;
+  }
+}

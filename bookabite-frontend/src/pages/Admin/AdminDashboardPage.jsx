@@ -20,6 +20,7 @@ import {
   assignRestaurantOwner,
   fetchAdminBookings,
 } from '../../api/admin';
+import FeesBillingTab from './FeesBillingTab';
 import StatisticsReport from '../../components/reports/StatisticsReport';
 import './AdminPages.css';
 
@@ -28,6 +29,7 @@ const TABS = [
   ['users', 'Users'],
   ['restaurants', 'Restaurants'],
   ['bookings', 'Bookings'],
+  ['billing', 'Fees & billing'],
   ['reports', 'Statistics reports'],
 ];
 
@@ -307,6 +309,8 @@ export default function AdminDashboardPage() {
                 </table>
               </div>
             )}
+
+            {tab === 'billing' && <FeesBillingTab />}
 
             {tab === 'reports' && (
               <StatisticsReport restaurants={restaurants} showRestaurantFilter />

@@ -6,19 +6,19 @@ import {
   HiOutlineBookOpen,
   HiOutlineUserGroup,
   HiOutlineClock,
-  HiOutlineEye,
   HiOutlineCheck,
   HiOutlineX,
   HiPlus,
   HiOutlineTrash,
   HiOutlineTrendingUp,
-  HiOutlineStar,
   HiOutlineLocationMarker,
+  HiOutlineCreditCard,
 } from 'react-icons/hi';
 import PageLoader from '../../components/common/PageLoader';
 import FoodMascot from '../../components/mascot/FoodMascot';
 import { fetchOwnerRestaurants, deleteRestaurant } from '../../api/restaurants';
 import { fetchOwnerBookings, updateBookingStatus } from '../../api/bookings';
+import { fetchOwnerBilling } from '../../api/ownerBilling';
 import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../../components/common/Toast';
@@ -32,6 +32,7 @@ export default function OwnerDashboardPage() {
 
   const [restaurants, setRestaurants] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [billing, setBilling] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deletingRestaurantId, setDeletingRestaurantId] = useState(null);
 
@@ -45,23 +46,26 @@ export default function OwnerDashboardPage() {
     async function loadDashboard() {
       try {
         setLoading(true);
-        const [rests, bks] = await Promise.all([
-          fetchOwnerRestaurants(user.user_id).catch(() => []),
-          fetchOwnerBookings(user.user_id).catch(() => []),
+        const [rests, bks, billingSummary] = await Promise.all([
+          fetchOwnerRestaurants(user.user_id),
+          fetchOwnerBookings(user.user_id),
+          fetchOwnerBilling(),
         ]);
         if (active) {
           setRestaurants(rests);
           setBookings(bks);
+          setBilling(billingSummary);
         }
       } catch (err) {
         console.error("Dashboard error:", err);
+        if (active) showToast(err.message || 'Could not load your owner dashboard.', 'error');
       } finally {
         if (active) setLoading(false);
       }
     }
     loadDashboard();
     return () => { active = false; };
-  }, [user, navigate]);
+  }, [user, navigate, showToast]);
 
   const handleUpdateStatus = async (bookingId, newStatus) => {
     try {
@@ -69,6 +73,14 @@ export default function OwnerDashboardPage() {
       setBookings((prev) =>
         prev.map((b) => (b.booking_id === bookingId ? { ...b, status: newStatus } : b))
       );
+      if (newStatus === 'Completed') {
+        try {
+          setBilling(await fetchOwnerBilling());
+        } catch (error) {
+          console.error('Failed to refresh owner billing:', error);
+          showToast('Booking completed, but billing could not be refreshed.', 'error');
+        }
+      }
       showToast(`Booking marked as ${newStatus}`, 'success');
       if (newStatus === 'Confirmed') {
         triggerReaction('happy', "Reservation confirmed for your guests!", 3000);
@@ -100,12 +112,11 @@ export default function OwnerDashboardPage() {
   if (loading) return <PageLoader text="Loading your restaurant dashboard..." />;
 
   const upcomingBookings = bookings.filter((b) => b.status === 'Pending' || b.status === 'Confirmed');
-  const completedBookings = bookings.filter((b) => b.status === 'Completed');
   const totalGuests = bookings.reduce((sum, b) => sum + (b.party_size || 0), 0);
 
   return (
     <div className="bab-owner-page">
-      <div className="bab-container bab-owner-container">
+      <div className="bab-container bab-owner-container bab-owner-layout">
         {/* SIDEBAR NAVIGATION */}
         <aside className="bab-owner-sidebar">
           <div className="bab-owner-profile-summary">
@@ -134,6 +145,12 @@ export default function OwnerDashboardPage() {
             <Link to="/owner/reports" className="bab-owner-nav-item">
               <HiOutlineTrendingUp size={18} /> Statistics Reports
             </Link>
+            <Link to="/owner/billing" className="bab-owner-nav-item">
+              <HiOutlineCreditCard size={18} /> Payments &amp; dues
+              {billing?.amount_due > 0 && (
+                <span className="bab-owner-nav-badge">{`₹${Number(billing.amount_due).toLocaleString('en-IN')}`}</span>
+              )}
+            </Link>
             <Link to="/owner/restaurants/new" className="bab-owner-nav-item">
               <HiPlus size={18} /> Add New Restaurant
             </Link>
@@ -156,6 +173,17 @@ export default function OwnerDashboardPage() {
               <HiPlus size={16} /> Add Restaurant
             </Link>
           </div>
+
+          <Link to="/owner/billing" className="bab-owner-due-card">
+            <div className="bab-owner-due-card__icon"><HiOutlineCreditCard size={21} /></div>
+            <div className="bab-owner-due-card__copy">
+              <span>Platform dues</span>
+              <strong>{billing ? `₹${Number(billing.amount_due).toLocaleString('en-IN')}` : '—'}</strong>
+            </div>
+            <span className="bab-owner-due-card__action">
+              {billing?.amount_due > 0 ? 'Review & pay' : 'View billing'}
+            </span>
+          </Link>
 
           {/* METRIC CARDS */}
           <div className="bab-owner-metrics-grid">
@@ -225,16 +253,19 @@ export default function OwnerDashboardPage() {
                       <p className="bab-venue-card__cuisine">{rest.cuisine} • ₹{rest.priceForTwo} for two</p>
 
                       <div className="bab-venue-card__actions">
-                        <Link to={`/owner/restaurants/${rest.id}/tables`} className="bab-btn bab-btn--outline" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
-                          View Table Status
+                        <Link to={`/owner/restaurants/${rest.id}/manage-tables`} className="bab-btn bab-btn--outline bab-venue-action">
+                          Manage Tables
                         </Link>
-                        <Link to={`/restaurants/${rest.id}`} className="bab-btn bab-btn--outline" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+                        <Link to={`/owner/restaurants/${rest.id}/tables`} className="bab-btn bab-btn--outline bab-venue-action">
+                          Table Status
+                        </Link>
+                        <Link to={`/restaurants/${rest.id}`} className="bab-btn bab-btn--outline bab-venue-action">
                           View Public Page
                         </Link>
-                        <Link to={`/owner/restaurants/${rest.id}/edit`} className="bab-btn bab-btn--secondary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+                        <Link to={`/owner/restaurants/${rest.id}/edit`} className="bab-btn bab-btn--secondary bab-venue-action">
                           Edit Profile
                         </Link>
-                        <Link to="/owner/menu" className="bab-btn bab-btn--glass" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+                        <Link to={`/owner/restaurants/${rest.id}/menu`} className="bab-btn bab-btn--glass bab-venue-action">
                           Manage Menu
                         </Link>
                         <button
@@ -245,8 +276,6 @@ export default function OwnerDashboardPage() {
                           aria-label={`Delete ${rest.name}`}
                           title="Remove restaurant"
                           style={{
-                            padding: '6px 10px',
-                            fontSize: '0.8rem',
                             color: '#CF1322',
                             borderColor: '#FFA39E',
                           }}

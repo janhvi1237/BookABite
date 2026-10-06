@@ -7,6 +7,8 @@ from .review import Review
 from .coupon import Coupon
 from .favorite import Favorite
 from .scratch_card import ScratchCard
+from .setting import Setting
+from .owner_dues_payment import OwnerDuesPayment
 
 __all__ = [
     "User",
@@ -21,4 +23,6 @@ __all__ = [
     "Coupon",
     "Favorite",
     "ScratchCard",
+    "Setting",
+    "OwnerDuesPayment",
 ]

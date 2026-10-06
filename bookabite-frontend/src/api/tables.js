@@ -16,3 +16,12 @@ export function fetchCustomerAvailableTables(restaurantId, bookingDate, bookingT
   });
   return api.get(`/api/restaurants/${restaurantId}/available-tables?${params.toString()}`);
 }
+
+export const fetchRestaurantTables = (restaurantId) =>
+  api.get(`/api/restaurants/${restaurantId}/tables`);
+export const addRestaurantTable = (restaurantId, body) =>
+  api.post(`/api/restaurants/${restaurantId}/tables`, body);
+export const updateRestaurantTable = (tableId, body) =>
+  api.put(`/api/tables/${tableId}`, body);
+export const deleteRestaurantTable = (tableId) =>
+  api.delete(`/api/tables/${tableId}`);

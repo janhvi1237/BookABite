@@ -75,6 +75,7 @@ def statistics_report():
     status_counts = {"pending": 0, "confirmed": 0, "completed": 0, "cancelled": 0}
     guests = 0
     paid_booking_fees = 0.0
+    platform_fee_due = 0.0
     for booking in bookings:
         party_size = int(booking.party_size or 0)
         guests += party_size
@@ -88,6 +89,7 @@ def statistics_report():
             status_counts[normalized_status] += 1
         if booking.fee_status == "Paid":
             paid_booking_fees += float(booking.booking_fee or 0)
+        platform_fee_due += float(booking.owner_fee or 0)
 
     rating_totals = {restaurant_id: [0, 0] for restaurant_id in by_restaurant}
     for review in reviews:
@@ -112,6 +114,7 @@ def statistics_report():
         "average_party_size": round(guests / len(bookings), 2) if bookings else 0,
         **status_counts,
         "paid_booking_fees": round(paid_booking_fees, 2),
+        "platform_fee_due": round(platform_fee_due, 2),
         "reviews": len(reviews),
         "average_rating": average_rating,
     }

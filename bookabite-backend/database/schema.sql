@@ -5,9 +5,9 @@
 -- does not exist yet, so running this file twice does no harm
 -- and never deletes data.
 --
--- Tables (13): Users, Restaurants, RestaurantImages, Amenities,
+-- Tables: Users, Restaurants, RestaurantImages, Amenities,
 --   RestaurantAmenities, RestaurantTables, MenuItems, Bookings,
---   Payments, Reviews, Coupons, ScratchCards, Favorites
+--   Payments, OwnerDuesPayments, Settings, Reviews, Coupons, ScratchCards, Favorites
 --
 -- Easiest way to build everything (schema + sample data):
 --     python database/setup_db.py
@@ -161,6 +161,7 @@ CREATE TABLE Bookings (
     scratch_card_used BIT DEFAULT 0,
     booking_fee       DECIMAL(10,2) NOT NULL CONSTRAINT DF_Bookings_booking_fee DEFAULT 0,
     fee_status        NVARCHAR(20) NOT NULL CONSTRAINT DF_Bookings_fee_status DEFAULT 'None',  -- None, Paid, Refunded
+    owner_fee         DECIMAL(10,2) NOT NULL CONSTRAINT DF_Bookings_owner_fee DEFAULT 0,
     created_at        DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Booking_User       FOREIGN KEY (user_id)       REFERENCES Users(user_id),
     CONSTRAINT FK_Booking_Restaurant FOREIGN KEY (restaurant_id) REFERENCES Restaurants(restaurant_id),
@@ -184,6 +185,27 @@ CREATE TABLE Payments (
     invoice_number      NVARCHAR(50) NULL,
     created_at          DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Payment_Booking FOREIGN KEY (booking_id) REFERENCES Bookings(booking_id)
+);
+GO
+
+-- Demo ledger for owners settling platform fees (not a real payment gateway).
+IF OBJECT_ID('dbo.OwnerDuesPayments', 'U') IS NULL
+CREATE TABLE OwnerDuesPayments (
+    payment_id    INT IDENTITY(1,1) PRIMARY KEY,
+    owner_id      INT NOT NULL,
+    amount        DECIMAL(10,2) NOT NULL,
+    payment_method NVARCHAR(30) NOT NULL,
+    reference     NVARCHAR(50) NOT NULL UNIQUE,
+    status        NVARCHAR(20) NOT NULL CONSTRAINT DF_OwnerDuesPayments_status DEFAULT 'Success',
+    created_at    DATETIME NOT NULL CONSTRAINT DF_OwnerDuesPayments_created_at DEFAULT GETDATE(),
+    CONSTRAINT FK_OwnerDuesPayments_Owner FOREIGN KEY (owner_id) REFERENCES Users(user_id)
+);
+GO
+
+IF OBJECT_ID('dbo.Settings', 'U') IS NULL
+CREATE TABLE Settings (
+    setting_key   NVARCHAR(60) PRIMARY KEY,
+    setting_value NVARCHAR(100) NOT NULL
 );
 GO
 

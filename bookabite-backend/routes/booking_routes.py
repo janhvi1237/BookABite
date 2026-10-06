@@ -4,6 +4,7 @@ from datetime import datetime, date, time, timedelta
 from extensions import db
 from models.booking import Booking
 from models.payment import Payment
+from services.settings_service import get_settings
 from services.fee_service import (
     calculate_fee, make_invoice_number, is_refundable, PAYMENT_METHODS
 )
@@ -981,6 +982,12 @@ def update_booking_status(booking_id):
             booking.end_time = table_service.end_time_for(booking.booking_time, sitting)
 
         booking.status = new_status
+
+        # Lock the platform fee when a booking is completed; later status edits must not erase it.
+        if new_status == "Completed":
+            if not booking.owner_fee:
+                rate = get_settings()["owner_fee_per_guest"]
+                booking.owner_fee = rate * int(booking.party_size or 0)
 
         # Owner/admin cancelling always refunds the booking fee.
         if new_status == "Cancelled" and booking.fee_status == "Paid":

@@ -37,7 +37,9 @@ import OwnerPendingPage from './pages/Owner/OwnerPendingPage';
 // 12. Owner Dashboard
 import OwnerDashboardPage from './pages/Owner/OwnerDashboardPage';
 import OwnerReportsPage from './pages/Owner/OwnerReportsPage';
+import OwnerBillingPage from './pages/Owner/OwnerBillingPage';
 import RestaurantTableStatusPage from './pages/Owner/RestaurantTableStatusPage';
+import ManageTablesPage from './pages/Owner/ManageTablesPage';
 // 13. Add Restaurant
 import AddRestaurantPage from './pages/Owner/AddRestaurantPage';
 // 14. Edit Restaurant
@@ -121,7 +123,10 @@ export default function App() {
           {/* 12. Owner Dashboard */}
           <Route path="/owner/dashboard" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerDashboardPage /></RequireRole>} />
           <Route path="/owner" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerDashboardPage /></RequireRole>} />
+          <Route path="/owner/restaurants/:id/manage-tables" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><ManageTablesPage /></RequireRole>} />
+<Route path="/admin/restaurants/:id/manage-tables" element={<RequireRole roles={['admin']} loginPath="/admin/login"><ManageTablesPage /></RequireRole>} />
           <Route path="/owner/reports" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerReportsPage /></RequireRole>} />
+          <Route path="/owner/billing" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><OwnerBillingPage /></RequireRole>} />
           <Route path="/owner/restaurants/:id/tables" element={<RequireRole roles={OWNER_ROLES} loginPath="/owner/login"><RestaurantTableStatusPage /></RequireRole>} />
           <Route path="/admin/restaurants/:id/tables" element={<RequireRole roles={['admin']} loginPath="/admin/login"><RestaurantTableStatusPage /></RequireRole>} />
 

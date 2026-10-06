@@ -4,6 +4,8 @@ from extensions import db
 from models import User, Restaurant, Review
 from models.booking import Booking
 from models.restaurant import serialize_restaurants
+from datetime import date
+from services.settings_service import get_settings, update_settings
 from utils.auth import roles_required, current_user, ROLE_ADMIN, ROLE_OWNER, ROLE_CUSTOMER
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/api/admin")
@@ -129,7 +131,6 @@ def list_restaurants():
         owner = owners.get(r.owner_id)
         item["owner_name"] = owner.full_name if owner else None
         item["owner_email"] = owner.email if owner else None
-        results.append(item)
     return jsonify(results), 200
 
 
@@ -191,3 +192,66 @@ def list_bookings():
         item["customer_email"] = b.user.email if b.user else None
         results.append(item)
     return jsonify(results), 200
+
+
+# GET /api/admin/settings  -> current fee settings
+# PUT /api/admin/settings  body: any of customer_fee_per_guest, customer_fee_max, owner_fee_per_guest
+@admin_bp.route("/settings", methods=["GET", "PUT"])
+@roles_required(ROLE_ADMIN)
+def fee_settings():
+    if request.method == "PUT":
+        settings, error = update_settings(request.get_json(silent=True) or {})
+        if error:
+            return jsonify({"error": error}), 400
+    else:
+        settings = get_settings()
+    return jsonify({k: float(v) for k, v in settings.items()}), 200
+
+
+# GET /api/admin/owner-billing?month=2026-10
+# What each owner owes for COMPLETED bookings in the month + what customers paid in fees.
+@admin_bp.route("/owner-billing", methods=["GET"])
+@roles_required(ROLE_ADMIN)
+def owner_billing():
+    month = request.args.get("month") or date.today().strftime("%Y-%m")
+    try:
+        year, mon = (int(x) for x in month.split("-"))
+        start = date(year, mon, 1)
+        end = date(year + (mon == 12), mon % 12 + 1, 1)
+    except (ValueError, TypeError):
+        return jsonify({"error": "month must look like 2026-10"}), 400
+
+    bookings = Booking.query.filter(Booking.booking_date >= start, Booking.booking_date < end).all()
+    rows = {}
+    customer_fees = 0.0
+    for b in bookings:
+        if b.fee_status == "Paid":
+            customer_fees += float(b.booking_fee or 0)
+        if b.status != "Completed" or not b.restaurant:
+            continue
+        r = b.restaurant
+        row = rows.setdefault(r.restaurant_id, {
+            "restaurant_id": r.restaurant_id, "restaurant_name": r.name,
+            "owner_id": r.owner_id, "owner_name": None, "owner_email": None,
+            "completed_bookings": 0, "guests": 0, "amount_due": 0.0,
+        })
+        row["completed_bookings"] += 1
+        row["guests"] += int(b.party_size or 0)
+        row["amount_due"] += float(b.owner_fee or 0)
+
+    owner_ids = {r["owner_id"] for r in rows.values() if r["owner_id"]}
+    owners = {u.user_id: u for u in User.query.filter(User.user_id.in_(owner_ids)).all()} if owner_ids else {}
+    for row in rows.values():
+        owner = owners.get(row["owner_id"])
+        if owner:
+            row["owner_name"], row["owner_email"] = owner.full_name, owner.email
+        row["amount_due"] = round(row["amount_due"], 2)
+
+    owner_total = round(sum(r["amount_due"] for r in rows.values()), 2)
+    return jsonify({
+        "month": month,
+        "rows": sorted(rows.values(), key=lambda r: -r["amount_due"]),
+        "owner_fees_total": owner_total,
+        "customer_fees_total": round(customer_fees, 2),
+        "platform_revenue": round(owner_total + customer_fees, 2),
+    }), 200
