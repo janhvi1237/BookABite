@@ -11,6 +11,7 @@ import App from './App.jsx';
 import './index.css';
 import './styles/cafe-theme.css';
 import './styles/vibrant.css';
+import './styles/dark-theme.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

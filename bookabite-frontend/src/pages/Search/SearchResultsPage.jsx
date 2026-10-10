@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
-  HiOutlineSearch,
   HiOutlineLocationMarker,
   HiOutlineFilter,
   HiOutlineSparkles,
@@ -11,6 +10,7 @@ import FoodMascot from '../../components/mascot/FoodMascot';
 import RestaurantCard from '../../components/restaurant/RestaurantCard';
 import FoodItemCard from '../../components/menu/FoodItemCard';
 import FoodItemModal from '../../components/menu/FoodItemModal';
+import RestaurantSearchInput from '../../components/restaurant/RestaurantSearchInput';
 import { fetchRestaurants } from '../../api/restaurants';
 import { fetchMenuItems } from '../../api/menu';
 import { useMascot } from '../../context/MascotContext';
@@ -95,23 +95,13 @@ export default function SearchResultsPage() {
 
           <form onSubmit={handleSearchSubmit} className="bab-search-bar-inline">
             <div className="bab-search-bar-inline__input-wrap">
-              <HiOutlineSearch
-                size={18}
-                style={{
-                  position: 'absolute',
-                  left: 14,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--color-text-muted)',
-                }}
-              />
-              <input
-                type="text"
+              <RestaurantSearchInput
+                id="results-search"
                 className="bab-form-input"
                 placeholder="Search by restaurant name, cuisine, or specific dish..."
                 value={inputQuery}
-                onChange={(e) => setInputQuery(e.target.value)}
-                style={{ paddingLeft: 40 }}
+                onChange={setInputQuery}
+                city={selectedCity === 'All Cities' ? '' : selectedCity}
               />
             </div>
 

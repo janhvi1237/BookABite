@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HiStar, HiOutlineHeart, HiHeart } from 'react-icons/hi';
+import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../common/Toast';
 import './FoodItemCard.css';
 
 export default function FoodItemCard({ item, onSelect, isSelected = false }) {
+  const { isAuthenticated } = useAuth();
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [isFav, setIsFav] = useState(false);
 
   const handleCardClick = () => {
@@ -16,6 +20,12 @@ export default function FoodItemCard({ item, onSelect, isSelected = false }) {
 
   const handleFav = (e) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      showToast('Please log in to save favourite dishes', 'info');
+      navigate('/login');
+      return;
+    }
+
     setIsFav((prev) => !prev);
     if (!isFav) {
       triggerReaction('happy', `Saved ${item.name} to your cravings!`, 3000);
@@ -57,7 +67,7 @@ export default function FoodItemCard({ item, onSelect, isSelected = false }) {
           onClick={handleFav}
           aria-label="Favorite dish"
         >
-          {isFav ? <HiHeart size={18} color="#D65A3A" /> : <HiOutlineHeart size={18} />}
+          {isFav ? <HiHeart size={18} /> : <HiOutlineHeart size={18} />}
         </button>
       </div>
 

@@ -6,6 +6,7 @@ import FilterPanel from '../../components/restaurant/FilterPanel';
 import MobileFilterDrawer from '../../components/restaurant/MobileFilterDrawer';
 import { RestaurantCardSkeleton } from '../../components/common/RestaurantCardSkeleton';
 import { EmptyState } from '../../components/common/EmptyState';
+import RestaurantSearchInput from '../../components/restaurant/RestaurantSearchInput';
 import { fetchRestaurants } from '../../api/restaurants';
 import { useMascot } from '../../context/MascotContext';
 import './ExplorePage.css';
@@ -90,11 +91,12 @@ export default function ExplorePage() {
           <div className="bab-explore-controls">
             <div className="bab-explore-search-wrap">
               <HiOutlineSearch size={18} className="bab-explore-search-icon" />
-              <input
-                type="text"
+              <RestaurantSearchInput
+                id="explore-search"
                 placeholder="Search by restaurant name, area, or keywords..."
                 value={filters.search}
-                onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                onChange={(search) => setFilters((prev) => ({ ...prev, search }))}
+                city={filters.city}
                 className="bab-explore-search-input"
               />
             </div>

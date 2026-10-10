@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, UtensilsCrossed, CalendarCheck, Heart, Shuffle } from 'lucide-react';
+import RestaurantSearchInput from '../restaurant/RestaurantSearchInput';
 import './LovableHero.css';
 
 const VIBES = ['Date Night', 'Quick Bite', 'Weekend Brunch', 'Solo & Cozy', 'Big Group'];
@@ -89,8 +90,12 @@ export default function LovableHero() {
             </div>
 
             <form className="bab-lovable-search" onSubmit={handleSearch}>
-              <Search size={19} aria-hidden="true" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search restaurants, cuisines, areas…" aria-label="Search restaurants" />
+              <RestaurantSearchInput
+                id="lovable-restaurant-search"
+                value={query}
+                onChange={setQuery}
+                placeholder="Search restaurants, cuisines, areas…"
+              />
               <button type="submit">Explore</button>
             </form>
 

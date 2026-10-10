@@ -15,6 +15,7 @@ import HeroDiningIllustration from '../../components/home/HeroDiningIllustration
 import RestaurantCard from '../../components/restaurant/RestaurantCard';
 import { RestaurantCardSkeleton } from '../../components/common/RestaurantCardSkeleton';
 import FoodMascot from '../../components/mascot/FoodMascot';
+import RestaurantSearchInput from '../../components/restaurant/RestaurantSearchInput';
 import { fetchRestaurants } from '../../api/restaurants';
 import { useMascot } from '../../context/MascotContext';
 import './HomePage.css';
@@ -125,8 +126,8 @@ export default function HomePage() {
               </div>
               <div className="bab-home-stat__divider" />
               <div className="bab-home-stat">
-                <strong>Zero</strong>
-                <span>Reservation Fees</span>
+                <strong>Easy</strong>
+                <span>Table Reservations</span>
               </div>
               <div className="bab-home-stat__divider" />
               <div className="bab-home-stat">
@@ -165,11 +166,10 @@ export default function HomePage() {
               <HiOutlineSearch size={20} className="bab-search-icon" />
               <div className="bab-search-field__inner">
                 <label htmlFor="search-query">Restaurant or Cuisine</label>
-                <input
+                <RestaurantSearchInput
                   id="search-query"
-                  type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={setSearchQuery}
                   placeholder="e.g. The Spice Terrace, Italian, Coffee..."
                 />
               </div>
@@ -292,17 +292,14 @@ export default function HomePage() {
       </section>
 
       {/* =====================================================
-          MASCOT INTRO & HOW IT WORKS
+          HOW IT WORKS
       ===================================================== */}
       <section className="bab-home-section">
         <div className="bab-container">
           <div className="bab-how-it-works-box">
-            <div className="bab-how-it-works__mascot">
-              <FoodMascot mood="serving" size={130} />
-              <div className="bab-how-it-works__bubble">
-                <strong>Meet Chef Pierre!</strong>
-                <p>Your friendly culinary concierge on BookABite. Here to guide your cravings and ensure your table is warm and waiting.</p>
-              </div>
+            <div className="bab-how-it-works__intro">
+              <strong>Dining, made easy.</strong>
+              <p>Discover a place you love, choose a time, and reserve your table in just a few steps.</p>
             </div>
 
             <div className="bab-how-steps">

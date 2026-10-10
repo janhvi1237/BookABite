@@ -1,17 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { HiX, HiStar, HiHeart, HiOutlineHeart, HiOutlineSparkles } from 'react-icons/hi';
 import FoodMascot from '../mascot/FoodMascot';
+import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../common/Toast';
 
 export default function FoodItemModal({ item, onClose }) {
+  const { isAuthenticated } = useAuth();
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [isFav, setIsFav] = useState(false);
+
+  useEffect(() => {
+    if (!item) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [item, onClose]);
 
   if (!item) return null;
 
   const handleFav = () => {
+    if (!isAuthenticated) {
+      showToast('Please log in to save favourite dishes', 'info');
+      navigate('/login');
+      return;
+    }
+
     setIsFav((prev) => !prev);
     if (!isFav) {
       triggerReaction('happy', `Saved ${item.name} to cravings!`, 3000);
@@ -19,7 +46,7 @@ export default function FoodItemModal({ item, onClose }) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -29,7 +56,7 @@ export default function FoodItemModal({ item, onClose }) {
         bottom: 0,
         background: 'rgba(43, 23, 18, 0.65)',
         backdropFilter: 'blur(8px)',
-        zIndex: 1100,
+        zIndex: 12000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -38,6 +65,9 @@ export default function FoodItemModal({ item, onClose }) {
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bab-food-modal-title"
         style={{
           background: 'var(--bab-bg-card)',
           borderRadius: 'var(--bab-radius-lg)',
@@ -63,8 +93,9 @@ export default function FoodItemModal({ item, onClose }) {
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.9)',
+            background: 'var(--bab-bg-raised)',
             border: 'none',
+            color: 'var(--bab-text)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -93,7 +124,7 @@ export default function FoodItemModal({ item, onClose }) {
         <div style={{ padding: 24, overflowY: 'auto', flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
             <div>
-              <h3 style={{ fontSize: '1.45rem', color: 'var(--bab-primary)' }}>{item.name}</h3>
+              <h3 id="bab-food-modal-title" style={{ fontSize: '1.45rem', color: 'var(--bab-primary)' }}>{item.name}</h3>
               {item.restaurant_name && (
                 <p style={{ fontSize: '0.85rem', color: 'var(--bab-secondary)', fontWeight: 600, margin: 0 }}>
                   at {item.restaurant_name} ({item.restaurant_area})
@@ -143,7 +174,7 @@ export default function FoodItemModal({ item, onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bab-secondary-light)', padding: 12, borderRadius: 'var(--bab-radius-sm)', marginBottom: 20 }}>
             <FoodMascot mood="happy" size={54} />
             <p style={{ fontSize: '0.85rem', color: 'var(--bab-secondary)', margin: 0, fontWeight: 600 }}>
-              Chef Pierre says: &ldquo;Pairs exceptionally well with our signature artisanal mocktails or a freshly brewed roast!&rdquo;
+              Pair this dish with a signature artisanal mocktail or a freshly brewed roast.
             </p>
           </div>
 
@@ -157,7 +188,7 @@ export default function FoodItemModal({ item, onClose }) {
                 style={{ position: 'static', width: 44, height: 44 }}
                 aria-label="Save dish"
               >
-                {isFav ? <HiHeart size={22} color="#D65A3A" /> : <HiOutlineHeart size={22} />}
+                {isFav ? <HiHeart size={22} /> : <HiOutlineHeart size={22} />}
               </button>
             </div>
 
@@ -172,6 +203,7 @@ export default function FoodItemModal({ item, onClose }) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

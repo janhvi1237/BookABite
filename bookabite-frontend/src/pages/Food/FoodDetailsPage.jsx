@@ -5,6 +5,7 @@ import PageLoader from '../../components/common/PageLoader';
 import { ErrorState } from '../../components/common/ErrorState';
 import FoodMascot from '../../components/mascot/FoodMascot';
 import { fetchDishById } from '../../api/menu';
+import { useAuth } from '../../context/AuthContext';
 import { useMascot } from '../../context/MascotContext';
 import { useToast } from '../../components/common/Toast';
 import './FoodDetailsPage.css';
@@ -12,6 +13,7 @@ import './FoodDetailsPage.css';
 export default function FoodDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { triggerReaction } = useMascot();
   const { showToast } = useToast();
 
@@ -38,6 +40,12 @@ export default function FoodDetailsPage() {
   }, [id]);
 
   const handleFavorite = () => {
+    if (!isAuthenticated) {
+      showToast('Please log in to save favourite dishes', 'info');
+      navigate('/login');
+      return;
+    }
+
     setIsFav((prev) => !prev);
     if (!isFav) {
       triggerReaction('happy', `Saved ${dish.name} to cravings!`, 3000);
@@ -46,7 +54,6 @@ export default function FoodDetailsPage() {
   };
 
   const handleBookTable = () => {
-    triggerReaction('excited', `Chef Pierre is setting up a table at ${dish.restaurant?.name || 'the restaurant'}!`, 4000);
     navigate(`/restaurants/${dish.restaurant_id}/book`);
   };
 
@@ -88,7 +95,7 @@ export default function FoodDetailsPage() {
               onClick={handleFavorite}
               aria-label="Save dish"
             >
-              {isFav ? <HiHeart size={24} color="#D65A3A" /> : <HiOutlineHeart size={24} />}
+              {isFav ? <HiHeart size={24} /> : <HiOutlineHeart size={24} />}
             </button>
           </div>
 
@@ -144,7 +151,7 @@ export default function FoodDetailsPage() {
             <div className="bab-food-mascot-box">
               <FoodMascot mood="serving" size={75} />
               <div>
-                <h4>Chef Pierre&apos;s Recommendation</h4>
+                <h4>Pairing Suggestion</h4>
                 <p>
                   &ldquo;This specialty is prepared fresh upon table arrival. Pair it with an iced cold brew or house mocktail for the ultimate bite!&rdquo;
                 </p>

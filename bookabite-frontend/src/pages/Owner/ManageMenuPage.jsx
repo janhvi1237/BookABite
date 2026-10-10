@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useParams } from 'react-router-dom';
 import {
   HiPlus,
@@ -62,6 +63,22 @@ export default function ManageMenuPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState(initialDishForm);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!showModal) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setShowModal(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showModal]);
 
   // Load restaurants and select the restaurant addressed by the current route.
   useEffect(() => {
@@ -392,13 +409,8 @@ export default function ManageMenuPage() {
                     </td>
                     <td>
                       <span
-                        className="bab-badge"
-                        style={{
-                          background: item.isVeg ? '#F6FFED' : '#FFF1F0',
-                          color: item.isVeg ? '#389E0D' : '#CF1322',
-                          borderColor: item.isVeg ? '#B7EB8F' : '#FFA39E',
-                          fontSize: '0.75rem',
-                        }}
+                        className={`bab-badge bab-owner-diet-badge ${item.isVeg ? 'bab-owner-diet-badge--veg' : 'bab-owner-diet-badge--nonveg'}`}
+                        style={{ fontSize: '0.75rem' }}
                       >
                         {item.isVeg ? 'Veg' : 'Non-Veg'}
                       </span>
@@ -412,6 +424,7 @@ export default function ManageMenuPage() {
                       <button
                         type="button"
                         onClick={() => handleToggleAvailability(item)}
+                        className={`bab-owner-availability ${item.isAvailable ? 'bab-owner-availability--available' : 'bab-owner-availability--unavailable'}`}
                         style={{
                           padding: '4px 10px',
                           borderRadius: 'var(--radius-full)',
@@ -419,8 +432,6 @@ export default function ManageMenuPage() {
                           fontWeight: 600,
                           border: 'none',
                           cursor: 'pointer',
-                          background: item.isAvailable ? '#F6FFED' : '#FFF2E8',
-                          color: item.isAvailable ? '#389E0D' : '#D4380D',
                         }}
                       >
                         {item.isAvailable ? '● In Stock' : '○ Sold Out'}
@@ -469,51 +480,43 @@ export default function ManageMenuPage() {
         )}
 
         {/* MODAL: ADD / EDIT DISH */}
-        {showModal && (
+        {showModal && createPortal((
           <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.55)',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 16,
+            className="bab-menu-editor-overlay"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setShowModal(false);
             }}
           >
             <div
-              style={{
-                background: 'white',
-                borderRadius: 'var(--radius-2xl)',
-                maxWidth: 600,
-                width: '100%',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                padding: 28,
-                boxShadow: 'var(--shadow-xl)',
-              }}
+              className="bab-menu-editor-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="menu-editor-title"
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', margin: 0 }}>
-                  {editingItem ? 'Edit Dish' : 'Add New Menu Item'}
-                </h3>
+              <div className="bab-menu-editor-header">
+                <div>
+                  <span className="bab-menu-editor-eyebrow">MENU EDITOR</span>
+                  <h3 id="menu-editor-title">
+                    {editingItem ? 'Edit Dish' : 'Add New Menu Item'}
+                  </h3>
+                  <p>Add the details guests need to discover their next favorite.</p>
+                </div>
                 <button
                   type="button"
+                  className="bab-menu-editor-close"
                   onClick={() => setShowModal(false)}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}
+                  aria-label="Close menu item editor"
                 >
                   <HiOutlineX size={22} />
                 </button>
               </div>
 
-              <form onSubmit={handleSaveDish} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div>
-                  <label className="bab-form-label">Dish Name *</label>
+              <form onSubmit={handleSaveDish} className="bab-menu-editor-form">
+                <div className="bab-menu-editor-field">
+                  <label className="bab-form-label" htmlFor="menu-item-name">Dish Name *</label>
                   <input
+                    id="menu-item-name"
                     type="text"
                     className="bab-form-input"
                     value={formData.name}
@@ -523,10 +526,11 @@ export default function ManageMenuPage() {
                   />
                 </div>
 
-                <div className="bab-wizard-form-grid">
-                  <div>
-                    <label className="bab-form-label">Category</label>
+                <div className="bab-menu-editor-grid">
+                  <div className="bab-menu-editor-field">
+                    <label className="bab-form-label" htmlFor="menu-item-category">Category</label>
                     <select
+                      id="menu-item-category"
                       className="bab-form-select"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -537,9 +541,10 @@ export default function ManageMenuPage() {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="bab-form-label">Price (₹) *</label>
+                  <div className="bab-menu-editor-field">
+                    <label className="bab-form-label" htmlFor="menu-item-price">Price (₹) *</label>
                     <input
+                      id="menu-item-price"
                       type="number"
                       className="bab-form-input"
                       value={formData.price}
@@ -551,21 +556,23 @@ export default function ManageMenuPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="bab-form-label">Description</label>
+                <div className="bab-menu-editor-field">
+                  <label className="bab-form-label" htmlFor="menu-item-description">Description</label>
                   <textarea
+                    id="menu-item-description"
                     className="bab-form-textarea"
-                    rows={2}
+                    rows={3}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe taste profile, preparation method, or pairings..."
                   />
                 </div>
 
-                <div className="bab-wizard-form-grid">
-                  <div>
-                    <label className="bab-form-label">Spice Level</label>
+                <div className="bab-menu-editor-grid">
+                  <div className="bab-menu-editor-field">
+                    <label className="bab-form-label" htmlFor="menu-item-spice">Spice Level</label>
                     <select
+                      id="menu-item-spice"
                       className="bab-form-select"
                       value={formData.spiceLevel}
                       onChange={(e) => setFormData({ ...formData, spiceLevel: e.target.value })}
@@ -576,9 +583,10 @@ export default function ManageMenuPage() {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="bab-form-label">Dietary Type</label>
+                  <div className="bab-menu-editor-field">
+                    <label className="bab-form-label" htmlFor="menu-item-dietary">Dietary Type</label>
                     <select
+                      id="menu-item-dietary"
                       className="bab-form-select"
                       value={formData.isVeg ? 'veg' : 'non-veg'}
                       onChange={(e) => setFormData({ ...formData, isVeg: e.target.value === 'veg' })}
@@ -589,9 +597,10 @@ export default function ManageMenuPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="bab-form-label">Key Ingredients</label>
+                <div className="bab-menu-editor-field">
+                  <label className="bab-form-label" htmlFor="menu-item-ingredients">Key Ingredients</label>
                   <input
+                    id="menu-item-ingredients"
                     type="text"
                     className="bab-form-input"
                     value={formData.ingredients}
@@ -600,9 +609,10 @@ export default function ManageMenuPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="bab-form-label">Photo Image URL</label>
+                <div className="bab-menu-editor-field">
+                  <label className="bab-form-label" htmlFor="menu-item-image-url">Photo Image URL</label>
                   <input
+                    id="menu-item-image-url"
                     type="url"
                     className="bab-form-input"
                     value={formData.imageUrl}
@@ -610,13 +620,13 @@ export default function ManageMenuPage() {
                     placeholder="https://..."
                   />
                   {formData.imageUrl && (
-                    <div style={{ marginTop: 8, height: 100, borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
-                      <img src={formData.imageUrl} alt="Dish preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div className="bab-menu-editor-preview">
+                      <img src={formData.imageUrl} alt="Dish preview" />
                     </div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 12 }}>
+                <div className="bab-menu-editor-actions">
                   <button
                     type="button"
                     className="bab-btn bab-btn--outline"
@@ -635,7 +645,7 @@ export default function ManageMenuPage() {
               </form>
             </div>
           </div>
-        )}
+        ), document.body)}
           </>
         )}
       </div>

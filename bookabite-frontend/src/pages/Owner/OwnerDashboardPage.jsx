@@ -158,7 +158,7 @@ export default function OwnerDashboardPage() {
 
           <div className="bab-owner-mascot-tip">
             <FoodMascot mood="serving" size={54} />
-            <p>Chef Pierre is tracking your reservations 24/7!</p>
+            <p>Your reservations and booking activity are available here.</p>
           </div>
         </aside>
 

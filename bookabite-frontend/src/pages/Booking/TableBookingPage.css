@@ -87,6 +87,7 @@
 
 /* FORM CARD */
 .bab-booking-card {
+  scroll-margin-top: 90px;
   background: var(--bab-bg-card);
   border: 1px solid var(--bab-border);
   border-radius: var(--bab-radius-lg);

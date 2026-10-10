@@ -70,7 +70,7 @@ export default function BookingConfirmationPage() {
           </div>
           <h1 className="bab-confirm-title">Your Table is Reserved!</h1>
           <p className="bab-confirm-subtitle">
-            A confirmation notification has been dispatched. Chef Pierre and the team at {restaurantName} look forward to welcoming you.
+            A confirmation notification has been dispatched. The team at {restaurantName} looks forward to welcoming you.
           </p>
         </div>
 

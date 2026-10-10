@@ -172,7 +172,7 @@ export default function HelpFAQPage() {
           <FoodMascot mood="happy" size={76} />
           <h3>Still Have Questions?</h3>
           <p>
-            Can't find what you are looking for? Our friendly concierge team and Chef Pierre are standing by to assist you.
+            Can't find what you are looking for? Our support team is ready to assist you.
           </p>
           <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
             <Link to="/contact" className="bab-btn bab-btn--secondary">

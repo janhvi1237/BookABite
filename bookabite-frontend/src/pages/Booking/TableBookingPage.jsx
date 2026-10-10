@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   HiCheck,
@@ -75,6 +75,7 @@ export default function TableBookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [payMethod, setPayMethod] = useState('upi');
   const [feeQuote, setFeeQuote] = useState(null);
+  const bookingCardRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -223,6 +224,9 @@ export default function TableBookingPage() {
       triggerReaction('serving', "Reviewing your table reservation pass...", 2500);
     }
     setStep((s) => Math.min(4, s + 1));
+    window.requestAnimationFrame(() => {
+      bookingCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
   const handlePrevStep = () => {
@@ -341,7 +345,7 @@ export default function TableBookingPage() {
         </div>
 
         {/* FORM CONTAINER */}
-        <div className="bab-booking-card">
+        <div ref={bookingCardRef} className="bab-booking-card">
           {/* STEP 1: DATE & TIME */}
           {step === 1 && (
             <div className="bab-booking-step-pane">
@@ -650,7 +654,7 @@ export default function TableBookingPage() {
 
               <div className="bab-booking-mascot-cheer">
                 <FoodMascot mood="celebrating" size={80} />
-                <p>Chef Pierre is getting everything ready. Your table will be held exclusively for you.</p>
+                <p>Your table will be held exclusively for you while we complete your reservation.</p>
               </div>
             </div>
           )}

@@ -122,7 +122,7 @@ export default function ContactPage() {
           {/* Form Card */}
           <div className="bab-contact-form-card">
             <h3>Send Us a Message</h3>
-            <p>Fill out the form below and Chef Pierre’s support squad will get back to you within 2 hours.</p>
+            <p>Fill out the form below and our support team will get back to you within 2 hours.</p>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>

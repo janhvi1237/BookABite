@@ -1,85 +1,66 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { lazy, Suspense } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 // Layout & Navigation
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import MobileBottomNav from './components/layout/MobileBottomNav';
-import MascotReaction from './components/mascot/MascotReaction';
 import ScrollToTop from './components/common/ScrollToTop';
+import SteamMark from './components/layout/SteamMark';
 
-// 24 Production Pages
-// 1. Home
-import HomePage from './pages/Home/HomePage';
-// 2. Explore Restaurants
-import ExplorePage from './pages/Explore/ExplorePage';
-// 3. Restaurant Details
-import RestaurantDetails from './pages/Restaurant/RestaurantDetails';
-// 4. Global Menu
-import MenuPage from './pages/Menu/MenuPage';
-// 5. Food / Dish Details
-import FoodDetailsPage from './pages/Food/FoodDetailsPage';
-// 6. Table Booking
-import TableBookingPage from './pages/Booking/TableBookingPage';
-// 7. Booking Confirmation
-import BookingConfirmationPage from './pages/Booking/BookingConfirmationPage';
-// 8. Customer Login
-import CustomerLoginPage from './pages/Auth/CustomerLoginPage';
-import LoginOptionsPage from './pages/Auth/LoginOptionsPage';
-// 9. Customer Register
-import CustomerRegisterPage from './pages/Auth/CustomerRegisterPage';
-import PasswordRecoveryPage from './pages/Auth/PasswordRecoveryPage';
-// 10. Owner Login
-import OwnerLoginPage from './pages/Owner/OwnerLoginPage';
-// 11. Owner Register
-import OwnerRegisterPage from './pages/Owner/OwnerRegisterPage';
-import OwnerPendingPage from './pages/Owner/OwnerPendingPage';
-// 12. Owner Dashboard
-import OwnerDashboardPage from './pages/Owner/OwnerDashboardPage';
-import OwnerReportsPage from './pages/Owner/OwnerReportsPage';
-import OwnerBillingPage from './pages/Owner/OwnerBillingPage';
-import RestaurantTableStatusPage from './pages/Owner/RestaurantTableStatusPage';
-import ManageTablesPage from './pages/Owner/ManageTablesPage';
-// 13. Add Restaurant
-import AddRestaurantPage from './pages/Owner/AddRestaurantPage';
-// 14. Edit Restaurant
-import EditRestaurantPage from './pages/Owner/EditRestaurantPage';
-// 15. Manage Menu
-import ManageMenuPage from './pages/Owner/ManageMenuPage';
-// 16. Manage Bookings
-import ManageBookingsPage from './pages/Owner/ManageBookingsPage';
-// 17. Customer Profile
-import CustomerProfilePage from './pages/Customer/CustomerProfilePage';
-// 18. My Bookings
-import MyBookingsPage from './pages/Customer/MyBookingsPage';
-// 19. Favorite Restaurants
-import FavoritesPage from './pages/Customer/FavoritesPage';
-// 20. Search Results
-import SearchResultsPage from './pages/Search/SearchResultsPage';
-// 21. About
-import AboutPage from './pages/About/AboutPage';
-// 22. Contact
-import ContactPage from './pages/Contact/ContactPage';
-// 23. Help & FAQ
-import HelpFAQPage from './pages/Help/HelpFAQPage';
-// 24. 404 Not Found
-import NotFoundPage from './pages/NotFound/NotFoundPage';
+const HomePage = lazy(() => import('./pages/Home/HomePage'));
+const ExplorePage = lazy(() => import('./pages/Explore/ExplorePage'));
+const RestaurantDetails = lazy(() => import('./pages/Restaurant/RestaurantDetails'));
+const MenuPage = lazy(() => import('./pages/Menu/MenuPage'));
+const FoodDetailsPage = lazy(() => import('./pages/Food/FoodDetailsPage'));
+const TableBookingPage = lazy(() => import('./pages/Booking/TableBookingPage'));
+const BookingConfirmationPage = lazy(() => import('./pages/Booking/BookingConfirmationPage'));
+const CustomerLoginPage = lazy(() => import('./pages/Auth/CustomerLoginPage'));
+const LoginOptionsPage = lazy(() => import('./pages/Auth/LoginOptionsPage'));
+const CustomerRegisterPage = lazy(() => import('./pages/Auth/CustomerRegisterPage'));
+const PasswordRecoveryPage = lazy(() => import('./pages/Auth/PasswordRecoveryPage'));
+const OwnerLoginPage = lazy(() => import('./pages/Owner/OwnerLoginPage'));
+const OwnerRegisterPage = lazy(() => import('./pages/Owner/OwnerRegisterPage'));
+const OwnerPendingPage = lazy(() => import('./pages/Owner/OwnerPendingPage'));
+const OwnerDashboardPage = lazy(() => import('./pages/Owner/OwnerDashboardPage'));
+const OwnerReportsPage = lazy(() => import('./pages/Owner/OwnerReportsPage'));
+const OwnerBillingPage = lazy(() => import('./pages/Owner/OwnerBillingPage'));
+const RestaurantTableStatusPage = lazy(() => import('./pages/Owner/RestaurantTableStatusPage'));
+const ManageTablesPage = lazy(() => import('./pages/Owner/ManageTablesPage'));
+const AddRestaurantPage = lazy(() => import('./pages/Owner/AddRestaurantPage'));
+const EditRestaurantPage = lazy(() => import('./pages/Owner/EditRestaurantPage'));
+const ManageMenuPage = lazy(() => import('./pages/Owner/ManageMenuPage'));
+const ManageBookingsPage = lazy(() => import('./pages/Owner/ManageBookingsPage'));
+const CustomerProfilePage = lazy(() => import('./pages/Customer/CustomerProfilePage'));
+const MyBookingsPage = lazy(() => import('./pages/Customer/MyBookingsPage'));
+const FavoritesPage = lazy(() => import('./pages/Customer/FavoritesPage'));
+const SearchResultsPage = lazy(() => import('./pages/Search/SearchResultsPage'));
+const AboutPage = lazy(() => import('./pages/About/AboutPage'));
+const ContactPage = lazy(() => import('./pages/Contact/ContactPage'));
+const HelpFAQPage = lazy(() => import('./pages/Help/HelpFAQPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFound/NotFoundPage'));
+const AdminLoginPage = lazy(() => import('./pages/Admin/AdminLoginPage'));
+const AdminDashboardPage = lazy(() => import('./pages/Admin/AdminDashboardPage'));
 
-// Admin + page guard
-import AdminLoginPage from './pages/Admin/AdminLoginPage';
-import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 import RequireRole from './components/common/RequireRole';
 
 const OWNER_ROLES = ['owner', 'admin'];
 
 export default function App() {
+  const location = useLocation();
+
   return (
     <div className="bab-app">
       <ScrollToTop />
       <Navbar />
 
       <main className="bab-app__main">
-        <Routes>
+        <div key={location.pathname} className="bab-page-transition">
+          <span className="bab-page-transition__steam">
+            <SteamMark size={36} animate />
+          </span>
+          <Suspense fallback={<div role="status" style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: 'var(--bab-text-muted)' }}>Loading page…</div>}>
+          <Routes>
           {/* 1. Home */}
           <Route path="/" element={<HomePage />} />
 
@@ -180,11 +161,10 @@ export default function App() {
 
           {/* 24. 404 Not Found Catch-All */}
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+          </Routes>
+          </Suspense>
+        </div>
       </main>
-
-      {/* Floating Interactive Mascot Assistant */}
-      <MascotReaction />
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />

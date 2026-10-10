@@ -52,7 +52,7 @@ export function ToastProvider({ children }) {
                 transition={{ duration: 0.2 }}
                 style={{
                   pointerEvents: 'auto',
-                  background: 'rgba(255, 255, 255, 0.96)',
+                  background: 'var(--bab-bg-card)',
                   backdropFilter: 'blur(12px)',
                   border: '1px solid var(--bab-border)',
                   boxShadow: 'var(--bab-shadow-lg)',

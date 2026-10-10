@@ -71,7 +71,7 @@ export default function RestaurantCard({ restaurant, isFavoritedInitially = fals
           disabled={favLoading}
           aria-label={isFav ? "Remove from favourites" : "Add to favourites"}
         >
-          {isFav ? <HiHeart size={20} color="#D65A3A" /> : <HiOutlineHeart size={20} />}
+          {isFav ? <HiHeart size={20} /> : <HiOutlineHeart size={20} />}
         </button>
       </Link>
 

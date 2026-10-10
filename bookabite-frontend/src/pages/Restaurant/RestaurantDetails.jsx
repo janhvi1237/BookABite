@@ -362,7 +362,7 @@ export default function RestaurantDetails() {
               <div className="bab-chef-highlight-box">
                 <FoodMascot mood="happy" size={70} />
                 <div>
-                  <h4>Chef Pierre&apos;s Ambiance Note</h4>
+                  <h4>Visit Tip</h4>
                   <p>
                     &ldquo;Arrive 15 minutes before sunset if you are reserving an outdoor or rooftop table to enjoy the golden hour skyline of {restaurant.area}!&rdquo;
                   </p>

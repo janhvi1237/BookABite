@@ -24,7 +24,7 @@
 .bab-navbar__logo {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 7px;
   color: #241510;
   text-decoration: none;
   flex-shrink: 0;
@@ -34,18 +34,12 @@
   color: #241510;
 }
 
-.bab-navbar__logo-mark {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9px;
-  background: #b45e39;
-  color: #fffaf6;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 17px;
-  font-weight: 600;
+.bab-navbar__logo .steam-mark {
+  transition: transform 0.25s ease;
+}
+
+.bab-navbar__logo:hover .steam-mark {
+  transform: translateY(-2px);
 }
 
 .bab-navbar__brand {
@@ -101,6 +95,25 @@
   align-items: center;
   gap: 9px;
   flex-shrink: 0;
+}
+
+.bab-navbar__theme-toggle {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(60, 35, 24, 0.12);
+  border-radius: 50%;
+  background: transparent;
+  color: #6e5b51;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.bab-navbar__theme-toggle:hover {
+  background: #f2e7df;
+  color: #b45e39;
 }
 
 .bab-navbar__icon-button {
@@ -228,11 +241,6 @@
 
   .bab-navbar__brand {
     font-size: 17px;
-  }
-
-  .bab-navbar__logo-mark {
-    width: 27px;
-    height: 27px;
   }
 
   .bab-navbar__links {

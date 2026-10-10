@@ -1,10 +1,13 @@
 import { Link, NavLink } from 'react-router-dom';
-import { Heart, LogIn, UserRound } from 'lucide-react';
+import { Heart, LogIn, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import SteamMark from './SteamMark';
 import './Navbar.css';
 
 export default function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const isOwnerAccount = user?.role === 'owner';
 
   return (
@@ -13,7 +16,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" className="bab-navbar__logo">
-          <span className="bab-navbar__logo-mark">B</span>
+          <SteamMark size={36} animate />
 
           <span className="bab-navbar__brand">
             Book<span>ABite</span>
@@ -67,6 +70,15 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="bab-navbar__actions">
+          <button
+            type="button"
+            className="bab-navbar__theme-toggle"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+          >
+            {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+          </button>
 
           {isAuthenticated ? (
             <>

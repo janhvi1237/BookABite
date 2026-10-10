@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   HiOutlineSparkles,
@@ -7,19 +7,10 @@ import {
   HiOutlineShieldCheck,
   HiOutlineUserGroup,
   HiOutlineStar,
-  HiArrowRight,
 } from 'react-icons/hi';
-import FoodMascot from '../../components/mascot/FoodMascot';
-import { useMascot } from '../../context/MascotContext';
 import './AboutPage.css';
 
 export default function AboutPage() {
-  const { triggerReaction } = useMascot();
-
-  useEffect(() => {
-    triggerReaction('serving', 'Welcome to BookABite! Here is how our story began.', 4000);
-  }, []);
-
   return (
     <div className="bab-about-page">
       {/* Hero Section */}
@@ -117,22 +108,6 @@ export default function AboutPage() {
                 We equip chefs and restaurant owners with modern table-management suites, real-time booking insights, and zero predatory platform fees.
               </p>
             </div>
-          </div>
-        </section>
-
-        {/* Mascot Spotlight */}
-        <section className="bab-mascot-spotlight">
-          <div>
-            <FoodMascot mood="celebrating" size={130} />
-          </div>
-          <div className="bab-mascot-spotlight__text">
-            <h2>Meet Chef Pierre, Your Digital Sommelier</h2>
-            <p>
-              Dining should be fun, warm, and interactive. Chef Pierre pops in to celebrate your table confirmations, recommend specialty appetizers, and make your food discovery feel alive.
-            </p>
-            <Link to="/explore" className="bab-btn bab-btn--gold" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              Let Chef Pierre Guide You <HiArrowRight size={16} />
-            </Link>
           </div>
         </section>
 
